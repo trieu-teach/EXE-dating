@@ -1,0 +1,133 @@
+/* Layout & surfaces — chuẩn web hẹn hò SameMess */
+
+.dating-page {
+  width: 100%;
+}
+
+.dating-page-header {
+  margin-bottom: 24px;
+}
+
+.dating-page-header h1 {
+  margin: 0 0 6px;
+  font-size: clamp(26px, 3.5vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
+}
+
+.dating-page-header p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+
+.dating-panel {
+  padding: 24px 28px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.dating-card {
+  padding: 18px 20px;
+  background: var(--card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.dating-card:hover {
+  border-color: var(--user-pink-border);
+  box-shadow: var(--shadow-md);
+}
+
+.dating-card--interactive:hover {
+  transform: translateY(-2px);
+}
+
+.dating-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  background: var(--card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--dur) var(--ease);
+}
+
+.dating-chip:hover {
+  color: var(--foreground);
+  border-color: var(--user-pink-border);
+}
+
+.dating-chip--active {
+  color: #fff;
+  background: var(--brand-gradient);
+  border-color: transparent;
+  box-shadow: var(--shadow-brand);
+}
+
+.dating-stat {
+  text-align: center;
+}
+
+.dating-stat strong {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.dating-stat span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+
+.dating-match-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--user-pink-dark);
+  background: var(--user-pink-light);
+  border-radius: var(--radius-pill);
+}
+
+.dating-empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--muted-foreground);
+}
+
+.dating-empty strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: var(--foreground);
+}
+
+@media (max-width: 640px) {
+  .dating-panel {
+    padding: 18px 16px;
+  }
+}

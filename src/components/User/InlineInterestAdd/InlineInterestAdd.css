@@ -1,0 +1,48 @@
+.inline-interest-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.inline-interest-add__input {
+  flex: 1;
+  min-width: 140px;
+  height: 40px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--foreground);
+  background: var(--card);
+  border: 1.5px solid var(--user-pink-border);
+  border-radius: var(--radius-md);
+  outline: none;
+}
+
+.inline-interest-add__input:focus {
+  box-shadow: 0 0 0 3px var(--user-pink-focus);
+}
+
+.inline-interest-add__save {
+  padding: 8px 16px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--brand-gradient);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.inline-interest-add__cancel {
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}

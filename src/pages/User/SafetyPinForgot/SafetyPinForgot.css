@@ -1,0 +1,21 @@
+.safety-pin-forgot {
+  text-align: left;
+}
+
+.safety-pin-forgot .page-header {
+  margin-bottom: 20px;
+}
+
+.safety-pin-forgot .flow-card__icon,
+.safety-pin-forgot h1,
+.safety-pin-forgot .flow-card__desc {
+  text-align: center;
+}
+
+.safety-pin-forgot__note {
+  margin: 16px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  text-align: center;
+}

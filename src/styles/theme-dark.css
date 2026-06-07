@@ -1,0 +1,167 @@
+/* Dark theme — override tokens & vài surface hardcoded */
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --user-pink-light: rgba(226, 85, 122, 0.14);
+  --user-pink-border: rgba(240, 164, 188, 0.28);
+  --user-pink-card: rgba(226, 85, 122, 0.12);
+  --user-pink-focus: rgba(240, 164, 188, 0.28);
+
+  --background: #141014;
+  --foreground: #f5f0f2;
+  --card: #221a1f;
+  --card-foreground: #f5f0f2;
+  --muted: #2a2228;
+  --muted-foreground: #b5a8b0;
+  --subtle: #1c161a;
+  --border-soft: #3d3339;
+  --input-bg: #1e181c;
+  --ring: rgba(240, 164, 188, 0.42);
+  --ring-offset: #141014;
+  --elevated: #2e262c;
+
+  --glass-bg: rgba(34, 26, 31, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.08);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 32px 64px -20px rgba(0, 0, 0, 0.65);
+  --shadow-brand: 0 12px 32px -8px rgba(226, 85, 122, 0.45);
+
+  /* Legacy index.css aliases */
+  --text: #f5f0f2;
+  --text-h: #faf7f9;
+  --bg: #141014;
+  --border: #3d3339;
+  --code-bg: #2a2228;
+  --social-bg: rgba(42, 34, 40, 0.6);
+}
+
+[data-theme='dark'] ::selection {
+  background: rgba(226, 85, 122, 0.45);
+  color: #fff;
+}
+
+[data-theme='dark'] * {
+  scrollbar-color: #4a4046 transparent;
+}
+
+[data-theme='dark'] *::-webkit-scrollbar-thumb {
+  background: #4a4046;
+}
+
+[data-theme='dark'] *::-webkit-scrollbar-thumb:hover {
+  background: #5c5158;
+}
+
+/* App shell & auth pages */
+[data-theme='dark'] .app-shell {
+  background:
+    radial-gradient(ellipse 100% 80% at 50% -30%, rgba(201, 61, 102, 0.22), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 100% 50%, rgba(226, 85, 122, 0.1), transparent 45%),
+    radial-gradient(ellipse 60% 40% at 0% 80%, rgba(240, 164, 188, 0.08), transparent 50%),
+    var(--background);
+}
+
+[data-theme='dark'] .app-shell__bg::after {
+  background-image: radial-gradient(circle at 1px 1px, rgba(240, 164, 188, 0.08) 1px, transparent 0);
+}
+
+[data-theme='dark'] .app-shell__blob--1 {
+  background: rgba(201, 61, 102, 0.35);
+}
+
+[data-theme='dark'] .app-shell__blob--2 {
+  background: rgba(226, 85, 122, 0.25);
+}
+
+[data-theme='dark'] .user-page {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(201, 61, 102, 0.2), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(226, 85, 122, 0.12), transparent 50%),
+    linear-gradient(165deg, #1a1418 0%, #141014 45%, #120e11 100%);
+}
+
+[data-theme='dark'] .user-card::before {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(226, 85, 122, 0.25));
+}
+
+/* Filter / chip surfaces */
+[data-theme='dark'] .search-gender-btn,
+[data-theme='dark'] .search-proximity-btn:not(.search-proximity-btn--active),
+[data-theme='dark'] .search-mood-btn:not(.search-mood-btn--active),
+[data-theme='dark'] .search-want-btn:not(.search-want-btn--active),
+[data-theme='dark'] .search-tag-picker__btn:not(.search-tag-picker__btn--on) {
+  background: var(--elevated);
+  border-color: var(--border-soft);
+  color: var(--muted-foreground);
+}
+
+[data-theme='dark'] .search-filters__block--highlight {
+  background: linear-gradient(145deg, rgba(226, 85, 122, 0.12), rgba(34, 26, 31, 0.95));
+}
+
+[data-theme='dark'] .interest-group {
+  background: var(--muted);
+  border-color: var(--border-soft);
+}
+
+[data-theme='dark'] .interest-chip:not(.interest-chip--selected) {
+  background: var(--card);
+  border-color: var(--border-soft);
+}
+
+[data-theme='dark'] .interest-chip:hover {
+  background: var(--elevated);
+}
+
+[data-theme='dark'] .profile-hero__avatar,
+[data-theme='dark'] .discovery-card,
+[data-theme='dark'] .match-success-avatar {
+  border-color: var(--border-soft);
+}
+
+[data-theme='dark'] .profile-hero::before {
+  opacity: 0.12;
+}
+
+[data-theme='dark'] .profile-info-form__section--required {
+  background: linear-gradient(180deg, rgba(226, 85, 122, 0.1) 0%, var(--card) 56px);
+}
+
+[data-theme='dark'] .interest-add-menu__trigger:hover {
+  background: var(--elevated);
+}
+
+[data-theme='dark'] .chat-bubble--in,
+[data-theme='dark'] .chat-sidebar__item:not(.chat-sidebar__item--active) {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+[data-theme='dark'] .chat-bubble--out {
+  background: var(--brand-gradient);
+  color: #fff;
+}
+
+[data-theme='dark'] .settings-show-btn:not(.settings-show-btn--active) {
+  background: var(--elevated);
+  border-color: var(--border-soft);
+  color: var(--muted-foreground);
+}
+
+[data-theme='dark'] .event-history-hero,
+[data-theme='dark'] .daily-connection-streak {
+  background: linear-gradient(135deg, rgba(226, 85, 122, 0.15), var(--card));
+}
+
+[data-theme='dark'] .emergency-alert-banner {
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.15), rgba(34, 26, 31, 0.95));
+}
+
+[data-theme='dark'] .love-tree-page .surface-glass,
+[data-theme='dark'] .lt-scene__backdrop .lt-scene__mesh {
+  opacity: 0.85;
+}

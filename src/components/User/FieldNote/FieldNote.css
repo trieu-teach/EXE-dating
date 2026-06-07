@@ -1,0 +1,10 @@
+.field-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+}
+
+.profile-field--error .field-note {
+  color: var(--muted-foreground);
+}

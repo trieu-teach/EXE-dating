@@ -1,0 +1,126 @@
+.emergency-page {
+  width: 100%;
+}
+
+.emergency-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.emergency-alert-card {
+  padding: 24px;
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+  border: 1px solid #fed7aa;
+  border-radius: 20px;
+}
+
+.emergency-alert-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #c2410c;
+  background: var(--card);
+  border-radius: 999px;
+}
+
+.emergency-alert-card p {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+
+.emergency-alert-card__time {
+  font-size: 13px !important;
+  color: var(--muted-foreground) !important;
+}
+
+.emergency-map-card {
+  padding: 22px;
+  background: var(--card);
+  border: 1px solid var(--user-pink-border);
+  border-radius: 20px;
+  text-align: center;
+}
+
+.emergency-map-card__visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  margin-bottom: 14px;
+  background: linear-gradient(180deg, #e8f4ea, #d4edda);
+  border-radius: 14px;
+}
+
+.emergency-map-card__pin {
+  font-size: 40px;
+}
+
+.emergency-map-card h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  color: var(--foreground);
+}
+
+.emergency-map-card p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+.emergency-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.emergency-btn {
+  padding: 14px 20px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.emergency-btn--urgent {
+  color: #fff;
+  background: linear-gradient(135deg, #fb923c, #ea580c);
+  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.35);
+}
+
+.emergency-actions__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.emergency-btn--secondary {
+  color: var(--foreground);
+  background: var(--card);
+  border: 1px solid #e5e5e5;
+}
+
+.emergency-demo-link {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--user-pink-dark);
+  text-align: center;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .emergency-layout {
+    grid-template-columns: 1fr;
+  }
+}

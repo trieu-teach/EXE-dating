@@ -1,0 +1,124 @@
+.connection-reminder-list {
+  margin: 0 8px 10px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--user-pink-border);
+  border-radius: var(--radius-md);
+}
+
+.connection-reminder-list--compact {
+  padding: 10px;
+}
+
+.connection-reminder-list__head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.connection-reminder-list__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--brand-gradient);
+  border-radius: var(--radius-pill);
+}
+
+.connection-reminder-list__head strong {
+  display: block;
+  font-size: 13px;
+  color: var(--foreground);
+}
+
+.connection-reminder-list__head p {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.connection-reminder-list__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.connection-reminder-list__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.connection-reminder-list__item + .connection-reminder-list__item {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-soft);
+}
+
+.connection-reminder-list__meet-btn {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.connection-reminder-list__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.connection-reminder-list__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--user-pink-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.connection-reminder-list__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.connection-reminder-list__info strong {
+  display: block;
+  font-size: 13px;
+}
+
+.connection-reminder-list__info span {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.connection-reminder-list__warmth {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand-600);
+}

@@ -1,0 +1,316 @@
+.create-profile-page {
+  padding: 24px 16px 40px;
+}
+
+.create-profile-shell {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: min(800px, var(--layout-max));
+  margin-inline: auto;
+  padding-inline: var(--layout-padding-x);
+  box-sizing: border-box;
+}
+
+.create-profile-topbar {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.create-profile-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--foreground);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease);
+}
+
+.create-profile-back:hover {
+  background: var(--user-pink-light);
+}
+
+.create-profile-back svg {
+  width: 22px;
+  height: 22px;
+}
+
+.create-profile-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--foreground);
+}
+
+.create-profile-topbar-spacer {
+  width: 40px;
+}
+
+.create-profile-progress {
+  margin-bottom: 24px;
+}
+
+.create-profile-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.create-profile-progress-track {
+  height: 6px;
+  overflow: hidden;
+  background: var(--muted);
+  border-radius: var(--radius-pill);
+}
+
+.create-profile-progress-fill {
+  height: 100%;
+  background: var(--brand-gradient);
+  border-radius: var(--radius-pill);
+  transition: width 0.3s var(--ease);
+}
+
+.create-profile-main {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.create-profile-section {
+  padding: 28px 24px 32px;
+}
+
+.create-profile-section h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.create-profile-desc {
+  margin: 0 0 24px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+
+.create-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.create-profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.create-profile-field input,
+.create-profile-field textarea,
+.create-profile-field select {
+  padding: 12px 16px;
+  font: inherit;
+  font-weight: 400;
+  color: var(--foreground);
+  background: var(--input-bg);
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  outline: none;
+  resize: vertical;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.create-profile-field input:focus,
+.create-profile-field textarea:focus,
+.create-profile-field select:focus {
+  border-color: var(--user-pink-dark);
+  box-shadow: 0 0 0 4px var(--user-pink-focus);
+}
+
+.create-profile-field input::placeholder,
+.create-profile-field textarea::placeholder {
+  color: var(--muted-foreground);
+}
+
+.create-profile-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.create-profile-photos h3 {
+  margin: 8px 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.create-profile-photo-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  min-height: 220px;
+}
+
+.create-profile-photo-slot {
+  position: relative;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--subtle);
+  border: 2px dashed var(--user-pink-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.create-profile-photo-slot--main {
+  grid-row: 1 / span 2;
+}
+
+.create-profile-photo-slot:hover {
+  border-color: var(--user-pink-dark);
+  transform: scale(1.01);
+}
+
+.create-profile-photo-slot--filled {
+  border-style: solid;
+  border-color: var(--user-pink-dark);
+}
+
+.create-profile-photo-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.create-profile-photo-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--user-pink-dark);
+}
+
+.create-profile-photo-add svg {
+  width: 28px;
+  height: 28px;
+}
+
+.create-profile-photo-tip {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+
+.create-profile-photo-tip--req {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.create-profile-form-error {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b91c1c;
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: var(--radius-md);
+}
+
+.create-profile-section .profile-info-form {
+  margin-bottom: 20px;
+}
+
+.create-profile-file-input {
+  display: none;
+}
+
+.create-profile-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.create-profile-btn-primary {
+  width: 100%;
+  padding: 14px 20px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--brand-gradient);
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  box-shadow: var(--shadow-brand);
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.create-profile-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 40px -8px var(--brand-glow);
+}
+
+.create-profile-skip {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+
+.create-profile-skip:hover {
+  color: var(--user-pink-dark);
+}
+
+@media (max-width: 560px) {
+  .create-profile-page {
+    padding: 16px 12px 32px;
+  }
+
+  .create-profile-section {
+    padding: 22px 16px 26px;
+  }
+
+  .create-profile-row {
+    grid-template-columns: 1fr;
+  }
+
+  .create-profile-photo-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    min-height: auto;
+  }
+
+  .create-profile-photo-slot--main {
+    grid-row: auto;
+  }
+
+  .create-profile-photo-slot {
+    aspect-ratio: 1;
+  }
+}

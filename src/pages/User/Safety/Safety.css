@@ -1,0 +1,141 @@
+.safety-layout {
+  display: grid;
+  grid-template-columns: 1fr minmax(300px, 380px);
+  gap: 24px;
+  align-items: start;
+}
+
+.safety-panel {
+  max-width: 100%;
+}
+
+.safety-section {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.safety-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 8px;
+}
+
+.safety-section__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.safety-section__hint {
+  margin: -8px 0 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+.safety-save-btn {
+  max-width: 100%;
+}
+
+.safety-map-card {
+  padding: 24px;
+  background: var(--card);
+  border: 1px solid var(--user-pink-border);
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(232, 164, 184, 0.12);
+}
+
+.safety-map-card__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 20px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.safety-map-visual {
+  position: relative;
+  height: 220px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #e8f4ea 0%, #d4edda 100%);
+  border-radius: 16px;
+}
+
+.safety-map-visual__ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  border: 2px dashed var(--user-pink);
+  border-radius: 50%;
+  background: rgba(232, 164, 184, 0.15);
+  transform: translate(-50%, -50%);
+}
+
+.safety-map-visual__pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
+  background: var(--user-pink-dark);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -50%);
+}
+
+.safety-map-card__radius {
+  margin: 0 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--user-pink-dark);
+  text-align: center;
+}
+
+.safety-map-tips {
+  margin: 0;
+  padding: 0 0 0 18px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+
+.safety-map-tips li + li {
+  margin-top: 8px;
+}
+
+.safety-quick-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.safety-quick-links a {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--user-pink-dark);
+  text-decoration: none;
+}
+
+.safety-quick-links a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .safety-layout {
+    grid-template-columns: 1fr;
+  }
+}

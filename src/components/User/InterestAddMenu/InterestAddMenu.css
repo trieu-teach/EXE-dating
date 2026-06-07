@@ -1,0 +1,62 @@
+.interest-add-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.interest-add-menu__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--user-pink-dark);
+  background: var(--user-pink-light);
+  border: 1px solid var(--user-pink-border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    background var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.interest-add-menu__trigger:hover {
+  background: #fff;
+  transform: scale(1.06);
+}
+
+.interest-add-menu__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  min-width: 200px;
+  padding: 6px;
+  background: var(--card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.interest-add-menu__menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--foreground);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.interest-add-menu__menu button:hover {
+  background: var(--user-pink-light);
+  color: var(--user-pink-dark);
+}

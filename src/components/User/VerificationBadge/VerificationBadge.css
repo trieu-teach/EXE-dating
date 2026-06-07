@@ -1,0 +1,56 @@
+.verify-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.verify-badge--sm {
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.verify-badge--lg {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.verify-badge--verified {
+  color: #166534;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.verify-badge--unverified {
+  color: #9a3412;
+  background: rgba(251, 146, 60, 0.12);
+  border: 1px solid rgba(251, 146, 60, 0.35);
+}
+
+[data-theme='dark'] .verify-badge--verified {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.18);
+}
+
+[data-theme='dark'] .verify-badge--unverified {
+  color: #fdba74;
+  background: rgba(251, 146, 60, 0.15);
+}
+
+.verify-badge__icon {
+  display: inline-flex;
+  font-size: 1em;
+}
+
+.verify-badge__trust {
+  padding-left: 6px;
+  margin-left: 2px;
+  border-left: 1px solid currentColor;
+  opacity: 0.85;
+  font-weight: 600;
+}

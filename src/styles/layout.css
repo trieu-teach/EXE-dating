@@ -1,0 +1,9 @@
+/* Layout shell — đồng bộ nav + nội dung, tận dụng chiều ngang */
+
+.layout-container {
+  width: 100%;
+  max-width: var(--layout-max);
+  margin-inline: auto;
+  padding-inline: var(--layout-padding-x);
+  box-sizing: border-box;
+}

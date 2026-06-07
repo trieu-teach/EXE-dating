@@ -1,0 +1,142 @@
+.level-up-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100svh - 100px);
+  padding: 24px;
+}
+
+.level-up-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 36px 32px;
+  text-align: center;
+  background: var(--card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  animation: ui-scale-in 0.4s var(--ease) both;
+}
+
+.level-up-card__visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 180px;
+  margin-bottom: 24px;
+  background: linear-gradient(180deg, #1a2e1a 0%, #2d4a2d 50%, #3d5c3d 100%);
+  border-radius: 20px;
+}
+
+.level-up-card__sprout {
+  font-size: 64px;
+  filter: drop-shadow(0 0 20px rgba(134, 239, 172, 0.6));
+}
+
+.level-up-card__badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+.level-up-card h1 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.level-up-card > p {
+  margin: 0 0 24px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+
+.level-up-rewards {
+  margin-bottom: 24px;
+  padding: 20px;
+  text-align: left;
+  background: #fafafa;
+  border-radius: 16px;
+}
+
+.level-up-rewards h2 {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+}
+
+.level-up-rewards ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.level-up-rewards li {
+  display: flex;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.level-up-rewards li:last-child {
+  border-bottom: none;
+}
+
+.level-up-rewards li span:first-child {
+  font-size: 24px;
+}
+
+.level-up-rewards strong {
+  display: block;
+  font-size: 15px;
+  color: var(--foreground);
+}
+
+.level-up-rewards li span:last-child {
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+
+.level-up-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  background: var(--brand-gradient);
+  border-radius: 999px;
+  box-shadow: var(--shadow-brand);
+  transition: filter var(--dur) var(--ease);
+}
+
+.level-up-btn:hover {
+  filter: saturate(1.05);
+}
+
+.level-up-share {
+  margin-top: 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--user-pink-dark);
+  background: none;
+  border: none;
+  cursor: pointer;
+}

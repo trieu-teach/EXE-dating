@@ -1,0 +1,89 @@
+.login-page {
+  position: relative;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 44px 40px;
+  text-align: left;
+}
+
+.login-header {
+  margin-bottom: 32px;
+}
+
+.login-header h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.login-header p {
+  color: var(--muted-foreground);
+  font-size: 16px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.login-forgot-wrap {
+  margin: -6px 0 0;
+  text-align: right;
+}
+
+.login-forgot {
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-forgot:hover {
+  text-decoration: underline;
+}
+
+.login-submit {
+  margin-top: 8px;
+  height: 52px;
+  padding: 0 24px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.login-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.login-footer {
+  margin: 28px 0 0;
+  padding-top: 24px;
+  font-size: 14px;
+  text-align: center;
+  color: var(--muted-foreground);
+  border-top: 1px solid var(--border-soft);
+}
+
+.login-footer a {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 24px;
+  }
+}

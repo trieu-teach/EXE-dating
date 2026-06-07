@@ -1,0 +1,91 @@
+/* Glass & elevated surfaces — dating app premium feel */
+
+.surface-glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: var(--shadow-md);
+}
+
+.surface-panel {
+  background: var(--card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.surface-panel--lift {
+  transition:
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.surface-panel--lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--user-pink-border);
+}
+
+/* Gradient border card (modern bento) */
+.surface-gradient-border {
+  position: relative;
+  padding: 1px;
+  border-radius: calc(var(--radius-xl) + 1px);
+  background: var(--brand-gradient-soft);
+}
+
+.surface-gradient-border > * {
+  border-radius: var(--radius-xl);
+  background: var(--card);
+}
+
+.text-gradient {
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--user-pink-dark);
+}
+
+.page-title {
+  margin: 0 0 8px;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--foreground);
+}
+
+.page-subtitle {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+
+/* Glow halo behind hero cards */
+.glow-halo {
+  position: relative;
+}
+
+.glow-halo::before {
+  content: '';
+  position: absolute;
+  inset: -20px -10px -30px;
+  z-index: -1;
+  background: var(--brand-gradient);
+  border-radius: 50%;
+  filter: blur(48px);
+  opacity: 0.28;
+  pointer-events: none;
+}
