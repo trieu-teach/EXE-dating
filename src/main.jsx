@@ -9,6 +9,7 @@ import './styles/theme-dark.css'
 import './styles/ui.css'
 import './styles/surface.css'
 import './styles/dating-shared.css'
+import './styles/admin.css'
 import App from './App.jsx'
 
 initTheme()

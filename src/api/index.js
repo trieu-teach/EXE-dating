@@ -14,3 +14,18 @@ export { safetyService } from './services/safety.service.js'
 export { searchService } from './services/search.service.js'
 export { settingsService } from './services/settings.service.js'
 export { connectionRemindersService } from './services/connectionReminders.service.js'
+
+// Admin services
+export {
+  adminAuthService,
+  adminDashboardService,
+  adminUsersService,
+  adminVerificationsService,
+  adminReportsService,
+  adminEventsService,
+  adminPremiumService,
+  adminInterestsService,
+  adminSettingsService,
+  adminPhotosService,
+  adminAuditService,
+} from './services/admin.service.js'

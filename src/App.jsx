@@ -33,6 +33,19 @@ import Register from './pages/User/Register/Register.jsx'
 import ResetPassword from './pages/User/ResetPassword/ResetPassword.jsx'
 import VerifyOtp from './pages/User/VerifyOtp/VerifyOtp.jsx'
 
+// Admin
+import AdminLogin from './pages/Admin/Login/Login.jsx'
+import Dashboard from './pages/Admin/Dashboard/Dashboard.jsx'
+import Users from './pages/Admin/Users/Users.jsx'
+import Verifications from './pages/Admin/Verifications/Verifications.jsx'
+import Reports from './pages/Admin/Reports/Reports.jsx'
+import EventsAdmin from './pages/Admin/Events/Events.jsx'
+import Photos from './pages/Admin/Photos/Photos.jsx'
+import PremiumAdmin from './pages/Admin/Premium/Premium.jsx'
+import InterestsAdmin from './pages/Admin/Interests/Interests.jsx'
+import AdminSettings from './pages/Admin/Settings/Settings.jsx'
+import Audit from './pages/Admin/Audit/Audit.jsx'
+
 function App() {
   return (
     <BrowserRouter>
@@ -72,6 +85,20 @@ function App() {
         <Route path="/settings/change-password" element={<ChangePassword />} />
         <Route path="/settings/discovery" element={<DiscoverySettings />} />
         <Route path="/settings/interests" element={<Interests />} />
+
+        {/* Admin */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<Dashboard />} />
+        <Route path="/admin/users" element={<Users />} />
+        <Route path="/admin/verifications" element={<Verifications />} />
+        <Route path="/admin/reports" element={<Reports />} />
+        <Route path="/admin/photos" element={<Photos />} />
+        <Route path="/admin/events" element={<EventsAdmin />} />
+        <Route path="/admin/premium" element={<PremiumAdmin />} />
+        <Route path="/admin/interests" element={<InterestsAdmin />} />
+        <Route path="/admin/settings" element={<AdminSettings />} />
+        <Route path="/admin/audit" element={<Audit />} />
+
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
