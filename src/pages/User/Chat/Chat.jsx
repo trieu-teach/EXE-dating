@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { SearchIcon, SendIcon, Sparkles2Icon, HeartChatIcon, Check2Icon, LightbulbIcon, XSmallIcon } from '../../../components/ui/CustomIcons.jsx'
+import { SearchIcon, SendIcon, Sparkles2Icon, HeartChatIcon, Check2Icon, LightbulbIcon, XSmallIcon, ArrowUpIcon } from '../../../components/ui/CustomIcons.jsx'
 import { chatService, plantsService, connectionRemindersService, meetupService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { timeAgo } from '../../../utils/format.js'
