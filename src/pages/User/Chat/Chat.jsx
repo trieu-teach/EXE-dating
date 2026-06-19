@@ -1,459 +1,415 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { chatService, connectionRemindersService } from '../../../api/index.js'
-import { formatMessageTime } from '../../../api/mocks/chat.mock.js'
-import AppShell from '../../../components/User/AppShell/AppShell.jsx'
-import AsyncContent from '../../../components/User/AsyncContent/AsyncContent.jsx'
-import ChatAiAssistant from '../../../components/User/ChatAiAssistant/ChatAiAssistant.jsx'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { SearchIcon, SendIcon, Sparkles2Icon, HeartChatIcon, Check2Icon, LightbulbIcon, XSmallIcon } from '../../../components/ui/CustomIcons.jsx'
+import { chatService, plantsService, connectionRemindersService, meetupService } from '../../../api'
+import { useToast } from '../../../context/ToastContext.jsx'
+import { timeAgo } from '../../../utils/format.js'
 import ChatThreadToolbar from '../../../components/User/ChatThreadToolbar/ChatThreadToolbar.jsx'
-import ConnectionReminderList from '../../../components/User/ConnectionReminderList/ConnectionReminderList.jsx'
+import AISuggestionPanel from '../../../components/User/AISuggestionPanel/AISuggestionPanel.jsx'
 import LoveTreeBondBar from '../../../components/User/LoveTreeBondBar/LoveTreeBondBar.jsx'
-import { buildQuickNudgeMessage } from '../../../data/connectionNudges.js'
-import { useAsync } from '../../../hooks/useAsync.js'
-import { useMutation } from '../../../hooks/useMutation.js'
-import {
-  getConversationTracking,
-  markDateInviteHandled,
-  markNudgeDismissed,
-} from '../../../utils/connectionTracking.js'
-import {
-  canSuggestDateFromTree,
-  getLoveTreeState,
-} from '../../../utils/loveTreeState.js'
+import VenueMessage from '../../../components/User/VenueMessage/VenueMessage.jsx'
+import VenueDetailModal from '../../../components/User/VenueDetailModal/VenueDetailModal.jsx'
+import { Avatar } from '../../../components/ui/Avatar.jsx'
 import './Chat.css'
 
-function Chat() {
-  const { conversationId: paramId } = useParams()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const matchState = location.state
-  const hasThread = Boolean(paramId)
-  const chatBodyRef = useRef(null)
-
-  const [messages, setMessages] = useState([])
-  const [dailyQuest, setDailyQuest] = useState(null)
-  const [draft, setDraft] = useState('')
-  const [aiOpen, setAiOpen] = useState(false)
-  const [aiData, setAiData] = useState({ suggestions: [], insight: '' })
-  const [aiLoading, setAiLoading] = useState(false)
-  const [activeNudges, setActiveNudges] = useState([])
-  const [treeState, setTreeState] = useState({ level: 1, attachmentPercent: 0 })
-
-  const {
-    data: convData,
-    loading: convLoading,
-    error: convError,
-    refetch: refetchConversations,
-  } = useAsync(() => chatService.getConversations(), [])
-
-  const {
-    data: msgData,
-    loading: msgLoading,
-    error: msgError,
-    refetch: refetchMessages,
-  } = useAsync(
-    () => (paramId ? chatService.getMessages(paramId) : Promise.resolve(null)),
-    [paramId],
-  )
-
-  const conversations = convData?.conversations ?? []
-
-  const messagesByConvo = paramId ? { [paramId]: messages } : {}
-
-  const { data: reminderData, refetch: refetchReminders } = useAsync(
-    () =>
-      conversations.length
-        ? connectionRemindersService.getReminders(conversations, messagesByConvo)
-        : Promise.resolve({ reminders: [], total: 0, headline: '' }),
-    [conversations, messages],
-  )
-
-  const reminders = reminderData?.reminders ?? []
-
-  useEffect(() => {
-    if (!paramId || !matchState?.partnerName) return
-    chatService.ensureConversation({
-      id: paramId,
-      name: matchState.partnerName,
-      image: matchState.partnerImage,
-      matchPercent: matchState.matchPercent,
+function formatMeetupTime(iso) {
+  if (!iso) return '—'
+  try {
+    return new Date(iso).toLocaleString('vi-VN', {
+      weekday: 'short', day: '2-digit', month: '2-digit',
+      year: 'numeric', hour: '2-digit', minute: '2-digit',
     })
-    refetchConversations()
-  }, [paramId, matchState, refetchConversations])
+  } catch { return iso }
+}
 
+const convListVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.04, delayChildren: 0.05 },
+  },
+}
+
+const convItemVariants = {
+  hidden: { opacity: 0, y: 8 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.2, ease: 'easeOut' } },
+}
+
+const msgVariants = {
+  hidden: { opacity: 0, y: 10, scale: 0.97 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.22, ease: 'easeOut' } },
+}
+
+const threadVariants = {
+  hidden: { opacity: 0, x: 20 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.25, ease: 'easeOut' } },
+  exit: { opacity: 0, x: -20, transition: { duration: 0.15 } },
+}
+
+export default function Chat() {
+  const { conversationId } = useParams()
+  const navigate = useNavigate()
+  const toast = useToast()
+  const messagesEnd = useRef(null)
+
+  const [conversations, setConversations] = useState([])
+  const [convLoading, setConvLoading] = useState(true)
+  const [conversation, setConversation] = useState(null)
+  const [messages, setMessages] = useState([])
+  const [threadLoading, setThreadLoading] = useState(false)
+  const [text, setText] = useState('')
+  const [sending, setSending] = useState(false)
+  const [plant, setPlant] = useState(null)
+  const [watering, setWatering] = useState(false)
+  const [nudges, setNudges] = useState([])
+  const [meetups, setMeetups] = useState([])
+  const [detailVenue, setDetailVenue] = useState(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [responding, setResponding] = useState(null)
+  const [search, setSearch] = useState('')
+
+  // Load conversation list
   useEffect(() => {
-    if (!paramId || !matchState?.showMeetup) return
-    navigate(`/meet-up/${paramId}`, { replace: true })
-  }, [paramId, matchState?.showMeetup, navigate])
+    chatService.conversations()
+      .then((list) => setConversations(Array.isArray(list) ? list : (list?.items ?? [])))
+      .catch(() => setConversations([]))
+      .finally(() => setConvLoading(false))
+  }, [])
 
-  const activeConvo = paramId
-    ? conversations.find((c) => c.id === paramId) ??
-      (matchState?.partnerName
-        ? {
-            id: paramId,
-            partnerId: paramId,
-            partnerName: matchState.partnerName,
-            partnerAvatar: '💕',
-            partnerImage: matchState.partnerImage,
-            matchPercent: matchState.matchPercent ?? '—',
-            status: 'Vừa match',
-            lastMessage: '',
-            unreadCount: 0,
-          }
-        : null)
-    : null
-
-  const loadConversationNudges = useCallback(async () => {
-    if (!activeConvo) {
-      setActiveNudges([])
-      return
+  // Resolve active conversation from URL
+  useEffect(() => {
+    if (!conversationId) return
+    const found = conversations.find((c) => c.id === conversationId)
+    if (found) {
+      setConversation(found)
+    } else {
+      setConversation({ id: conversationId })
     }
-    const result = await connectionRemindersService.getConversationNudges(activeConvo, messages)
-    setActiveNudges(result.nudges ?? [])
-  }, [activeConvo, messages])
+  }, [conversationId, conversations])
 
+  // Load thread messages & related data
   useEffect(() => {
-    if (msgData?.messages) {
-      setMessages(msgData.messages)
-      if (paramId) setTreeState(getLoveTreeState(paramId))
+    if (!conversation?.id) return
+    let cancelled = false
+    setThreadLoading(true)
+    setMessages([])
+    setPlant(null)
+    setNudges([])
+    setMeetups([])
+
+    chatService.messages(conversation.id, { limit: 50 })
+      .then((list) => { if (!cancelled) setMessages(Array.isArray(list) ? list : (list?.items ?? [])) })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setThreadLoading(false) })
+
+    chatService.markRead(conversation.id).catch(() => {})
+
+    if (conversation?.matchId) {
+      plantsService.get(conversation.matchId)
+        .then((p) => { if (!cancelled) setPlant(p) })
+        .catch(() => {})
+      connectionRemindersService.nudges(conversation.id)
+        .then((n) => { if (!cancelled) setNudges(Array.isArray(n?.items) ? n.items : (Array.isArray(n) ? n : [])) })
+        .catch(() => {})
+      meetupService.list(conversation.id)
+        .then((list) => { if (!cancelled) setMeetups(Array.isArray(list) ? list : (list?.items ?? [])) })
+        .catch(() => {})
     }
-    if (msgData?.dailyQuest) setDailyQuest(msgData.dailyQuest)
-    if (msgData) refetchConversations()
-  }, [msgData, refetchConversations, paramId])
+
+    return () => { cancelled = true }
+  }, [conversation?.id, conversation?.matchId])
 
   useEffect(() => {
-    if (!msgLoading && activeConvo) loadConversationNudges()
-  }, [msgLoading, activeConvo, loadConversationNudges])
-
-  const loadAiSuggestions = useCallback(async () => {
-    if (!paramId) return
-    const chatMessages = messages.filter((m) => m.role !== 'system')
-    if (!chatMessages.length) {
-      setAiData({ suggestions: [], insight: 'Bắt đầu trò chuyện để AI gợi ý phản hồi.' })
-      return
-    }
-    setAiLoading(true)
-    try {
-      const result = await chatService.getAiSuggestions(
-        paramId,
-        chatMessages,
-        activeConvo?.partnerName,
-      )
-      setAiData({
-        suggestions: result.suggestions ?? [],
-        insight: result.insight ?? '',
-      })
-    } finally {
-      setAiLoading(false)
-    }
-  }, [messages, paramId, activeConvo?.partnerName])
-
-  useEffect(() => {
-    if (!aiOpen || msgLoading || !paramId) return undefined
-    const timer = setTimeout(loadAiSuggestions, 500)
-    return () => clearTimeout(timer)
-  }, [messages, aiOpen, msgLoading, loadAiSuggestions, paramId])
-
-  useEffect(() => {
-    chatBodyRef.current?.scrollTo({ top: chatBodyRef.current.scrollHeight, behavior: 'smooth' })
+    messagesEnd.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const { mutate: sendMessage, loading: sending } = useMutation((content) =>
-    chatService.sendMessage(paramId, content),
-  )
+  const openConv = (conv) => {
+    setConversation(conv)
+    navigate(`/chat/${conv.id}`, { replace: true })
+  }
 
-  async function handleSend(e, textOverride) {
-    e?.preventDefault()
-    const text = (textOverride ?? draft).trim()
-    if (!text || sending || !paramId) return
-    if (!textOverride) setDraft('')
+  const send = async (e) => {
+    e?.preventDefault?.()
+    if (!text.trim() || !conversation?.id || sending) return
+    setSending(true)
     try {
-      const { message } = await sendMessage(text)
-      setMessages((prev) => [...prev, message])
-      refetchConversations()
-      refetchReminders()
-      loadConversationNudges()
-    } catch {
-      if (!textOverride) setDraft(text)
+      const msg = await chatService.send(conversation.id, text.trim())
+      setMessages((cur) => [...cur, msg])
+      setText('')
+    } catch (err) {
+      toast.error(err?.message || 'Gửi tin thất bại.')
+    } finally {
+      setSending(false)
     }
   }
 
-  function handleSelectSuggestion(text) {
-    setDraft(text)
-  }
-
-  function handleNudgeAction(nudge) {
-    if (!activeConvo) return
-    if (nudge.id === 'ready_to_meet' || nudge.id === 'weekend_push') {
-      navigate(`/meet-up/${paramId}`)
-      return
-    }
-    const text = buildQuickNudgeMessage(nudge.id, activeConvo.partnerName)
-    setDraft(text)
-    if (nudge.tone === 'urgent') {
-      handleSend(null, text)
+  const handleWater = async () => {
+    if (!conversation?.matchId) return
+    setWatering(true)
+    try {
+      const updated = await plantsService.water(conversation.matchId)
+      setPlant(updated)
+      toast.success('Đã tưới cây 💧')
+    } catch (err) {
+      toast.error(err?.message || 'Không tưới được cây.')
+    } finally {
+      setWatering(false)
     }
   }
 
-  async function handleDismissNudge(nudge) {
-    if (!paramId) return
-    markNudgeDismissed(paramId, nudge.id)
-    if (nudge.id === 'intimacy_date_invite') {
-      markDateInviteHandled(paramId, false)
+  const handleMeetupRespond = async (meetupId, action) => {
+    setResponding(meetupId)
+    try {
+      await meetupService.respond(meetupId, action)
+      toast.success(action === 'accept' ? 'Đã đồng ý hẹn! 💕' : 'Đã từ chối.')
+      setMeetups((cur) =>
+        cur.map((m) => m.id === meetupId ? { ...m, status: action === 'accept' ? 'Accepted' : 'Declined' } : m),
+      )
+    } catch (err) {
+      toast.error(err?.message || 'Không thể phản hồi.')
+    } finally {
+      setResponding(null)
     }
-    await connectionRemindersService.dismissNudge(paramId, nudge.id)
-    loadConversationNudges()
-    refetchReminders()
   }
 
-  function openConversation(id, state = {}) {
-    navigate(`/chat/${id}`, { state })
+  const handleDismissNudge = async (nudgeId) => {
+    try {
+      await connectionRemindersService.dismissNudge(conversation.id, nudgeId)
+      setNudges((cur) => cur.filter((n) => (n.id || n.code) !== nudgeId))
+    } catch {}
   }
 
-  function handleBackToList() {
-    navigate('/chat')
+  const openVenueDetail = (venue) => {
+    setDetailVenue(venue)
+    setDetailOpen(true)
   }
 
-  const partnerId = activeConvo?.partnerId ?? paramId
-  const currentTree = paramId ? getLoveTreeState(paramId) : treeState
-  const tracking = paramId ? getConversationTracking(paramId) : {}
-  const dismissed = new Set(tracking.dismissedNudges ?? [])
-  const topNudge = activeNudges.find(
-    (n) =>
-      !dismissed.has(n.id) &&
-      !(n.id === 'intimacy_date_invite' && tracking.dateInviteAccepted),
+  const filtered = conversations.filter((c) =>
+    !search || (c.otherDisplayName || '').toLowerCase().includes(search.toLowerCase()),
   )
 
   return (
-    <AppShell activeNav="chat">
-      <div className={`chat-page${hasThread ? ' chat-page--thread-open' : ''}`}>
-        <aside className="chat-sidebar" aria-label="Danh sách tin nhắn">
-          <header className="chat-sidebar__head">
-            <h2>Tin nhắn</h2>
-            <span className="chat-sidebar__count">{conversations.length} cuộc trò chuyện</span>
-          </header>
-
-          <ConnectionReminderList
-            reminders={reminders}
-            onOpenChat={(id) => openConversation(id)}
-            onMeetUp={(id) => navigate(`/meet-up/${id}`)}
+    <div className={`chat-root${conversationId ? ' chat-thread-open' : ''}`}>
+      {/* ── Sidebar ── */}
+      <aside className="chat-sidebar">
+        <div className="chat-sidebar-header">
+          <span className="chat-sidebar-title">Tin nhắn</span>
+        </div>
+        <div className="chat-sidebar-search">
+          <span className="chat-sidebar-search-icon">
+            <SearchIcon size={15} />
+          </span>
+          <input
+            placeholder="Tìm cuộc trò chuyện…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
+        </div>
 
-          <AsyncContent
-            loading={convLoading}
-            error={convError}
-            onRetry={refetchConversations}
-            loadingLabel="Đang tải hội thoại..."
+        {convLoading ? (
+          <div className="chat-loading-state">Đang tải…</div>
+        ) : filtered.length === 0 ? (
+          <div className="chat-empty-list">Không có cuộc trò chuyện nào</div>
+        ) : (
+          <motion.div
+            className="chat-conv-list"
+            variants={convListVariants}
+            initial="hidden"
+            animate="show"
           >
-            <ul className="chat-sidebar__list">
-              {conversations.map((c) => (
-                <li key={c.id}>
-                  <button
-                    type="button"
-                    className={`chat-sidebar__item${c.id === paramId ? ' chat-sidebar__item--active' : ''}${c.unreadCount ? ' chat-sidebar__item--unread' : ''}`}
-                    onClick={() => openConversation(c.id)}
-                  >
-                    <span className="chat-sidebar__avatar">
-                      {c.partnerImage ? (
-                        <img src={c.partnerImage} alt="" />
-                      ) : (
-                        c.partnerAvatar
-                      )}
-                      {c.status?.includes('online') && (
-                        <span className="chat-sidebar__online" aria-label="Đang online" />
-                      )}
-                    </span>
-                    <span className="chat-sidebar__body">
-                      <span className="chat-sidebar__row">
-                        <strong>{c.partnerName}</strong>
-                        <time dateTime={c.lastMessageAt}>
-                          {formatMessageTime(c.lastMessageAt)}
-                        </time>
-                      </span>
-                      <span className="chat-sidebar__preview">{c.lastMessage}</span>
-                      <LoveTreeBondBar
-                        treeState={getLoveTreeState(c.id)}
-                        partnerId={c.partnerId ?? c.id}
-                        compact
-                      />
-                    </span>
-                    {c.unreadCount > 0 && (
-                      <span className="chat-sidebar__badge" aria-label={`${c.unreadCount} tin chưa đọc`}>
-                        {c.unreadCount > 9 ? '9+' : c.unreadCount}
-                      </span>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </AsyncContent>
-
-          <Link to="/daily-connection" className="chat-sidebar__link">
-            🔥 Nhiệm vụ ngày
-          </Link>
-        </aside>
-
-        <section className="chat-main" aria-label="Nội dung trò chuyện">
-          {!hasThread && (
-            <div className="chat-empty">
-              <div className="chat-empty__icon">💬</div>
-              <h3>Chọn cuộc trò chuyện</h3>
-              <p>
-                {reminders.length > 0
-                  ? `${reminders.length} người đang chờ bạn nhắn — bấm tên bên trái nhé.`
-                  : 'Bấm vào tên bên trái để xem tin nhắn — giống Messenger.'}
-              </p>
-              {reminders.length > 0 && (
-                <button
-                  type="button"
-                  className="chat-empty__cta"
-                  onClick={() => openConversation(reminders[0].conversationId)}
-                >
-                  Nhắn {reminders[0].partnerName} ngay
-                </button>
-              )}
-            </div>
-          )}
-
-          {hasThread && (
-            <AsyncContent
-              loading={msgLoading}
-              error={msgError}
-              onRetry={refetchMessages}
-              loadingLabel="Đang tải tin nhắn..."
-            >
-              {activeConvo && (
-                <>
-                  <header className="chat-header">
-                    <button
-                      type="button"
-                      className="chat-header__back"
-                      onClick={handleBackToList}
-                      aria-label="Quay lại danh sách"
-                    >
-                      ←
-                    </button>
-                    <span className="chat-header__avatar">
-                      {activeConvo.partnerImage ? (
-                        <img src={activeConvo.partnerImage} alt="" className="chat-header__avatar-img" />
-                      ) : (
-                        activeConvo.partnerAvatar
-                      )}
-                    </span>
-                    <div className="chat-header__info">
-                      <strong>{activeConvo.partnerName}</strong>
-                      <span className="chat-header__status">{activeConvo.status}</span>
-                    </div>
-                    {canSuggestDateFromTree(currentTree) && (
-                      <Link to={`/meet-up/${partnerId}`} className="chat-header__meet-link">
-                        📅 Hẹn gặp
-                      </Link>
-                    )}
-                    <button
-                      type="button"
-                      className={`chat-header__ai-toggle${aiOpen ? ' chat-header__ai-toggle--on' : ''}`}
-                      onClick={() => setAiOpen((v) => !v)}
-                      aria-pressed={aiOpen}
-                    >
-                      ✨ AI
-                    </button>
-                  </header>
-
-                  <ChatThreadToolbar
-                    partnerId={partnerId}
-                    partnerName={activeConvo.partnerName}
-                    treeState={currentTree}
-                    topNudge={topNudge}
-                    onNudgeAction={handleNudgeAction}
-                    onDismissNudge={handleDismissNudge}
+            {filtered.map((c) => (
+              <motion.div
+                key={c.id}
+                variants={convItemVariants}
+                className={`chat-conv-item${conversation?.id === c.id ? ' is-active' : ''}`}
+                onClick={() => openConv(c)}
+              >
+                <div className="chat-conv-avatar-wrap">
+                  <div
+                    className="chat-conv-avatar"
+                    style={c.otherAvatarUrl ? { backgroundImage: `url(${c.otherAvatarUrl})` } : undefined}
                   />
-
-                  {dailyQuest && (
-                    <div className="chat-banner chat-banner--compact">
-                      Ngày {dailyQuest.day} · {dailyQuest.title}
-                    </div>
-                  )}
-
-                  <div className="chat-body" ref={chatBodyRef}>
-                    {messages.length === 0 && (
-                      <p className="chat-body__hint">Chưa có tin nhắn — hãy gửi lời chào đầu tiên!</p>
-                    )}
-                    {messages.map((m) =>
-                      m.role === 'system' ? (
-                        <div key={m.id} className="chat-icebreaker">
-                          <p>{m.content}</p>
-                        </div>
-                      ) : m.role === 'partner' ? (
-                        <div key={m.id} className="chat-row chat-row--in">
-                          <span className="chat-row__avatar">
-                            {activeConvo.partnerImage ? (
-                              <img src={activeConvo.partnerImage} alt="" />
-                            ) : (
-                              activeConvo.partnerAvatar
-                            )}
-                          </span>
-                          <div className="chat-bubble chat-bubble--in">{m.content}</div>
-                        </div>
-                      ) : (
-                        <div key={m.id} className="chat-row chat-row--out">
-                          <div className="chat-bubble chat-bubble--out">{m.content}</div>
-                        </div>
-                      ),
-                    )}
+                  {c.isOnline && <div className="chat-conv-avatar-dot" />}
+                </div>
+                <div className="chat-conv-body">
+                  <div className="chat-conv-name">{c.otherDisplayName || 'Match'}</div>
+                  <div className={`chat-conv-preview${c.unreadCount > 0 ? ' is-unread' : ''}`}>
+                    {c.lastMessageText || 'Bắt đầu cuộc trò chuyện…'}
                   </div>
+                </div>
+                <div className="chat-conv-meta">
+                  {c.lastMessageAt && <div className="chat-conv-time">{timeAgo(c.lastMessageAt)}</div>}
+                  {c.unreadCount > 0 && <span className="chat-conv-unread">{c.unreadCount}</span>}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </aside>
 
-                  {aiOpen && (
-                    <ChatAiAssistant
-                      insight={aiData.insight}
-                      suggestions={aiData.suggestions}
-                      loading={aiLoading}
-                      onSelect={handleSelectSuggestion}
-                      onRefresh={loadAiSuggestions}
-                      disabled={sending}
-                    />
-                  )}
+      {/* ── Thread ── */}
+      <main className="chat-main">
+        <AnimatePresence mode="wait">
+          {conversation ? (
+            <motion.div
+              key={conversation.id}
+              variants={threadVariants}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              className="chat-thread-wrapper"
+            >
+              <ChatThreadToolbar conversation={conversation} onBack={() => { setConversation(null); navigate('/chat') }} />
 
-                  <form className="chat-input-bar" onSubmit={handleSend}>
-                    {canSuggestDateFromTree(currentTree) ? (
-                      <Link
-                        to={`/meet-up/${partnerId}`}
-                        className="chat-input-bar__icon chat-input-bar__icon--link"
-                        aria-label="Gợi ý hẹn gặp"
-                        title="Gợi ý hẹn gặp"
-                      >
-                        📅
-                      </Link>
-                    ) : (
-                      <span
-                        className="chat-input-bar__icon chat-input-bar__icon--disabled"
-                        title="Chăm cây đến cấp 4 để hẹn gặp"
-                      >
-                        🔒
-                      </span>
-                    )}
-                    <input
-                      type="text"
-                      placeholder="Nhập tin nhắn..."
-                      value={draft}
-                      onChange={(e) => setDraft(e.target.value)}
-                      disabled={sending}
-                    />
-                    <button
-                      type="submit"
-                      className="chat-input-bar__send"
-                      disabled={!draft.trim() || sending}
-                    >
-                      Gửi
-                    </button>
-                  </form>
-                </>
+              {plant && (
+                <div className="chat-bond-bar-wrapper">
+                  <LoveTreeBondBar plant={plant} matchId={conversation?.matchId} onWater={handleWater} loading={watering} />
+                </div>
               )}
-            </AsyncContent>
+
+              <div className="chat-messages">
+                {threadLoading ? (
+                  <div className="chat-loading-state">Đang tải tin nhắn…</div>
+                ) : messages.length === 0 ? (
+                  <div className="chat-empty-thread">
+                    <div className="chat-empty-thread-icon"><HeartChatIcon size={40} /></div>
+                    <h3>Chưa có tin nhắn</h3>
+                    <p>Hãy bắt đầu bằng lời chào</p>
+                  </div>
+                ) : messages.map((m) => {
+                  if (m.type === 'venue') {
+                    return (
+                      <motion.div
+                        key={m.id}
+                        className={`chat-msg${m.isMine ? ' is-mine' : ''}`}
+                        variants={msgVariants}
+                        initial="hidden"
+                        animate="show"
+                      >
+                        <VenueMessage
+                          venue={{ id: m.venueId, name: m.venueName, imageUrl: m.venueImageUrl, address: m.venueAddress, category: m.venueCategory, distanceKm: m.distanceKm }}
+                          meta={m.isMine ? 'Bạn đã chia sẻ' : `${conversation?.otherDisplayName} đã chia sẻ`}
+                          onClick={() => openVenueDetail({ id: m.venueId, venueName: m.venueName })}
+                        />
+                        <div className="chat-msg-time">{timeAgo(m.sentAt)}</div>
+                      </motion.div>
+                    )
+                  }
+                  return (
+                    <motion.div
+                      key={m.id}
+                      className={`chat-msg${m.isMine ? ' is-mine' : ''}`}
+                      variants={msgVariants}
+                      initial="hidden"
+                      animate="show"
+                    >
+                      <div className="chat-bubble">{m.content}</div>
+                      <div className="chat-msg-time">{timeAgo(m.sentAt)}</div>
+                    </motion.div>
+                  )
+                })}
+
+                {meetups.filter((mu) => mu.status === 'Proposed' && !mu.isMine).map((mu) => (
+                  <motion.div
+                    key={mu.id}
+                    className="chat-meetup-proposal"
+                    variants={msgVariants}
+                    initial="hidden"
+                    animate="show"
+                  >
+                    <div className="chat-meetup-proposal-header">💌 {conversation?.otherDisplayName} đề xuất hẹn</div>
+                    <div className="chat-meetup-proposal-card">
+                      <div className="chat-meetup-proposal-venue">📍 {mu.venueName || `Quán #${mu.venueId}`}</div>
+                      <div className="chat-meetup-proposal-time">⏰ {formatMeetupTime(mu.proposedAt)}</div>
+                      {mu.note && <div className="chat-meetup-proposal-note">{mu.note}</div>}
+                      <div className="chat-meetup-proposal-actions">
+                        <button className="chat-meetup-accept-btn" disabled={responding === mu.id} onClick={() => handleMeetupRespond(mu.id, 'accept')}>
+                          {responding === mu.id ? <span className="spinner" /> : '💕 Đồng ý'}
+                        </button>
+                        <button className="chat-meetup-decline-btn" disabled={responding === mu.id} onClick={() => handleMeetupRespond(mu.id, 'decline')}>
+                          Không
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+
+                {meetups.filter((mu) => mu.status === 'Accepted').map((mu) => (
+                  <motion.div
+                    key={mu.id}
+                    className="chat-meetup-accepted"
+                    variants={msgVariants}
+                    initial="hidden"
+                    animate="show"
+                  >
+                    <div className="chat-meetup-accepted-icon"><Check2Icon size={18} /></div>
+                    <div>
+                      <div className="chat-meetup-accepted-title">Buổi hẹn đã chốt!</div>
+                      <div className="chat-meetup-accepted-detail">{mu.venueName} · {formatMeetupTime(mu.proposedAt)}</div>
+                    </div>
+                  </motion.div>
+                ))}
+
+                <div ref={messagesEnd} />
+              </div>
+
+              {nudges.length > 0 && (
+                <div className="chat-nudge-bar">
+                  {nudges.slice(0, 2).map((n) => (
+                    <div key={n.id || n.code} className="chat-nudge">
+                      <span><LightbulbIcon size={14} /> {n.title || n.body || n.code}</span>
+                      <button type="button" className="chat-nudge-dismiss" onClick={() => handleDismissNudge(n.id || n.code)} aria-label="Bỏ qua">
+                        <XSmallIcon size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {conversation?.matchId && (
+                <div className="chat-ai-panel-wrapper">
+                  <AISuggestionPanel matchId={conversation.matchId} onPick={(t) => setText(t)} />
+                </div>
+              )}
+
+              <VenueDetailModal venue={detailVenue} open={detailOpen} onClose={() => setDetailOpen(false)} onPropose={() => toast.info('Mở mục Hẹn hò trên Cây tình yêu để đề xuất.')} />
+
+              <form className="chat-input-bar" onSubmit={send}>
+                <textarea
+                  className="chat-input"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Tin nhắn…"
+                  rows={1}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() }
+                  }}
+                />
+                <button type="submit" className="chat-send-btn" disabled={sending || !text.trim()} aria-label="Gửi">
+                  {sending ? (
+                    <span className="spinner" />
+                  ) : (
+                <ArrowUpIcon size={18} />
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="empty"
+              className="chat-empty-thread"
+              variants={threadVariants}
+              initial="hidden"
+              animate="show"
+            >
+              <div className="chat-empty-thread-icon"><Sparkles2Icon size={40} /></div>
+              <h3>Chọn cuộc trò chuyện</h3>
+              <p>Chọn một cuộc trò chuyện từ danh sách bên trái để bắt đầu nhắn tin.</p>
+            </motion.div>
           )}
-        </section>
-      </div>
-    </AppShell>
+        </AnimatePresence>
+      </main>
+    </div>
   )
 }
-
-export default Chat

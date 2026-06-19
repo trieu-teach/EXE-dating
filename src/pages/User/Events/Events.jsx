@@ -1,147 +1,168 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { eventsService } from '../../../api/index.js'
-import AppShell from '../../../components/User/AppShell/AppShell.jsx'
-import AsyncContent from '../../../components/User/AsyncContent/AsyncContent.jsx'
-import { useAsync } from '../../../hooks/useAsync.js'
-import '../../../styles/events-shared.css'
+import { useEffect, useState } from 'react'
+import { eventsService } from '../../../api'
+import { useToast } from '../../../context/ToastContext.jsx'
+import { formatDate } from '../../../utils/format.js'
+import { useNavigate } from 'react-router-dom'
+import { CalendarIcon, PinIcon, UsersIcon, ClockIcon } from '../../../components/ui/CustomIcons.jsx'
+import { motion } from 'framer-motion'
+import { Button } from '../../../components/ui/Button.jsx'
 import './Events.css'
 
-function Events() {
-  const [category, setCategory] = useState('today')
-  const { data, loading, error, refetch } = useAsync(() => eventsService.getList(), [])
+export default function Events() {
+  const navigate = useNavigate()
+  const toast = useToast()
+  const [events, setEvents] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [registering, setRegistering] = useState(null)
 
-  const categories = data?.categories ?? []
-  const events = data?.events ?? []
-  const featuredId = data?.featuredId
-  const featured = events.find((e) => e.id === featuredId)
-  const upcoming = events.filter((e) => e.id !== featuredId)
+  useEffect(() => {
+    eventsService.list()
+      .then((list) => setEvents(Array.isArray(list) ? list : (list?.items ?? [])))
+      .catch((err) => toast.error(err?.message || 'Không tải được sự kiện.'))
+      .finally(() => setLoading(false))
+  }, [toast])
+
+  const handleRegister = async (id, e) => {
+    e.stopPropagation()
+    setRegistering(id)
+    try {
+      await eventsService.register(id)
+      toast.success('Đã đăng ký tham gia!')
+    } catch (err) {
+      toast.error(err?.message || 'Không đăng ký được.')
+    } finally {
+      setRegistering(null)
+    }
+  }
+
+  const getStatus = (ev) => {
+    if (ev.status === 'Ended') return { label: 'Đã kết thúc', cls: 'ended' }
+    if (ev.status === 'Full') return { label: 'Đã đầy', cls: 'full' }
+    return { label: 'Đang mở', cls: 'open' }
+  }
+
+  const formatEventDate = (dateStr) => {
+    if (!dateStr) return null
+    try {
+      const d = new Date(dateStr)
+      return {
+        month: d.toLocaleDateString('vi-VN', { month: 'short' }).toUpperCase(),
+        day: d.getDate(),
+        time: d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+      }
+    } catch { return null }
+  }
 
   return (
-    <AppShell activeNav="events">
-      <div className="events-page">
-        <header className="events-page-header">
-          <div>
-            <p className="events-page-header__eyebrow">Sự kiện SameMess</p>
-            <h1>Sự kiện cộng đồng</h1>
-            <p>Gặp gỡ thật — ngoài vuốt thẻ, trong không gian an toàn</p>
-          </div>
-          <div className="events-page-header__actions">
-            <Link to="/events/history" className="events-header-link">
-              Lịch sử
-            </Link>
-            <button type="button" className="events-notify-btn" aria-label="Thông báo">
-              🔔
-            </button>
-          </div>
-        </header>
+    <div className="events-root">
+      {/* Hero */}
+      <div className="events-hero">
+        <div className="events-hero-eyebrow">
+          <CalendarIcon size={12} />
+          Sự kiện
+        </div>
+        <h1 className="events-hero-title">Khám phá sự kiện</h1>
+        <p className="events-hero-subtitle">Gặp gỡ những người cùng sở thích tại các sự kiện độc đáo</p>
+      </div>
 
-        <label className="events-search">
-          <span aria-hidden="true">🔍</span>
-          <input type="search" placeholder="Tìm kết nối tiếp theo của bạn..." />
-        </label>
-
-        <AsyncContent loading={loading} error={error} onRetry={refetch}>
-        <div className="events-chips" role="tablist">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              role="tab"
-              className={`events-chip${category === cat.id ? ' events-chip--active' : ''}`}
-              onClick={() => setCategory(cat.id)}
-            >
-              {cat.label}
-            </button>
-          ))}
+      <div className="events-content">
+        {/* Toolbar */}
+        <div className="events-toolbar">
+          <div className="events-toolbar-title">
+            <span className="text-muted">Sự kiện đang mở</span>
+            <span className="events-count">{events.length}</span>
+          </div>
+          <button
+            className="events-history-btn"
+            onClick={() => navigate('/events/history')}
+          >
+            Lịch sử
+          </button>
         </div>
 
-        <article className="events-schedule-banner">
-          <div>
-            <strong>Lịch của bạn: 2 sự kiện tuần này</strong>
-            <p>Speed dating, workshop &amp; gặp gỡ ngoài trời</p>
-          </div>
-          <Link to="/events/history" className="events-schedule-banner__btn">
-            Xem lịch
-          </Link>
-        </article>
-
-        {featured && (
-          <section className="events-section">
-            <div className="events-section__head">
-              <h2>Nổi bật</h2>
-              <Link to={`/events/${featured.id}`}>Xem tất cả</Link>
-            </div>
-            <Link to={`/events/${featured.id}`} className="events-featured-card">
-              <img src={featured.image} alt="" />
-              <div className="events-featured-card__overlay" />
-              <div className="events-featured-card__content">
-                {featured.premiumOnly && (
-                  <span className="events-badge events-badge--premium">Chỉ Premium</span>
-                )}
-                <h3>{featured.title}</h3>
-                <p>
-                  {featured.date} · {featured.attendees} người tham gia
-                </p>
-              </div>
-            </Link>
-          </section>
-        )}
-
-        <section className="events-section">
-          <div className="events-section__head">
-            <h2>Sắp diễn ra</h2>
-          </div>
-          <ul className="events-list">
-            {upcoming.map((ev) =>
-              ev.soldOut ? (
-                <li key={ev.id} className="events-list-card events-list-card--disabled">
-                  <img src={ev.thumb} alt="" />
-                  <div>
-                    <h3>{ev.title}</h3>
-                    <p>
-                      {ev.date} · {ev.time}
-                    </p>
-                    <p className="events-list-card__loc">{ev.location}</p>
-                  </div>
-                  <span className="events-list-card__sold">Hết vé</span>
-                </li>
-              ) : (
-                <li key={ev.id}>
-                  <Link to={`/events/${ev.id}`} className="events-list-card">
-                    <img src={ev.thumb} alt="" />
-                    <div>
-                      <h3>{ev.title}</h3>
-                      <p>
-                        {ev.date} · {ev.time}
-                      </p>
-                      <p className="events-list-card__loc">{ev.location}</p>
+        {loading ? (
+          <div className="loading-block"><span className="spinner" /></div>
+        ) : events.length === 0 ? (
+          <div className="empty">Chưa có sự kiện nào đang mở.</div>
+        ) : (
+          <div className="events-grid">
+            {events.map((ev, i) => {
+              const status = getStatus(ev)
+              const date = formatEventDate(ev.startAt || ev.startsAt)
+              return (
+                <motion.article
+                  key={ev.id}
+                  className="event-card"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.06, duration: 0.3 }}
+                  onClick={() => navigate(`/events/${ev.id}`)}
+                >
+                  <div className="event-cover">
+                    <div
+                      className="event-cover-img"
+                      style={ev.coverUrl ? { backgroundImage: `url(${ev.coverUrl})` } : {}}
+                    >
+                      <div className="event-cover-gradient" />
                     </div>
-                    <span className="events-list-card__join">Tham gia</span>
-                  </Link>
-                </li>
-              ),
-            )}
-          </ul>
-        </section>
+                    <div className="event-date-badge">
+                      {date && (
+                        <>
+                          <div className="event-date-month">{date.month}</div>
+                          <div className="event-date-day">{date.day}</div>
+                        </>
+                      )}
+                    </div>
+                  </div>
 
-        </AsyncContent>
+                  <div className="event-body">
+                    <div className="event-title">{ev.title || ev.name}</div>
 
-        <Link to="/premium" className="events-premium-teaser">
-          <span>✨</span>
-          <div>
-            <strong>Mở khóa sự kiện Premium</strong>
-            <p>Ưu tiên đăng ký &amp; xem ai thích bạn</p>
+                    <div className="event-meta-list">
+                      {date && (
+                        <div className="event-meta-item">
+                          <ClockIcon size={12} />
+                          {date.time}
+                        </div>
+                      )}
+                      {ev.location && (
+                        <div className="event-meta-item">
+                          <PinIcon size={12} />
+                          {ev.location}
+                        </div>
+                      )}
+                      {ev.capacity && (
+                        <div className="event-meta-item">
+                          <UsersIcon size={12} />
+                          {ev.registeredCount || 0}/{ev.capacity}
+                        </div>
+                      )}
+                    </div>
+
+                    {ev.description && (
+                      <p className="event-desc">{ev.description.slice(0, 90)}…</p>
+                    )}
+
+                    <div className="event-footer">
+                      <span className={`event-status-badge ${status.cls}`}>{status.label}</span>
+                      {status.cls === 'open' && (
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={(e) => handleRegister(ev.id, e)}
+                          disabled={registering === ev.id}
+                        >
+                          {registering === ev.id ? <span className="spinner" /> : 'Đăng ký'}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </motion.article>
+              )
+            })}
           </div>
-          <span>→</span>
-        </Link>
-
-        <Link to="/events/history" className="events-fab" aria-label="Lịch sự kiện">
-          📅
-        </Link>
+        )}
       </div>
-    </AppShell>
+    </div>
   )
 }
-
-export default Events

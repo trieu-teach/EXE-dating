@@ -1,533 +1,635 @@
+/* ── LoveTree Page — Warm, romantic full-width layout ────────── */
 .love-tree-page {
-  width: 100%;
-}
-
-.love-tree-layout {
-  display: grid;
-  grid-template-columns: 1fr minmax(260px, 320px);
-  gap: 24px;
-  align-items: start;
-}
-
-.love-tree-main {
-  padding: 28px;
-  border-radius: var(--radius-xl);
-}
-
-.love-tree-hero {
-  margin-bottom: 24px;
-}
-
-/* Cặp đôi */
-.love-tree-couple {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 0;
+  min-height: calc(100vh - 64px);
+  background: var(--color-bg);
 }
 
-.love-tree-couple__avatar {
+/* ── Main: Tree Card ───────────────────────────────────────── */
+.love-tree-card {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  animation: lt-couple-float 3s ease-in-out infinite;
+  gap: 0;
+  padding-bottom: 16px;
 }
 
-.love-tree-couple__avatar--b {
-  animation-delay: 0.5s;
-}
-
-.love-tree-couple__avatar span,
-.love-tree-couple__avatar img {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  font-size: 28px;
-  background: var(--card);
-  border: 2px solid var(--user-pink-border);
-  border-radius: 50%;
-  box-shadow: var(--shadow-sm);
-  object-fit: cover;
-}
-
-.love-tree-couple__avatar em {
-  font-size: 12px;
-  font-weight: 600;
-  font-style: normal;
-  color: var(--muted-foreground);
-}
-
-.love-tree-couple__bond {
+/* Hero */
+.love-tree-hero {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
+  padding: 16px 20px 12px;
+  background: linear-gradient(135deg, #fff0f8 0%, #fce4ec 50%, #f3e5f5 100%);
+  overflow: hidden;
 }
-
-.love-tree-couple__line {
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--user-pink), transparent);
-  animation: lt-bond-flow 2s linear infinite;
+[data-theme='dark'] .love-tree-hero {
+  background: linear-gradient(135deg, #1a0d14 0%, #15091a 50%, #1a0d20 100%);
 }
-
-.love-tree-couple__heart {
+.love-tree-hero-float {
+  display: none;
+}
+.love-tree-hero-content {
   position: relative;
   z-index: 1;
-  font-size: 22px;
-  animation: lt-heart-beat 1.2s ease-in-out infinite;
-}
-
-.love-tree-couple__pulse {
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  border: 2px solid var(--user-pink);
-  border-radius: 50%;
-  animation: lt-pulse-ring 2s ease-out infinite;
-}
-
-/* Stats row */
-.love-tree-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.love-tree-stat {
-  padding: 14px 12px;
   text-align: center;
-  background: var(--subtle);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-lg);
-  animation: lt-stat-in 0.5s var(--ease) both;
 }
-
-.love-tree-stat:nth-child(2) {
-  animation-delay: 0.1s;
-}
-.love-tree-stat:nth-child(3) {
-  animation-delay: 0.2s;
-}
-
-.love-tree-stat strong {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 22px;
+.love-tree-hero-label {
+  font-size: 0.68rem;
   font-weight: 800;
-  color: var(--foreground);
-}
-
-.love-tree-stat--accent strong {
-  background: var(--brand-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.love-tree-stat--stage strong.love-tree-stat__emoji {
-  font-size: 26px;
-  font-weight: 400;
-  background: none;
-  -webkit-text-fill-color: unset;
-  color: inherit;
-}
-
-.love-tree-stat span {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted-foreground);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.12em;
+  color: var(--color-primary);
+  margin-bottom: 2px;
 }
-
-/* Progress */
-.love-tree-progress {
-  margin-bottom: 28px;
+.love-tree-hero-name {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--color-text);
+  letter-spacing: -0.03em;
 }
-
-.love-tree-progress__head {
+.love-tree-hero-sub {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+.love-tree-hero-badges {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.love-tree-progress__bar {
-  position: relative;
-  height: 12px;
-  margin-bottom: 8px;
-  overflow: hidden;
-  background: var(--muted);
-  border-radius: var(--radius-pill);
-}
-
-.love-tree-progress__fill {
-  display: block;
-  height: 100%;
-  background: var(--brand-gradient);
-  border-radius: var(--radius-pill);
-  transition: width 0.8s var(--ease);
-  box-shadow: 0 0 12px rgba(226, 85, 122, 0.45);
-}
-
-.love-tree-progress__shimmer {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.45) 50%,
-    transparent 100%
-  );
-  animation: lt-progress-shimmer 2.5s ease-in-out infinite;
-}
-
-.love-tree-progress p {
-  margin: 0;
-  font-size: 13px;
-  color: var(--muted-foreground);
-}
-
-/* Care buttons */
-.love-tree-care h3 {
-  margin: 0 0 4px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--foreground);
-  text-transform: uppercase;
-}
-
-.love-tree-care__hint {
-  margin: 0 0 16px;
-  font-size: 13px;
-  color: var(--muted-foreground);
-}
-
-.love-tree-care__actions {
-  display: flex;
-  gap: 14px;
   flex-wrap: wrap;
+  gap: 4px;
   justify-content: center;
+  margin-top: 6px;
+}
+.love-tree-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(255, 79, 139, 0.1);
+  color: var(--color-primary);
+}
+.love-tree-hero-badge.is-fire {
+  background: rgba(249, 115, 22, 0.1);
+  color: #f97316;
+}
+.love-tree-hero-badge.is-duo {
+  background: rgba(192, 125, 255, 0.12);
+  color: #c07dff;
 }
 
-.love-tree-care__btn {
+/* Tab bar */
+.love-tree-tab-bar {
+  display: flex;
+  gap: 4px;
+  padding: 8px 16px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+.love-tree-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  transition: all 0.2s;
+}
+.love-tree-tab-btn:hover { background: var(--color-surface-2); color: var(--color-text); }
+.love-tree-tab-btn.is-active {
+  background: linear-gradient(135deg, rgba(255,79,139,0.1), rgba(177,75,255,0.1));
+  color: var(--color-primary);
+  border: 1.5px solid rgba(255, 79, 139, 0.2);
+}
+
+/* Tree scene */
+.love-tree-scene {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  padding: 16px 24px 0;
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 100%);
+}
+.love-tree-glow {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(255, 79, 139, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+  border-radius: 50%;
+}
+.love-tree-img-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.love-tree-img {
   width: 100px;
   height: 100px;
-  padding: 12px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(255, 79, 139, 0.18));
+  transition: transform 0.3s;
+}
+.love-tree-img.is-bounce {
+  animation: tree-bounce 0.6s ease-out;
+}
+.love-tree-img.is-level-up {
+  animation: tree-levelup 1.2s ease-out;
+}
+@keyframes tree-bounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.15); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+@keyframes tree-levelup {
+  0% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 4px 12px rgba(255, 79, 139, 0.18)); }
+  30% { transform: scale(1.2) rotate(-5deg); filter: drop-shadow(0 0 24px rgba(255, 79, 139, 0.5)) brightness(1.15); }
+  60% { transform: scale(1.08) rotate(3deg); filter: drop-shadow(0 8px 20px rgba(177, 75, 255, 0.4)); }
+  100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 4px 12px rgba(255, 79, 139, 0.18)); }
+}
+.love-tree-level-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255,79,139,0.12), rgba(177,75,255,0.12));
+  border: 1px solid rgba(255, 79, 139, 0.18);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+.level-num {
+  font-size: 0.95rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.love-tree-ground {
+  display: none;
+}
+
+/* Growth progress */
+.love-tree-growth-section {
+  padding: 10px 24px;
+}
+.love-tree-growth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.love-tree-growth-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text-soft);
+}
+.love-tree-growth-pct {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+.love-tree-growth-bar {
+  height: 10px;
+  background: var(--color-surface-2);
+  border-radius: 999px;
   overflow: hidden;
-  font: inherit;
-  cursor: pointer;
-  background: var(--card);
-  border: 2px solid var(--user-pink-border);
-  border-radius: 50%;
-  transition:
-    transform var(--dur) var(--ease),
-    box-shadow var(--dur) var(--ease),
-    border-color var(--dur) var(--ease);
+  border: 1px solid var(--color-border);
+}
+.love-tree-growth-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff4f8b, #b14bff);
+  border-radius: 999px;
+  transition: width 0.8s ease;
+  box-shadow: 0 0 8px rgba(255, 79, 139, 0.4);
+}
+.love-tree-growth-detail {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
 }
 
-.love-tree-care__icon {
-  font-size: 32px;
-  transition: transform 0.3s var(--ease);
+/* Water section */
+.love-tree-water-section {
+  padding: 6px 16px 4px;
 }
-
-.love-tree-care__label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--foreground);
-}
-
-.love-tree-care__pts {
-  display: block;
-  margin-top: 2px;
-  font-size: 11px;
+.love-tree-water-title {
+  font-size: 0.72rem;
   font-weight: 800;
-  color: var(--user-pink-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
 }
-
-.love-tree-care__ripple {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(226, 85, 122, 0.35), transparent 70%);
-  opacity: 0;
-  transform: scale(0.5);
+.love-tree-water-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
 }
-
-.love-tree-care__btn:hover {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: var(--shadow-brand);
-  border-color: var(--user-pink-dark);
-}
-
-.love-tree-care__btn:hover .love-tree-care__icon {
-  transform: scale(1.15);
-}
-
-.love-tree-care__btn--active {
-  transform: scale(0.92);
-  border-color: var(--user-pink-dark);
-  box-shadow: 0 0 0 4px var(--user-pink-focus);
-}
-
-.love-tree-care__btn--active .love-tree-care__ripple {
-  animation: lt-care-ripple 0.6s var(--ease) forwards;
-}
-
-.love-tree-care__btn--active .love-tree-care__icon {
-  animation: lt-care-pop 0.5s var(--ease);
-}
-
-/* Links */
-.love-tree-links {
+.love-tree-water-btn {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-soft);
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  position: relative;
 }
-
-.love-tree-link {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--user-pink-dark);
-  text-decoration: none;
-  transition: opacity var(--dur) var(--ease);
+.love-tree-water-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 79, 139, 0.12);
 }
-
-.love-tree-link:hover {
-  text-decoration: underline;
+.love-tree-water-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
-
-.love-tree-link--primary {
-  padding: 10px 18px;
-  color: #fff;
-  background: var(--brand-gradient);
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-brand);
+.love-tree-water-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
-
-.love-tree-link--primary:hover {
-  text-decoration: none;
-  filter: saturate(1.08);
-}
-
-/* Milestones timeline */
-.love-tree-milestones {
-  padding: 24px;
-  border-radius: var(--radius-xl);
-}
-
-.love-tree-milestones h3 {
-  margin: 0 0 20px;
-  font-size: 16px;
+.love-tree-water-emoji { font-size: 1.3rem; line-height: 1; }
+.love-tree-water-label {
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--foreground);
+  color: var(--color-text);
+}
+.love-tree-water-bonus {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  padding: 1px 5px;
+  border-radius: 999px;
+}
+.love-tree-water-stock {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.love-tree-water-stock.is-empty {
+  color: var(--color-danger);
 }
 
-.love-tree-timeline {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.love-tree-milestone {
+/* Inventory */
+.love-tree-inventory {
   display: flex;
-  gap: 14px;
-  padding: 0 0 20px 4px;
-  animation: lt-milestone-in 0.5s var(--ease) both;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  flex-wrap: wrap;
+}
+.love-tree-inv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-soft);
 }
 
-.love-tree-milestone:not(:last-child) {
-  border-left: 2px solid var(--border-soft);
-  margin-left: 14px;
-  padding-left: 20px;
+/* Action buttons */
+.love-tree-actions {
+  display: flex;
+  gap: 8px;
+  padding: 6px 16px 0;
+}
+.btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+.btn-ghost {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  color: var(--color-text);
+}
+.btn-ghost:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+.btn-soft {
+  background: var(--color-surface-2);
+  border: 1.5px solid var(--color-border);
+  color: var(--color-text-soft);
+}
+.btn-soft:hover {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.btn-primary {
+  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 79, 139, 0.3);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(255, 79, 139, 0.4);
 }
 
-.love-tree-milestone__dot {
+/* Empty state */
+.love-tree-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+}
+.love-tree-empty-icon { font-size: 3rem; }
+.love-tree-empty p {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ── Sidebar: Match List ───────────────────────────────────── */
+.love-tree-match-list {
+  width: 220px;
   flex-shrink: 0;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+}
+.love-tree-match-list-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 12px 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+.love-tree-match-list-header h3 {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+.love-tree-match-count {
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+.love-tree-match-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+}
+.love-tree-match-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1.5px solid transparent;
+}
+.love-tree-match-item:hover {
+  background: var(--color-surface-2);
+}
+.love-tree-match-item.is-active {
+  background: var(--color-primary-soft);
+  border-color: rgba(255, 79, 139, 0.25);
+}
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-surface-2);
+  background-size: cover;
+  background-position: center;
+  border: 2px solid var(--color-border);
+  flex-shrink: 0;
+}
+.love-tree-match-meta {
+  flex: 1;
+  min-width: 0;
+}
+.love-tree-match-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.love-tree-match-sub {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* ── Debug panel ──────────────────────────────────────────── */
+.love-tree-debug {
+  position: fixed;
+  bottom: 80px;
+  right: 12px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.love-tree-debug-toggle {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  box-shadow: var(--shadow-md);
+  transition: all 0.15s;
+}
+.love-tree-debug-toggle:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.love-tree-debug-pre {
+  max-width: 320px;
+  max-height: 240px;
+  overflow: auto;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.85);
+  color: #a3e635;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-all;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── Milestone popup ───────────────────────────────────────── */
+.love-tree-milestone-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  margin-left: -15px;
-  font-size: 14px;
-  background: var(--card);
-  border: 2px solid var(--user-pink-border);
-  border-radius: 50%;
+  padding: 24px;
+}
+.love-tree-milestone {
+  background: var(--color-surface);
+  border-radius: 24px;
+  padding: 32px 24px;
+  max-width: 340px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.3);
+  animation: milestone-in 0.4s ease-out;
+}
+@keyframes milestone-in {
+  from { transform: scale(0.8) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+.love-tree-milestone-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 24px rgba(255,79,139,0.3));
+  animation: milestone-tree 0.8s ease-out;
+}
+@keyframes milestone-tree {
+  0% { transform: scale(0.6) rotate(-10deg); opacity: 0; }
+  50% { transform: scale(1.1) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.love-tree-milestone-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-primary);
+}
+.love-tree-milestone-level-num {
+  font-size: 2rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.03em;
+}
+.love-tree-milestone p {
+  font-size: 0.88rem;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+  margin: 0;
 }
 
-.love-tree-milestone--unlocked .love-tree-milestone__dot {
-  border-color: var(--user-pink-dark);
-  box-shadow: 0 0 12px rgba(226, 85, 122, 0.35);
-  animation: lt-dot-glow 2s ease-in-out infinite;
+/* ── Mobile ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .love-tree-page {
+    flex-direction: column;
+  }
+  .love-tree-match-list {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    max-height: 160px;
+  }
+  .love-tree-debug { bottom: 80px; right: 8px; }
 }
 
-.love-tree-milestone__body strong {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 15px;
-  color: var(--foreground);
+/* ── Dark mode ────────────────────────────────────────────── */
+[data-theme='dark'] .love-tree-card {
+  background: var(--color-bg);
 }
-
-.love-tree-milestone__body span {
-  font-size: 13px;
-  color: var(--muted-foreground);
+[data-theme='dark'] .love-tree-tab-bar {
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
-
-.love-tree-milestone--locked {
-  opacity: 0.5;
+[data-theme='dark'] .love-tree-water-btn {
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
-
-/* Keyframes */
-@keyframes lt-couple-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
+[data-theme='dark'] .love-tree-water-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
 }
-
-@keyframes lt-heart-beat {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  15% {
-    transform: scale(1.2);
-  }
-  30% {
-    transform: scale(1);
-  }
+[data-theme='dark'] .love-tree-growth-bar {
+  background: var(--color-surface-2);
 }
-
-@keyframes lt-pulse-ring {
-  0% {
-    transform: scale(0.8);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1.8);
-    opacity: 0;
-  }
+[data-theme='dark'] .love-tree-inv-chip {
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
-
-@keyframes lt-bond-flow {
-  0% {
-    background-position: -100% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+[data-theme='dark'] .btn-ghost {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
 }
-
-@keyframes lt-progress-shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+[data-theme='dark'] .btn-soft {
+  background: var(--color-surface-2);
+  border-color: var(--color-border);
+  color: var(--color-text-soft);
 }
-
-@keyframes lt-care-ripple {
-  0% {
-    opacity: 0.8;
-    transform: scale(0.5);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.4);
-  }
+[data-theme='dark'] .love-tree-match-item:hover {
+  background: var(--color-surface-2);
 }
-
-@keyframes lt-care-pop {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.35);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes lt-stat-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes lt-milestone-in {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes lt-dot-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 8px rgba(226, 85, 122, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 16px rgba(226, 85, 122, 0.55);
-  }
-}
-
-@media (max-width: 900px) {
-  .love-tree-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .love-tree-main {
-    padding: 20px 16px;
-  }
-
-  .love-tree-stats {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-
-  .love-tree-stat strong {
-    font-size: 18px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .love-tree-page *,
-  .love-tree-couple__heart,
-  .love-tree-progress__shimmer {
-    animation: none !important;
-  }
+[data-theme='dark'] .love-tree-debug-pre {
+  background: rgba(0,0,0,0.9);
 }

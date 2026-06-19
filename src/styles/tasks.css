@@ -1,0 +1,233 @@
+/* =========================================================
+ * Tasks / Gamification page
+ * ========================================================= */
+
+.tasks-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ===== Inventory header (3 chip cards) ===== */
+.tasks-inventory {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+.tasks-inventory-card {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.tasks-inventory-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.tasks-inventory-card[data-mat="Water"]::before     { background: rgba(59, 130, 246, 0.06); }
+.tasks-inventory-card[data-mat="Sun"]::before       { background: rgba(245, 158, 11, 0.08); }
+.tasks-inventory-card[data-mat="Fertilizer"]::before{ background: rgba(22, 163, 74, 0.06); }
+
+.tasks-inventory-emoji {
+  font-size: 32px;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+.tasks-inventory-qty {
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  line-height: 1.1;
+  position: relative;
+  z-index: 1;
+}
+.tasks-inventory-label {
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== Header with pull-to-refresh hint ===== */
+.tasks-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.tasks-header-text { flex: 1; min-width: 220px; }
+.tasks-header-text h1 { margin: 0; font-size: 1.4rem; }
+.tasks-header-text p { margin: 4px 0 0; color: var(--color-text-soft); font-size: 0.9rem; }
+.tasks-header-actions { display: flex; gap: 8px; }
+
+/* ===== Group (Daily / Weekly / Achievement) ===== */
+.tasks-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.tasks-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+.tasks-group-emoji { font-size: 1.2rem; }
+.tasks-group-title { font-size: 1rem; font-weight: 700; color: var(--color-text); }
+.tasks-group-count {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+.tasks-group-count strong { color: var(--color-success); }
+
+.tasks-group-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ===== Single task card ===== */
+.task-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-base);
+}
+.task-card:hover { box-shadow: var(--shadow-md); }
+.task-card.is-done {
+  background: rgba(22, 163, 74, 0.05);
+  border-color: rgba(22, 163, 74, 0.30);
+}
+.task-card.is-done .task-card-progress-fill { background: var(--color-success); }
+
+.task-card-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  background: var(--color-surface-2);
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.task-card.is-done .task-card-icon {
+  background: var(--color-success);
+  color: #fff;
+  font-size: 20px;
+}
+
+.task-card-body { flex: 1; min-width: 0; }
+.task-card-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+.task-card-desc {
+  font-size: 0.82rem;
+  color: var(--color-text-soft);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.task-card-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+.task-card-progress-bar {
+  height: 6px;
+  width: 100%;
+  background: var(--color-surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.task-card-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: 999px;
+  transition: width var(--transition-slow);
+}
+.task-card-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--color-text-soft);
+  font-weight: 600;
+}
+.task-card-progress-meta strong { color: var(--color-text); }
+
+.task-card-reward {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  min-width: 72px;
+  flex-shrink: 0;
+}
+.task-card-reward-qty {
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  line-height: 1.1;
+}
+.task-card-reward-emoji { font-size: 18px; }
+
+.task-card.is-done .task-card-reward { background: rgba(22, 163, 74, 0.10); color: var(--color-success); }
+.task-card.is-done .task-card-reward-qty { color: var(--color-success); }
+
+/* ===== Pull-to-refresh affordance ===== */
+.tasks-pull-hint {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  padding: var(--space-3);
+  user-select: none;
+}
+.tasks-pull-hint.is-pulling { color: var(--color-primary); font-weight: 700; }
+
+/* ===== Empty state ===== */
+.tasks-empty {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--color-text-soft);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 540px) {
+  .tasks-inventory { gap: 8px; }
+  .tasks-inventory-card { padding: var(--space-3); }
+  .tasks-inventory-emoji { font-size: 28px; }
+  .tasks-inventory-qty { font-size: 1.4rem; }
+  .task-card { padding: var(--space-3); }
+  .task-card-reward { min-width: 60px; padding: 6px 8px; }
+}

@@ -1,275 +1,105 @@
-import { useMemo, useRef, useState } from 'react'
-import AppShell from '../../../../components/User/AppShell/AppShell.jsx'
-import PageHeader from '../../../../components/User/PageHeader/PageHeader.jsx'
-import InlineInterestAdd from '../../../../components/User/InlineInterestAdd/InlineInterestAdd.jsx'
-import InterestAddMenu from '../../../../components/User/InterestAddMenu/InterestAddMenu.jsx'
-import {
-  DEFAULT_SELECTED_INTERESTS,
-  GROUP_ICONS,
-  INTEREST_GROUPS,
-  OTHER_INTERESTS_GROUP,
-  TAG_ICONS,
-  iconForTag,
-} from '../../../../data/interests.js'
-import { addCustomInterest, getStoredInterests } from '../../../../utils/interestsStorage.js'
-import { saveUser } from '../../../../utils/session.js'
-import '../../../../styles/settings-shared.css'
-import './Interests.css'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { searchService, settingsService } from '../../../../api'
+import { useToast } from '../../../../context/ToastContext.jsx'
+import { writeCachedInterestIds, readCachedInterestIds } from '../../../../utils/interestsStorage.js'
 
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <circle cx="11" cy="11" r="7" />
-      <path d="M20 20l-3-3" />
-    </svg>
-  )
-}
+const MAX = 10
 
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-      <path d="M20 6L9 17l-5-5" />
-    </svg>
-  )
-}
+export default function Interests() {
+  const navigate = useNavigate()
+  const toast = useToast()
+  const [all, setAll] = useState([])
+  const [selected, setSelected] = useState(new Set())
+  const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-function Interests() {
-  const topRef = useRef(null)
-  const otherGroupRef = useRef(null)
+  useEffect(() => {
+    Promise.all([
+      searchService.filters().catch(() => ({ interests: [] })),
+      settingsService.getInterests().catch(() => []),
+    ]).then(([f, mine]) => {
+      const list = Array.isArray(f?.interests) ? f.interests : []
+      setAll(list)
+      const mineIds = Array.isArray(mine) ? mine : (mine?.interestIds ?? [])
+      const cached = new Set(readCachedInterestIds())
+      const initial = new Set([...mineIds, ...cached])
+      setSelected(initial)
+    }).finally(() => setLoading(false))
+  }, [])
 
-  const [search, setSearch] = useState('')
-  const [stored, setStored] = useState(() => getStoredInterests())
-  const [selected, setSelected] = useState(
-    () => new Set(stored.interests.length ? stored.interests : DEFAULT_SELECTED_INTERESTS),
-  )
-  const [topEditorOpen, setTopEditorOpen] = useState(false)
-  const [otherEditorOpen, setOtherEditorOpen] = useState(false)
-
-  const otherTags = stored.customInterests
-
-  const groupsWithOther = useMemo(
-    () => ({
-      ...INTEREST_GROUPS,
-      [OTHER_INTERESTS_GROUP]: otherTags,
-    }),
-    [otherTags],
-  )
-
-  const filteredGroups = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    if (!q) return groupsWithOther
-
-    return Object.fromEntries(
-      Object.entries(groupsWithOther)
-        .map(([group, tags]) => [
-          group,
-          tags.filter((tag) => tag.toLowerCase().includes(q)),
-        ])
-        .filter(([, tags]) => tags.length > 0 || group === OTHER_INTERESTS_GROUP),
-    )
-  }, [search, groupsWithOther])
-
-  const selectedList = useMemo(() => Array.from(selected), [selected])
-
-  function refreshStored() {
-    setStored(getStoredInterests())
-  }
-
-  function toggleTag(tag) {
-    setSelected((prev) => {
-      const next = new Set(prev)
-      if (next.has(tag)) next.delete(tag)
-      else next.add(tag)
+  const toggle = (id) => {
+    setSelected((cur) => {
+      const next = new Set(cur)
+      if (next.has(id)) next.delete(id)
+      else if (next.size < MAX) next.add(id)
       return next
     })
   }
 
-  function clearAll() {
-    setSelected(new Set())
+  const handleSave = async () => {
+    if (selected.size > MAX) {
+      toast.error(`Chỉ được chọn tối đa ${MAX} sở thích.`)
+      return
+    }
+    setSaving(true)
+    try {
+      await settingsService.updateInterests({ interestIds: Array.from(selected) })
+      writeCachedInterestIds(Array.from(selected))
+      toast.success('Đã lưu sở thích.')
+    } catch (err) {
+      toast.error(err?.message || 'Không lưu được.')
+    } finally {
+      setSaving(false)
+    }
   }
 
-  function scrollToRef(ref) {
-    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
-  function openTopEditor() {
-    setTopEditorOpen(true)
-    setOtherEditorOpen(false)
-    scrollToRef(topRef)
-    window.setTimeout(() => {
-      topRef.current?.querySelector('.inline-interest-add__input')?.focus()
-    }, 400)
-  }
-
-  function openOtherEditor() {
-    setOtherEditorOpen(true)
-    setTopEditorOpen(false)
-    scrollToRef(otherGroupRef)
-    window.setTimeout(() => {
-      otherGroupRef.current?.querySelector('.inline-interest-add__input')?.focus()
-    }, 400)
-  }
-
-  function handleAddOther(label) {
-    const added = addCustomInterest(label)
-    if (!added) return
-    refreshStored()
-    setSelected((prev) => new Set([...prev, added]))
-    setTopEditorOpen(false)
-    setOtherEditorOpen(false)
-  }
+  if (loading) return <div className="loading-block"><span className="spinner" /></div>
 
   return (
-    <AppShell activeNav="discovery">
-      <div className="settings-page interests-page">
-        <PageHeader title="Sở thích chi tiết" backTo="/settings/discovery" />
-
-        <div className="settings-panel interests-panel" ref={topRef} id="interests-page-top">
-          <div className="interests-search-wrap">
-            <SearchIcon />
-            <input
-              type="search"
-              className="interests-search-input"
-              placeholder="Tìm sở thích..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              aria-label="Tìm sở thích"
-            />
-          </div>
-
-          <div className="interests-toolbar">
-            <div className="interests-toolbar__count">
-              <span className="interests-toolbar__badge">{selected.size}</span>
-              <span>đã chọn</span>
-            </div>
-            <div className="interests-toolbar__actions">
-              <InterestAddMenu
-                onEditAtTop={openTopEditor}
-                onEditInSidebar={openOtherEditor}
-                topLabel="Lên đầu trang (ô tìm)"
-                sidebarLabel={`Thêm tại "${OTHER_INTERESTS_GROUP}"`}
-              />
-              {selected.size > 0 && (
-                <button type="button" className="interests-clear-btn" onClick={clearAll}>
-                  Xóa tất cả
-                </button>
-              )}
-            </div>
-          </div>
-
-          {topEditorOpen && (
-            <div className="interests-inline-editor interests-inline-editor--top">
-              <p>Thêm sở thích tùy chỉnh — sẽ nằm trong nhóm &quot;{OTHER_INTERESTS_GROUP}&quot;.</p>
-              <InlineInterestAdd
-                onAdd={handleAddOther}
-                onCancel={() => setTopEditorOpen(false)}
-              />
-            </div>
-          )}
-
-          {selectedList.length > 0 && (
-            <div className="interests-selected-preview">
-              {selectedList.map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  className="interests-selected-chip"
-                  onClick={() => toggleTag(tag)}
-                  aria-label={`Bỏ chọn ${tag}`}
-                >
-                  <span>{TAG_ICONS[tag] ?? iconForTag(tag)}</span>
-                  {tag}
-                  <span className="interests-selected-chip__x">×</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          <div className="interests-groups">
-            {Object.entries(filteredGroups).map(([group, tags]) => (
-              <section
-                key={group}
-                className={`interest-group${group === OTHER_INTERESTS_GROUP ? ' interest-group--other' : ''}`}
-                ref={group === OTHER_INTERESTS_GROUP ? otherGroupRef : undefined}
-                id={group === OTHER_INTERESTS_GROUP ? 'interests-other-group' : undefined}
-              >
-                <header className="interest-group__head">
-                  <span className="interest-group__icon" aria-hidden="true">
-                    {GROUP_ICONS[group]}
-                  </span>
-                  <h2 className="interest-group__title">{group}</h2>
-                  {group === OTHER_INTERESTS_GROUP && (
-                    <InterestAddMenu
-                      className="interest-group__add"
-                      onEditAtTop={openTopEditor}
-                      onEditInSidebar={openOtherEditor}
-                      topLabel="Lên đầu trang"
-                      sidebarLabel="Thêm tại đây"
-                    />
-                  )}
-                </header>
-
-                <div className="interest-group__grid">
-                  {tags.length === 0 && group === OTHER_INTERESTS_GROUP && !otherEditorOpen && (
-                    <p className="interest-group__empty">
-                      Chưa có sở thích khác — bấm (+) để thêm.
-                    </p>
-                  )}
-                  {tags.map((tag) => {
-                    const isSelected = selected.has(tag)
-                    return (
-                      <button
-                        key={tag}
-                        type="button"
-                        className={`interest-chip${isSelected ? ' interest-chip--selected' : ''}`}
-                        onClick={() => toggleTag(tag)}
-                        aria-pressed={isSelected}
-                      >
-                        <span className="interest-chip__icon" aria-hidden="true">
-                          {TAG_ICONS[tag] ?? iconForTag(tag)}
-                        </span>
-                        <span className="interest-chip__label">{tag}</span>
-                        {isSelected && (
-                          <span className="interest-chip__check" aria-hidden="true">
-                            <CheckIcon />
-                          </span>
-                        )}
-                      </button>
-                    )
-                  })}
-                </div>
-
-                {group === OTHER_INTERESTS_GROUP && otherEditorOpen && (
-                  <InlineInterestAdd
-                    onAdd={handleAddOther}
-                    onCancel={() => setOtherEditorOpen(false)}
-                    placeholder="Nhập sở thích khác..."
-                  />
-                )}
-              </section>
-            ))}
-          </div>
-
-          <div className="interests-footer">
+    <div className="settings-page">
+      <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigate('/settings')} style={{ alignSelf: 'flex-start' }}>
+        ← Cài đặt
+      </button>
+      <h1>Sở thích của bạn</h1>
+      <p style={{ color: 'var(--color-text-soft)' }}>
+        Chọn tối đa {MAX} sở thích giúp chúng tôi gợi ý người phù hợp hơn.
+      </p>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {all.map((i) => {
+          const active = selected.has(i.id)
+          return (
             <button
+              key={i.id}
               type="button"
-              className="interests-apply-btn"
-              onClick={() => {
-                const interests = [...selected]
-                saveUser({
-                  interests,
-                  customInterests: stored.customInterests,
-                })
+              className={`tag ${active ? 'tag-primary' : ''}`}
+              onClick={() => toggle(i.id)}
+              style={{
+                cursor: 'pointer',
+                padding: '8px 14px',
+                fontSize: 14,
+                border: active ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
               }}
             >
-              <CheckIcon />
-              Áp dụng
+              {i.name || i.label}
             </button>
-          </div>
-        </div>
+          )
+        })}
       </div>
-    </AppShell>
+      <div style={{ marginTop: 16 }}>
+        <span style={{ fontSize: 13, color: 'var(--color-text-soft)' }}>
+          Đã chọn {selected.size}/{MAX}
+        </span>
+      </div>
+      <button
+        type="button"
+        className="btn btn-primary"
+        style={{ marginTop: 16, alignSelf: 'flex-start' }}
+        onClick={handleSave}
+        disabled={saving}
+      >
+        {saving ? <span className="spinner" /> : 'Lưu'}
+      </button>
+    </div>
   )
 }
-
-export default Interests

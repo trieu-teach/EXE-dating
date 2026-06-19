@@ -1,22 +1,16 @@
 import TopNav from '../TopNav/TopNav.jsx'
-import BottomNav from '../BottomNav/BottomNav.jsx'
+import { useAuth } from '../../../context/AuthContext.jsx'
 import './AppShell.css'
 
-function AppShell({ children, activeNav, focusMode = false }) {
+export default function AppShell({ children, variant = 'constrained' }) {
   return (
-    <div className={`app-shell${focusMode ? ' app-shell--focus' : ''}`}>
-      <div className="app-shell__bg" aria-hidden="true">
-        <div className="app-shell__blob app-shell__blob--1" />
-        <div className="app-shell__blob app-shell__blob--2" />
+    <div className="app-shell">
+      <TopNav />
+      <div className="app-shell-body">
+        <main className={variant === 'full' ? 'app-shell-main full' : 'app-shell-main'}>
+          {children}
+        </main>
       </div>
-
-      {!focusMode && <TopNav activeNav={activeNav} />}
-
-      <main className="app-shell__content">{children}</main>
-
-      {!focusMode && <BottomNav />}
     </div>
   )
 }
-
-export default AppShell

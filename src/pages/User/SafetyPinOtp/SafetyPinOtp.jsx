@@ -1,90 +1,73 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import AppShell from '../../../components/User/AppShell/AppShell.jsx'
-import PageHeader from '../../../components/User/PageHeader/PageHeader.jsx'
-import '../../../styles/flow-card.css'
-import './SafetyPinOtp.css'
+import { safetyService } from '../../../api'
+import { useToast } from '../../../context/ToastContext.jsx'
+import { validateOtp } from '../../../utils/validation.js'
 
-function SafetyPinOtp() {
+export default function SafetyPinOtp() {
   const navigate = useNavigate()
-  const [otp, setOtp] = useState('')
-  const [countdown, setCountdown] = useState(59)
+  const toast = useToast()
+  const [otp, setOtp] = useState(['', '', '', '', '', ''])
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const inputs = useRef([])
 
-  useEffect(() => {
-    if (countdown <= 0) return undefined
-    const t = setInterval(() => setCountdown((c) => c - 1), 1000)
-    return () => clearInterval(t)
-  }, [countdown])
+  useEffect(() => { inputs.current[0]?.focus() }, [])
 
-  function appendDigit(d) {
-    if (otp.length >= 6) return
-    const next = otp + d
+  const setDigit = (i, v) => {
+    const digit = v.replace(/\D/g, '').slice(0, 1)
+    const next = [...otp]
+    next[i] = digit
     setOtp(next)
-    if (next.length === 6) setTimeout(() => navigate('/safety-pin-setup'), 400)
+    if (digit && i < 5) inputs.current[i + 1]?.focus()
   }
 
-  function backspace() {
-    setOtp((o) => o.slice(0, -1))
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const code = otp.join('')
+    const v = validateOtp(code)
+    if (v) { setError(v); return }
+    setSubmitting(true)
+    setError('')
+    try {
+      await safetyService.verifyPinOtp({ otp: code })
+      toast.success('Xác minh thành công. Hãy đặt PIN mới.')
+      navigate('/safety-pin-setup')
+    } catch (err) {
+      setError(err?.message || 'OTP không đúng.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
-    <AppShell activeNav="safety" focusMode>
-      <div className="flow-page">
-        <div className="flow-card safety-pin-otp">
-          <PageHeader title="Xác thực mã OTP" backTo="/safety-pin-forgot" />
-
-          <span className="flow-card__icon">💌</span>
-          <h1>Xác thực mã OTP</h1>
-          <p className="flow-card__desc">
-            Nhập mã 6 số đã gửi tới email hoặc số điện thoại của bạn.
-          </p>
-
-          <div className="safety-pin-otp__slots">
-            {[0, 1, 2, 3, 4, 5].map((i) => (
-              <span key={i} className={otp[i] ? 'safety-pin-otp__slot--filled' : ''}>
-                {otp[i] || ''}
-              </span>
+    <main className="auth-page" style={{ alignItems: 'flex-start' }}>
+      <div className="auth-card" style={{ maxWidth: 420 }}>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigate(-1)} style={{ alignSelf: 'flex-start', marginBottom: 12 }}>
+          ← Quay lại
+        </button>
+        <h1>Nhập mã OTP</h1>
+        <p className="auth-subtitle">Mã đã được gửi đến email của bạn.</p>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+            {otp.map((d, i) => (
+              <input
+                key={i}
+                ref={(el) => { inputs.current[i] = el }}
+                value={d}
+                onChange={(e) => setDigit(i, e.target.value)}
+                inputMode="numeric"
+                maxLength={1}
+                style={{ width: 44, textAlign: 'center', fontSize: 22 }}
+              />
             ))}
           </div>
-
-          <button
-            type="button"
-            className="flow-btn-primary"
-            disabled={otp.length < 6}
-            onClick={() => navigate('/safety-pin-setup')}
-          >
-            Tiếp tục
+          {error && <div className="auth-form-error">{error}</div>}
+          <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+            {submitting ? <span className="spinner" /> : 'Xác nhận'}
           </button>
-
-          <button
-            type="button"
-            className="safety-pin-otp__resend"
-            disabled={countdown > 0}
-            onClick={() => setCountdown(59)}
-          >
-            Gửi lại mã {countdown > 0 ? `(${String(countdown).padStart(2, '0')}:00)` : ''}
-          </button>
-
-          <div className="safety-pin-otp__numpad">
-            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'].map((key) => (
-              <button
-                key={key || 'empty'}
-                type="button"
-                className={key === '' ? 'safety-pin-otp__key--empty' : ''}
-                onClick={() => {
-                  if (key === 'del') backspace()
-                  else if (key) appendDigit(key)
-                }}
-                disabled={key === ''}
-              >
-                {key === 'del' ? '⌫' : key}
-              </button>
-            ))}
-          </div>
-        </div>
+        </form>
       </div>
-    </AppShell>
+    </main>
   )
 }
-
-export default SafetyPinOtp

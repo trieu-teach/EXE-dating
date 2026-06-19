@@ -1,91 +1,72 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import AppShell from '../../../components/User/AppShell/AppShell.jsx'
-import PageHeader from '../../../components/User/PageHeader/PageHeader.jsx'
-import './SafetyPinSetup.css'
+import { useNavigate } from 'react-router-dom'
+import { safetyService } from '../../../api'
+import { useToast } from '../../../context/ToastContext.jsx'
+import { validatePin } from '../../../utils/validation.js'
 
-function SafetyPinSetup() {
+export default function SafetyPinSetup() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [pin, setPin] = useState('')
   const [confirm, setConfirm] = useState('')
-  const [step, setStep] = useState('enter')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
-  function appendDigit(d) {
-    if (step === 'enter') {
-      if (pin.length >= 4) return
-      const next = pin + d
-      setPin(next)
-      if (next.length === 4) setStep('confirm')
-    } else if (confirm.length < 4) {
-      setConfirm((c) => c + d)
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const v1 = validatePin(pin)
+    if (v1) { setError(v1); return }
+    if (pin !== confirm) { setError('Mã PIN nhập lại không khớp.'); return }
+    setSubmitting(true)
+    setError('')
+    try {
+      await safetyService.setupPin({ pin })
+      toast.success('Đã đặt PIN an toàn.')
+      navigate('/safety')
+    } catch (err) {
+      setError(err?.message || 'Không đặt được PIN.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
-  function backspace() {
-    if (step === 'confirm') setConfirm((c) => c.slice(0, -1))
-    else setPin((p) => p.slice(0, -1))
-  }
-
-  const active = step === 'enter' ? pin : confirm
-
-  function handleConfirm() {
-    if (pin === confirm && pin.length === 4) navigate('/safety')
-  }
-
   return (
-    <AppShell activeNav="safety" focusMode>
-      <div className="pin-setup-page">
-        <PageHeader title="Thiết lập mã PIN" backTo="/safety" />
-
-        <div className="pin-setup-card">
-          <span className="pin-setup-card__icon">🔒</span>
-          <h1>Thiết lập mã PIN an toàn</h1>
-          <p>
-            Mã PIN dùng để xác nhận an toàn và bảo vệ tài khoản khi có báo động.
-          </p>
-
-          <p className="pin-setup-card__hint">
-            {step === 'enter' ? 'Nhập mã PIN 4 số' : 'Nhập lại mã PIN để xác nhận'}
-          </p>
-          <div className="pin-setup-dots">
-            {[0, 1, 2, 3].map((i) => (
-              <span key={i} className={active.length > i ? 'pin-setup-dots__filled' : ''} />
-            ))}
+    <main className="auth-page" style={{ alignItems: 'flex-start' }}>
+      <div className="auth-card" style={{ maxWidth: 420 }}>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigate('/safety')} style={{ alignSelf: 'flex-start', marginBottom: 12 }}>
+          ← An toàn
+        </button>
+        <h1>Đặt mã PIN</h1>
+        <p className="auth-subtitle">PIN 4–6 chữ số dùng để mở khoá app và xác nhận khẩn cấp.</p>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="field">
+            <label className="field-label">PIN</label>
+            <input
+              type="password"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={pin}
+              onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              required
+            />
           </div>
-
-          <div className="pin-setup-numpad">
-            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'].map((key) => (
-              <button
-                key={key || 'empty'}
-                type="button"
-                className={`pin-setup-numpad__key${key === '' ? ' pin-setup-numpad__key--empty' : ''}`}
-                onClick={() => {
-                  if (key === 'del') backspace()
-                  else if (key) appendDigit(key)
-                }}
-                disabled={key === ''}
-              >
-                {key === 'del' ? '⌫' : key}
-              </button>
-            ))}
+          <div className="field">
+            <label className="field-label">Nhập lại PIN</label>
+            <input
+              type="password"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              required
+            />
           </div>
-
-          <button
-            type="button"
-            className="pin-setup-submit"
-            disabled={confirm.length < 4}
-            onClick={handleConfirm}
-          >
-            Xác nhận
+          {error && <div className="auth-form-error">{error}</div>}
+          <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+            {submitting ? <span className="spinner" /> : 'Lưu PIN'}
           </button>
-
-          <Link to="/safety-pin-forgot" className="pin-setup-forgot">
-            Quên mã PIN an toàn?
-          </Link>
-        </div>
+        </form>
       </div>
-    </AppShell>
+    </main>
   )
 }
-
-export default SafetyPinSetup

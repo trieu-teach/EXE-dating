@@ -1,80 +1,63 @@
-import { API_ENDPOINTS } from '../config.js'
-import { get, post, put, withMockFallback } from '../http.js'
-import {
-  getTrustScore,
-  getVerificationStatus,
-  isIdentityVerified,
-  isVerificationRequired,
-  saveIdentityVerification,
-} from '../../utils/identityVerification.js'
-import { getAvatarUrl, getProfilePhotos } from '../../utils/profilePhotos.js'
-import { getUser } from '../../utils/session.js'
+/**
+ * Profile service — covers STAGE 1 of E2E_USER_FLOW.
+ *
+ *   PUT  /api/profile                       update info
+ *   PUT  /api/profile/location              required before Discovery
+ *   POST /api/profile/photos                multipart → { id, url }
+ *   PUT  /api/profile/photos/{id}/primary   set primary
+ *   PUT  /api/profile/photos/order          reorder
+ *   DELETE /api/profile/photos/{id}
+ *   POST /api/profile/boost
+ *   POST /api/profile/verify-face           multipart selfie
+ *   GET  /api/profile/verification
+ *   GET  /api/profile/me                    { ..., isProfileCompleted }
+ */
 
-function delay(ms = 250) {
-  return new Promise((r) => setTimeout(r, ms))
-}
+import { API_ENDPOINTS } from '../config.js'
+import { del, get, post, put, upload } from '../http.js'
 
 export const profileService = {
-  async getMe() {
-    return withMockFallback(
-      () => get(API_ENDPOINTS.profile.me),
-      async () => {
-        await delay()
-        const local = getUser()
-        const profile = local?.profile ?? {}
-        const photos = getProfilePhotos()
-        return {
-          name: local?.name ?? profile.fullName ?? 'Người dùng SameMess',
-          displayName: profile.fullName ?? local?.name ?? 'Nguyễn Minh Anh',
-          username: local?.username ?? 'minhanh_23',
-          email: local?.email ?? 'minhanh@gmail.com',
-          avatarUrl: getAvatarUrl(),
-          profilePhotos: photos,
-          photoCount: photos.length || (local?.photoCount ?? 0),
-          identityVerified: isIdentityVerified(local),
-          verificationMethod: local?.verificationMethod ?? null,
-          verifiedAt: local?.verifiedAt ?? null,
-          trustScore: getTrustScore(local),
-          verificationStatus: getVerificationStatus(local),
-          verificationRequired: isVerificationRequired(),
-          stats: { likes: 12, connections: 5, completion: 89 },
-          location: profile.city ?? 'Hà Nội, Việt Nam',
-          age: profile.age ?? '25',
-          occupation: profile.occupation ?? '',
-          bio: profile.bio ?? '',
-          personality: profile.personality ?? 'Cân bằng',
-          shareSexualOrientation: Boolean(profile.sexualOrientation),
-          sexualOrientation: profile.sexualOrientation ?? '',
-        }
-      },
-    )
+  me() {
+    return get(API_ENDPOINTS.profile.me)
   },
 
-  async updateProfile(payload) {
-    return withMockFallback(
-      () => put(API_ENDPOINTS.profile.update, payload),
-      async () => ({ success: true, ...payload }),
-    )
+  update(payload) {
+    return put(API_ENDPOINTS.profile.update, payload)
   },
 
-  async submitVerification(payload) {
-    return withMockFallback(
-      () => post(API_ENDPOINTS.profile.verification, payload),
-      async () => {
-        await delay(600)
-        if (payload?.type === 'face' && !payload?.photo) {
-          throw new Error('Thiếu ảnh xác minh')
-        }
-        if (payload?.type === 'face' && payload?.photo) {
-          saveIdentityVerification({ photo: payload.photo, method: 'camera_pc' })
-        }
-        return {
-          success: true,
-          verified: true,
-          type: payload?.type ?? 'face',
-          trustScore: getTrustScore(),
-        }
-      },
-    )
+  updateLocation({ latitude, longitude }) {
+    return put(API_ENDPOINTS.profile.location, { latitude, longitude })
+  },
+
+  uploadPhoto(file) {
+    const fd = new FormData()
+    fd.append('file', file)
+    return upload(API_ENDPOINTS.profile.photos, fd)
+  },
+
+  setPrimary(photoId) {
+    return put(API_ENDPOINTS.profile.photoPrimary(photoId))
+  },
+
+  reorder(photoIds) {
+    return put(API_ENDPOINTS.profile.photoReorder, { photoIds })
+  },
+
+  deletePhoto(photoId) {
+    return del(API_ENDPOINTS.profile.photoDelete(photoId))
+  },
+
+  boost() {
+    return post(API_ENDPOINTS.profile.boost)
+  },
+
+  verifyFace(file) {
+    const fd = new FormData()
+    fd.append('file', file)
+    return upload(API_ENDPOINTS.profile.verifyFace, fd)
+  },
+
+  verification() {
+    return get(API_ENDPOINTS.profile.verification)
   },
 }

@@ -1,0 +1,166 @@
+/* =========================================================
+ * Face verification UI — camera viewport, preview, banners
+ * ========================================================= */
+
+.fv-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.fv-status-card {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  align-items: center;
+}
+.fv-status-card.is-approved { background: rgba(22, 163, 74, 0.10); border-color: rgba(22, 163, 74, 0.30); }
+.fv-status-card.is-pending  { background: rgba(37, 99, 235, 0.08); border-color: rgba(37, 99, 235, 0.25); }
+.fv-status-card.is-rejected { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.30); }
+.fv-status-card.is-empty    { background: var(--color-primary-soft); border-color: rgba(255, 79, 139, 0.30); }
+
+.fv-status-emoji {
+  font-size: 36px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.fv-status-text { flex: 1; min-width: 0; }
+.fv-status-text strong { display: block; font-size: 1rem; color: var(--color-text); }
+.fv-status-text span { color: var(--color-text-soft); font-size: 0.88rem; line-height: 1.45; }
+.fv-status-text small { color: var(--color-text-muted); font-size: 0.78rem; display: block; margin-top: 2px; }
+
+.fv-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--color-success);
+  border: 1px solid rgba(22, 163, 74, 0.35);
+}
+
+.fv-banner {
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.fv-banner.is-error { background: rgba(239, 68, 68, 0.10); color: var(--color-danger); border: 1px solid rgba(239, 68, 68, 0.30); }
+.fv-banner.is-info  { background: var(--color-primary-soft); color: var(--color-primary); border: 1px solid rgba(255, 79, 139, 0.30); }
+.fv-banner.is-warn  { background: rgba(245, 158, 11, 0.10); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.30); }
+
+.fv-camera {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 360px;
+  margin: 0 auto;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: #0e0a14;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fv-camera video,
+.fv-camera canvas,
+.fv-camera img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* mirror so it feels like a mirror selfie */
+  transform: scaleX(-1);
+}
+.fv-camera-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fv-camera-frame {
+  width: 70%;
+  aspect-ratio: 3 / 4;
+  border-radius: 50% / 40%;
+  border: 2px dashed rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+}
+.fv-camera-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 0.85rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.fv-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 360px;
+  margin: 0 auto;
+  border-radius: var(--radius-xl);
+  border: 2px dashed var(--color-border-strong);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--color-surface-2);
+  color: var(--color-text-soft);
+  text-align: center;
+  padding: var(--space-4);
+}
+.fv-placeholder-emoji { font-size: 48px; }
+.fv-placeholder small { color: var(--color-text-muted); font-size: 0.78rem; }
+
+.fv-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+.fv-actions.is-row {
+  grid-template-columns: 1fr 1fr;
+}
+.fv-actions .btn { padding: 12px 20px; }
+
+.fv-helper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+}
+.fv-helper-emoji { font-size: 18px; }
+
+.fv-spinner-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fv-prereq {
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--color-surface-2);
+  border: 1px dashed var(--color-border-strong);
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 540px) {
+  .fv-actions.is-row { grid-template-columns: 1fr; }
+}

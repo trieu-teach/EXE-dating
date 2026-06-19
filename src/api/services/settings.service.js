@@ -1,66 +1,49 @@
-import { API_ENDPOINTS } from '../config.js'
-import { get, put, withMockFallback } from '../http.js'
+/**
+ * Settings service — STAGE 2.
+ *
+ *   GET /api/settings/security              { twoFactorEnabled, loginAlertsEnabled, ... }
+ *   PUT /api/settings/security              { twoFactorEnabled?, loginAlertsEnabled? }
+ *   GET /api/settings/devices               DeviceDto[]
+ *   GET /api/settings/discovery             (= preferences)
+ *   PUT /api/settings/discovery
+ *   GET /api/settings/interests             → my interest ids
+ *   PUT /api/settings/interests             { interestIds: [] }  (max 10)
+ *   PUT /api/settings/password              { currentPassword, newPassword }  // thu hồi sessions
+ */
 
-function delay(ms = 250) {
-  return new Promise((r) => setTimeout(r, ms))
-}
+import { API_ENDPOINTS } from '../config.js'
+import { get, put } from '../http.js'
 
 export const settingsService = {
-  async getSecurity() {
-    return withMockFallback(
-      () => get(API_ENDPOINTS.settings.security),
-      async () => {
-        await delay()
-        return { twoFactor: false, loginAlerts: true }
-      },
-    )
+  getSecurity() {
+    return get(API_ENDPOINTS.settings.security)
   },
 
-  async getDevices() {
-    return withMockFallback(
-      () => get(API_ENDPOINTS.settings.devices),
-      async () => {
-        await delay()
-        return {
-          devices: [
-            { id: '1', name: 'Chrome · Windows', current: true, lastActive: 'Vừa xong' },
-          ],
-        }
-      },
-    )
+  updateSecurity(payload) {
+    return put(API_ENDPOINTS.settings.security, payload)
   },
 
-  async getDiscoverySettings() {
-    return withMockFallback(
-      () => get(API_ENDPOINTS.settings.discovery),
-      async () => {
-        await delay()
-        return { distanceKm: 25, ageMin: 22, ageMax: 35, showMe: 'everyone' }
-      },
-    )
+  getDevices() {
+    return get(API_ENDPOINTS.settings.devices)
   },
 
-  async getInterests() {
-    return withMockFallback(
-      () => get(API_ENDPOINTS.settings.interests),
-      async () => {
-        await delay()
-        return { selected: [], groups: [] }
-      },
-    )
+  getDiscovery() {
+    return get(API_ENDPOINTS.settings.discovery)
   },
 
-  async updateDiscoverySettings(payload) {
-    return withMockFallback(
-      () => put(API_ENDPOINTS.settings.discovery, payload),
-      async () => ({ success: true }),
-    )
+  updateDiscovery(payload) {
+    return put(API_ENDPOINTS.settings.discovery, payload)
   },
 
-  async changePassword(payload) {
-    return withMockFallback(
-      () => put(API_ENDPOINTS.settings.changePassword, payload),
-      async () => ({ success: true }),
-    )
+  getInterests() {
+    return get(API_ENDPOINTS.settings.interests)
+  },
+
+  updateInterests({ interestIds }) {
+    return put(API_ENDPOINTS.settings.interests, { interestIds })
+  },
+
+  changePassword({ currentPassword, newPassword }) {
+    return put(API_ENDPOINTS.settings.password, { currentPassword, newPassword })
   },
 }

@@ -1,74 +1,67 @@
 import { Link } from 'react-router-dom'
-import { canSuggestDateFromTree, loveTreeToDisplayState } from '../../../utils/loveTreeState.js'
-import './LoveTreeBondBar.css'
 
-const STAGE_EMOJI = {
-  sprout: '🌱',
-  sparse: '🌿',
-  seedling: '🪴',
-  budding: '🌸',
-  young: '🌺',
-  blooming: '🌳',
-  radiant: '✨',
+const TREE_IMAGES_MINI = {
+  seedling: '/assets/love-tree/tree-stage-seedling.png',
+  sprout:  '/assets/love-tree/tree-stage-sprout.png',
+  budding: '/assets/love-tree/tree-stage-budding.png',
+  sparse:  '/assets/love-tree/tree-stage-sparse.png',
+  young:   '/assets/love-tree/tree-stage-young.png',
+  blooming:'/assets/love-tree/tree-stage-blooming.png',
+  premium: '/assets/love-tree/cherry-tree-premium.png',
 }
 
-function LoveTreeBondBar({ treeState, partnerId, partnerName, compact = false }) {
-  if (!treeState) return null
+function getTreeMini(level) {
+  if (level >= 21) return TREE_IMAGES_MINI.premium
+  if (level >= 11) return TREE_IMAGES_MINI.blooming
+  if (level >= 6)  return TREE_IMAGES_MINI.young
+  if (level >= 4)  return TREE_IMAGES_MINI.sparse
+  if (level >= 3)  return TREE_IMAGES_MINI.budding
+  if (level >= 2)  return TREE_IMAGES_MINI.sprout
+  return TREE_IMAGES_MINI.seedling
+}
 
-  const display = loveTreeToDisplayState(treeState)
-  const emoji = STAGE_EMOJI[display.stageKey] ?? '🌱'
-  const dateReady = canSuggestDateFromTree(treeState)
-  const treeLink = partnerId ? `/love-tree?partner=${partnerId}` : '/love-tree'
-
-  if (compact) {
-    return (
-      <Link
-        to={treeLink}
-        className="love-tree-bond love-tree-bond--compact"
-        title={`Cây tình yêu · ${display.stageLabel} ${display.attachmentPercent}%`}
-      >
-        {emoji} Cấp {display.level}
-      </Link>
-    )
-  }
+export default function LoveTreeBondBar({ plant, matchId, onWater, loading }) {
+  if (!plant) return null
+  const level = Number(plant.level ?? 1)
+  const growthPct = Math.max(0, Math.min(100, Number(plant.growthPercent ?? 0)))
+  const perLevel = Math.max(1, Number(plant.percentPerLevel ?? 100))
+  const barPct = Math.min(100, (growthPct / perLevel) * 100)
+  const streak = Number(plant.streakCount ?? 0)
+  const bothWatered = Boolean(plant.bothWateredToday)
+  const treeImg = getTreeMini(level)
 
   return (
-    <div className={`love-tree-bond${dateReady ? ' love-tree-bond--date-ready' : ''}`}>
-      <div className="love-tree-bond__head">
-        <span className="love-tree-bond__emoji" aria-hidden="true">
-          {emoji}
-        </span>
-        <div className="love-tree-bond__info">
-          <strong>
-            Cây tình yêu · Cấp {display.level}/{display.maxLevel}
-          </strong>
-          <span>
-            {display.stageLabel} — {display.attachmentPercent}% gắn kết
-          </span>
+    <section className="bond-bar">
+      <div className="bond-bar-left">
+        <img src={treeImg} alt={`Cây cấp ${level}`} className="bond-bar-img" />
+      </div>
+      <div className="bond-bar-mid">
+        <div className="bond-bar-top">
+          <span className="bond-bar-level">Cấp {level}</span>
+          {streak > 0 && <span className="bond-bar-streak">🔥 {streak}</span>}
+          {bothWatered && <span className="bond-bar-duo">💞</span>}
         </div>
-        <Link to={treeLink} className="love-tree-bond__link">
-          Chăm cây →
-        </Link>
+        <div className="bond-bar-progress">
+          <div className="bond-bar-progress-fill" style={{ width: `${barPct}%` }} />
+        </div>
+        <div className="bond-bar-bottom">
+          <span className="bond-bar-xp">{growthPct}% / {perLevel}%</span>
+          {matchId && (
+            <Link to={`/love-tree?matchId=${matchId}`} className="bond-bar-link">
+              Chi tiết →
+            </Link>
+          )}
+        </div>
       </div>
-
-      <div
-        className="love-tree-bond__bar"
-        role="progressbar"
-        aria-valuenow={display.attachmentPercent}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Mức gắn kết cây tình yêu"
+      <button
+        type="button"
+        className="bond-bar-water-btn"
+        onClick={onWater}
+        disabled={loading}
+        title="Tưới cây"
       >
-        <span style={{ width: `${display.attachmentPercent}%` }} />
-      </div>
-
-      <p className="love-tree-bond__hint">
-        {dateReady
-          ? `Cây đủ lớn — có thể hẹn ${partnerName ?? 'đối phương'} gặp mặt thật!`
-          : 'Tưới nước, gửi nắng, bón yêu trên trang Cây tình yêu để hai bạn gắn bó hơn.'}
-      </p>
-    </div>
+        {loading ? <span className="spinner" /> : '💧'}
+      </button>
+    </section>
   )
 }
-
-export default LoveTreeBondBar

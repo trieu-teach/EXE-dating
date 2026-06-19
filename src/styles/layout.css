@@ -1,9 +1,37 @@
-/* Layout shell — đồng bộ nav + nội dung, tận dụng chiều ngang */
+/* App shell layout: top nav + centered content + bottom nav (mobile). */
 
-.layout-container {
-  width: 100%;
-  max-width: var(--layout-max);
-  margin-inline: auto;
-  padding-inline: var(--layout-padding-x);
-  box-sizing: border-box;
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
 }
+
+.app-shell-body {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: var(--space-5) var(--space-4) var(--space-12);
+}
+
+.app-shell-main {
+  width: 100%;
+  max-width: 680px;
+}
+
+@media (max-width: 600px) {
+  .app-shell-body {
+    padding: var(--space-3);
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  margin-bottom: var(--space-4);
+}
+.page-header h1 { font-size: 1.2rem; margin: 0; font-weight: 800; }
+.page-header .page-header-spacer { flex: 1; }

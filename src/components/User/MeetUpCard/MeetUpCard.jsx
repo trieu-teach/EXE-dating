@@ -1,102 +1,68 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { MEETUP_TIME_SLOTS, MEETUP_VENUES } from '../../../data/connectionNudges.js'
-import './MeetUpCard.css'
+import { resolveImageUrl, formatDistance, timeAgo } from '../../../utils/format.js'
 
-function MeetUpCard({
-  partnerName,
-  venues,
-  locationHint,
-  onSendInvite,
-  onClose,
-  sending = false,
-}) {
-  const venueList = venues?.length ? venues : MEETUP_VENUES
-  const [venueId, setVenueId] = useState(venueList[0]?.id)
-  const [timeId, setTimeId] = useState(MEETUP_TIME_SLOTS[0].id)
-
-  useEffect(() => {
-    if (venueList[0]?.id) setVenueId(venueList[0].id)
-  }, [venueList])
-
-  const venue = venueList.find((v) => v.id === venueId) ?? venueList[0]
-  const timeSlot = MEETUP_TIME_SLOTS.find((t) => t.id === timeId) ?? MEETUP_TIME_SLOTS[0]
-
+/**
+ * Card hiển thị 1 lời mời gặp mặt (meet-up) từ đối phương.
+ *
+ * Props:
+ *  - meetup: { id, proposerId, venueId, venueName?, venueAddress?, proposedAt, note, status }
+ */
+export default function MeetUpCard({ meetup, onAccept, onDecline, loading }) {
+  const cover = resolveImageUrl(meetup?.venuePhotoUrl)
   return (
-    <div className="meetup-card">
-      <div className="meetup-card__head">
-        <div>
-          <span className="meetup-card__eyebrow">Hẹn gặp thật</span>
-          <h3>Gợi ý buổi hẹn với {partnerName}</h3>
+    <article className="card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div
+        style={{
+          height: 120,
+          borderRadius: 12,
+          background: cover ? `url(${cover}) center/cover` : 'var(--color-surface-2)',
+        }}
+      />
+      <div>
+        <div style={{ fontWeight: 700 }}>
+          {meetup?.venueName || `Địa điểm #${meetup?.venueId}`}
         </div>
-        <button type="button" className="meetup-card__close" onClick={onClose} aria-label="Đóng">
-          ✕
-        </button>
+        {meetup?.venueAddress && (
+          <div style={{ fontSize: 13, color: 'var(--color-text-soft)' }}>
+            {meetup.venueAddress} · {formatDistance(meetup?.distanceKm)}
+          </div>
+        )}
+        <div style={{ fontSize: 13, color: 'var(--color-text-soft)', marginTop: 4 }}>
+          ⏰ {meetup?.proposedAt ? new Date(meetup.proposedAt).toLocaleString('vi-VN') : '—'}
+        </div>
+        {meetup?.note && (
+          <p style={{ marginTop: 8, fontSize: 14 }}>{meetup.note}</p>
+        )}
+        {meetup?.status && (
+          <div className="tag" style={{ marginTop: 8 }}>Trạng thái: {meetup.status}</div>
+        )}
+        <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 4 }}>
+          Gửi {timeAgo(meetup?.createdAt || meetup?.proposedAt)}
+        </div>
       </div>
-
-      {locationHint && <p className="meetup-card__location-hint">📍 {locationHint}</p>}
-
-      <p className="meetup-card__lead">
-        Chọn địa điểm & thời gian — gợi ý theo vị trí hai bạn đang ở.
-      </p>
-
-      <div className="meetup-card__section">
-        <span className="meetup-card__label">Địa điểm gần đây</span>
-        <div className="meetup-card__options">
-          {venueList.map((v) => (
+      {(onAccept || onDecline) && (
+        <div style={{ display: 'flex', gap: 8 }}>
+          {onDecline && (
             <button
-              key={v.id}
               type="button"
-              className={`meetup-card__option${venueId === v.id ? ' meetup-card__option--active' : ''}`}
-              onClick={() => setVenueId(v.id)}
+              className="btn btn-ghost"
+              onClick={onDecline}
+              disabled={loading}
             >
-              <span className="meetup-card__option-icon">{v.icon}</span>
-              <span>
-                <strong>{v.name}</strong>
-                <em>
-                  {v.desc}
-                  {v.distanceKm != null ? ` · ~${v.distanceKm} km` : ''}
-                </em>
-              </span>
+              Từ chối
             </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="meetup-card__section">
-        <span className="meetup-card__label">Thời gian</span>
-        <div className="meetup-card__times">
-          {MEETUP_TIME_SLOTS.map((slot) => (
+          )}
+          {onAccept && (
             <button
-              key={slot.id}
               type="button"
-              className={`meetup-card__time${timeId === slot.id ? ' meetup-card__time--active' : ''}`}
-              onClick={() => setTimeId(slot.id)}
+              className="btn btn-primary"
+              onClick={onAccept}
+              disabled={loading}
             >
-              <strong>{slot.label}</strong>
-              <span>{slot.sub}</span>
+              {loading ? <span className="spinner" /> : 'Đồng ý gặp'}
             </button>
-          ))}
+          )}
         </div>
-      </div>
-
-      <div className="meetup-card__meta">
-        <span>⏱ {venue?.duration ?? '60 phút'}</span>
-        <Link to="/safety-checkin" className="meetup-card__safety">
-          🛡 Check-in an toàn khi gặp
-        </Link>
-      </div>
-
-      <button
-        type="button"
-        className="meetup-card__send"
-        disabled={sending || !venue}
-        onClick={() => onSendInvite?.({ venue, timeSlot })}
-      >
-        {sending ? 'Đang gửi...' : `Gửi lời mời hẹn ${partnerName}`}
-      </button>
-    </div>
+      )}
+    </article>
   )
 }
-
-export default MeetUpCard

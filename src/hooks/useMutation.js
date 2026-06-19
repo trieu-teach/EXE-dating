@@ -1,34 +1,24 @@
-import { useCallback, useState } from 'react'
-import { normalizeError } from '../api/errors.js'
-
 /**
- * Hook cho form / hành động POST PUT
- * @template T, A
- * @param {(args: A) => Promise<T>} mutator
+ * Small wrapper around useAsync to expose a `mutate` function that runs an
+ * async operation and exposes loading/error state.
  */
+
+import { useCallback, useState } from 'react'
+
 export function useMutation(mutator) {
-  const [data, setData] = useState(null)
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [state, setState] = useState({ loading: false, error: null, data: null })
 
-  const mutate = useCallback(
-    async (args) => {
-      setLoading(true)
-      setError(null)
-      try {
-        const result = await mutator(args)
-        setData(result)
-        return result
-      } catch (err) {
-        const normalized = normalizeError(err)
-        setError(normalized)
-        throw normalized
-      } finally {
-        setLoading(false)
-      }
-    },
-    [mutator],
-  )
+  const mutate = useCallback(async (...args) => {
+    setState({ loading: true, error: null, data: null })
+    try {
+      const data = await mutator(...args)
+      setState({ loading: false, error: null, data })
+      return data
+    } catch (err) {
+      setState({ loading: false, error: err, data: null })
+      throw err
+    }
+  }, [mutator])
 
-  return { mutate, data, error, loading, reset: () => setError(null) }
+  return { ...state, mutate, reset: () => setState({ loading: false, error: null, data: null }) }
 }

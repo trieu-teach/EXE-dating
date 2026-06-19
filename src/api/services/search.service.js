@@ -1,43 +1,33 @@
-import { API_ENDPOINTS } from '../config.js'
-import { get, withMockFallback } from '../http.js'
-import {
-  CITY_OPTIONS,
-  filterSearchResults,
-  MOCK_SEARCH_PEOPLE,
-  MOOD_OPTIONS,
-  PROXIMITY_OPTIONS,
-  USER_DEFAULT_CITY,
-  WANT_TO_GO_OPTIONS,
-} from '../mocks/search.mock.js'
+/**
+ * Search service — STAGE 3.
+ *
+ *   GET /api/search/filters   → { interests: [{ id, name, group? }] }
+ *   GET /api/search/results?gender=&city=&minAge=&maxAge=&interests=&distanceKm=&sort=distance
+ */
 
-function delay(ms = 300) {
-  return new Promise((r) => setTimeout(r, ms))
+import { API_ENDPOINTS } from '../config.js'
+import { get } from '../http.js'
+
+function toQuery(params = {}) {
+  const qs = new URLSearchParams()
+  for (const [k, v] of Object.entries(params)) {
+    if (v === undefined || v === null || v === '') continue
+    if (Array.isArray(v)) {
+      qs.set(k, v.join(','))
+    } else {
+      qs.set(k, String(v))
+    }
+  }
+  const s = qs.toString()
+  return s ? `?${s}` : ''
 }
 
 export const searchService = {
-  async getFilters() {
-    return withMockFallback(
-      () => get(`${API_ENDPOINTS.search.results}/filters`),
-      async () => {
-        await delay(150)
-        return {
-          moods: MOOD_OPTIONS,
-          wantToGo: WANT_TO_GO_OPTIONS,
-          cities: CITY_OPTIONS,
-          proximity: PROXIMITY_OPTIONS,
-          userCity: USER_DEFAULT_CITY,
-        }
-      },
-    )
+  filters() {
+    return get(API_ENDPOINTS.search.filters)
   },
 
-  async search(params = {}) {
-    return withMockFallback(
-      () => get(`${API_ENDPOINTS.search.results}?${new URLSearchParams(params)}`),
-      async () => {
-        await delay()
-        return filterSearchResults(MOCK_SEARCH_PEOPLE, params)
-      },
-    )
+  results(params = {}) {
+    return get(`${API_ENDPOINTS.search.results}${toQuery(params)}`)
   },
 }

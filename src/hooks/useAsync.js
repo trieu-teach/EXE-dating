@@ -1,57 +1,50 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { normalizeError } from '../api/errors.js'
-
 /**
- * Hook chuẩn cho mọi trang gọi API
- * @template T
- * @param {() => Promise<T>} fetcher
- * @param {unknown[]} [deps]
- * @param {{ immediate?: boolean }} [options]
+ * Generic async-resource hook. Given an async loader and a deps array,
+ * returns `{ data, loading, error, reload, setData }`.
+ *
+ * The `loader` is captured into a memoised callback. We intentionally
+ * disable the exhaustive-deps lint for `useCallback` here because the
+ * caller passes a plain array — the rule expects an inline literal in
+ * older versions of the plugin, but accepts a variable too.
  */
-export function useAsync(fetcher, deps = [], options = {}) {
-  const { immediate = true } = options
-  const [data, setData] = useState(null)
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(immediate)
-  const fetcherRef = useRef(fetcher)
-  fetcherRef.current = fetcher
 
-  const execute = useCallback(async () => {
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+export function useAsync(loader, deps = []) {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const cancelled = useRef(false)
+  const memoLoader = useCallback(loader, deps) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/use-memo
+
+  const reload = useCallback(async (...args) => {
+    cancelled.current = false
     setLoading(true)
-    setError(null)
     try {
-      const result = await fetcherRef.current()
-      setData(result)
-      return result
+      const res = await memoLoader(...args)
+      if (!cancelled.current) {
+        setData(res)
+        setError(null)
+      }
+      return res
     } catch (err) {
-      const normalized = normalizeError(err)
-      setError(normalized)
-      throw normalized
+      if (!cancelled.current) setError(err)
+      throw err
     } finally {
-      setLoading(false)
+      if (!cancelled.current) setLoading(false)
     }
-  }, [])
+  }, [memoLoader])
 
   useEffect(() => {
-    if (!immediate) return undefined
-    let cancelled = false
-    ;(async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const result = await fetcherRef.current()
-        if (!cancelled) setData(result)
-      } catch (err) {
-        if (!cancelled) setError(normalizeError(err))
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps)
+    cancelled.current = false
+    let active = true
+    setLoading(true)
+    memoLoader()
+      .then((res) => { if (active) { setData(res); setError(null) } })
+      .catch((err) => { if (active) setError(err) })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false; cancelled.current = true }
+  }, [memoLoader])
 
-  return { data, error, loading, refetch: execute, setData }
+  return { data, loading, error, reload, setData }
 }

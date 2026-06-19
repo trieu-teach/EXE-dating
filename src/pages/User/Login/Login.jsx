@@ -1,174 +1,150 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import PasswordInput from '../../../components/User/PasswordInput/PasswordInput.jsx'
-import Toast from '../../../components/User/Toast/Toast.jsx'
-import {
-  hasErrors,
-  validateEmail,
-  validateLoginForm,
-  validatePassword,
-} from '../../../utils/validation.js'
-import AuthThemeBar from '../../../components/User/AuthThemeBar/AuthThemeBar.jsx'
-import LovePageDecor from '../../../components/User/LovePageDecor/LovePageDecor.jsx'
-import { authService } from '../../../api/index.js'
-import { getPostAuthRoute } from '../../../utils/identityVerification.js'
-import { saveUser } from '../../../utils/session.js'
-import { useMutation } from '../../../hooks/useMutation.js'
-import '../../../styles/auth-form.css'
+import { useAuth } from '../../../context/AuthContext.jsx'
+import { useToast } from '../../../context/ToastContext.jsx'
+import { validateEmail } from '../../../utils/validation.js'
+import ThemeToggle from '../../../components/User/ThemeToggle/ThemeToggle.jsx'
+import { Heart, Eye, EyeOff } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Button } from '../../../components/ui/Button.jsx'
+import { Input } from '../../../components/ui/Input.jsx'
+
 import './Login.css'
 
-function Login() {
+export default function Login() {
+  const { login } = useAuth()
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const toast = useToast()
+  const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
-  const [touched, setTouched] = useState({})
-  const [toast, setToast] = useState(null)
-  const { mutate: login, loading: submitting } = useMutation((payload) =>
-    authService.login(payload),
-  )
+  const [submitting, setSubmitting] = useState(false)
+  const [showPw, setShowPw] = useState(false)
 
-  function hideToast() {
-    setToast(null)
-  }
-
-  function showToast(message, type = 'info') {
-    setToast({ message, type, id: Date.now() })
-  }
-
-  useEffect(() => {
-    if (!toast) return undefined
-    const timer = setTimeout(hideToast, 4200)
-    return () => clearTimeout(timer)
-  }, [toast])
-
-  function touchField(field) {
-    setTouched((prev) => ({ ...prev, [field]: true }))
-  }
-
-  function validateField(field) {
-    if (field === 'email') return validateEmail(email)
-    if (field === 'password') return validatePassword(password)
-    return ''
-  }
-
-  function handleBlur(field) {
-    touchField(field)
-    setErrors((prev) => ({ ...prev, [field]: validateField(field) }))
-  }
-
-  function handleEmailChange(event) {
-    const value = event.target.value
-    setEmail(value)
-    if (touched.email) {
-      setErrors((prev) => ({ ...prev, email: validateEmail(value) }))
+  const validate = () => {
+    const next = {
+      email: validateEmail(form.email),
+      password: form.password ? undefined : 'Vui lòng nhập mật khẩu',
     }
+    setErrors(next)
+    return !next.email && !next.password
   }
 
-  function handlePasswordChange(event) {
-    const value = event.target.value
-    setPassword(value)
-    if (touched.password) {
-      setErrors((prev) => ({ ...prev, password: validatePassword(value) }))
-    }
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault()
-
-    const formErrors = validateLoginForm({ email, password })
-    setErrors(formErrors)
-    setTouched({ email: true, password: true })
-
-    if (hasErrors(formErrors)) {
-      showToast('Vui lòng kiểm tra lại thông tin nhập vào.', 'warning')
-      return
-    }
-
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!validate()) return
+    setSubmitting(true)
     try {
-      const { user, token } = await login({
-        email: email.trim().toLowerCase(),
-        password,
-      })
-      saveUser({ ...user, token })
-      showToast('Đăng nhập thành công!', 'success')
-      setTimeout(() => {
-        navigate(getPostAuthRoute({ ...user, token }))
-      }, 900)
+      await login({ email: form.email.trim(), password: form.password })
+      toast.success('Chào mừng bạn quay lại!')
+      navigate('/discovery', { replace: true })
     } catch (err) {
-      showToast(err.message || 'Đăng nhập thất bại.', 'warning')
+      if (err?.status === 401) toast.error('Email hoặc mật khẩu không đúng.')
+      else toast.error(err?.message || 'Đăng nhập thất bại.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
   return (
-    <div className="login-page user-page user-page--centered">
-      <AuthThemeBar />
-      <LovePageDecor />
-      {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={hideToast} />
-      )}
+    <div className="auth-page">
+      {/* Decorative blobs */}
+      <div className="auth-blob auth-blob-1" />
+      <div className="auth-blob auth-blob-2" />
 
-      <div className="login-card user-card">
-        <header className="login-header">
-          <h1>Đăng nhập</h1>
-          <p>Chào mừng bạn đến với SameMess</p>
-        </header>
+      <motion.div
+        className="auth-card"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+      >
+        {/* Header */}
+        <div className="auth-header">
+          <div className="auth-logo">
+            <Heart size={18} className="auth-logo-icon" fill="currentColor" />
+          </div>
+          <span className="auth-logo-text">SameMess</span>
+          <div className="auth-theme-btn">
+            <ThemeToggle />
+          </div>
+        </div>
 
-        <form className="login-form" onSubmit={handleSubmit} noValidate>
-          <label
-            className={`login-field auth-field${touched.email && errors.email ? ' auth-field--error' : ''}`}
+        {/* Hero */}
+        <div className="auth-hero">
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.3 }}
           >
-            <span>Email</span>
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={handleEmailChange}
-              onBlur={() => handleBlur('email')}
-              placeholder="email@cua-ban.com"
-              autoComplete="email"
-              aria-invalid={touched.email && errors.email ? true : undefined}
-            />
-            {touched.email && errors.email && (
-              <p className="auth-field-error">{errors.email}</p>
-            )}
-          </label>
-
-          <label
-            className={`login-field auth-field${touched.password && errors.password ? ' auth-field--error' : ''}`}
+            Chào bạn trở lại
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.3 }}
           >
-            <span>Mật khẩu</span>
-            <PasswordInput
-              name="password"
-              value={password}
-              onChange={handlePasswordChange}
-              onBlur={() => handleBlur('password')}
+            Đăng nhập để tiếp tục kết nối với những người phù hợp
+          </motion.p>
+        </div>
+
+        {/* Form */}
+        <motion.form
+          className="auth-form"
+          onSubmit={handleSubmit}
+          noValidate
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+        >
+          <Input
+            label="Email"
+            type="email"
+            autoComplete="email"
+            placeholder="your@email.com"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            error={errors.email}
+          />
+
+          <div className="auth-pw-wrap">
+            <Input
+              label="Mật khẩu"
+              type={showPw ? 'text' : 'password'}
               autoComplete="current-password"
-              classPrefix="login"
-              hasError={Boolean(touched.password && errors.password)}
+              placeholder="••••••••"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              error={errors.password}
             />
-            {touched.password && errors.password && (
-              <p className="auth-field-error">{errors.password}</p>
-            )}
-          </label>
+            <button
+              type="button"
+              className="auth-pw-toggle"
+              onClick={() => setShowPw(!showPw)}
+              aria-label={showPw ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+            >
+              {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
 
-          <p className="login-forgot-wrap">
-            <Link to="/forgot-password" className="login-forgot">
-              Quên mật khẩu?
-            </Link>
-          </p>
+          <div className="auth-forgot">
+            <Link to="/forgot-password" className="auth-link-primary">Quên mật khẩu?</Link>
+          </div>
 
-          <button type="submit" className="login-submit" disabled={submitting}>
-            {submitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
-          </button>
-        </form>
+          <Button type="submit" variant="primary" size="full" disabled={submitting}>
+            {submitting ? <span className="spinner" /> : 'Đăng nhập'}
+          </Button>
+        </motion.form>
 
-        <p className="login-footer">
-          Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
+        {/* Divider */}
+        <div className="auth-divider">
+          <span>Hoặc</span>
+        </div>
+
+        {/* Footer */}
+        <p className="auth-switch">
+          Chưa có tài khoản?{' '}
+          <Link to="/register" className="auth-link-bold">Đăng ký ngay</Link>
         </p>
-      </div>
+      </motion.div>
     </div>
   )
 }
-
-export default Login

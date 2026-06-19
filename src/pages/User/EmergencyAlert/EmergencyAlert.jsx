@@ -1,54 +1,107 @@
-import { Link } from 'react-router-dom'
-import AppShell from '../../../components/User/AppShell/AppShell.jsx'
-import PageHeader from '../../../components/User/PageHeader/PageHeader.jsx'
-import './EmergencyAlert.css'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { safetyService } from '../../../api'
+import { useToast } from '../../../context/ToastContext.jsx'
 
-function EmergencyAlert() {
+const EMPTY_CONTACT = { name: '', phoneNumber: '', relationship: '' }
+
+export default function EmergencyAlert() {
+  const navigate = useNavigate()
+  const toast = useToast()
+  const [alertMessage, setAlertMessage] = useState('Tôi đang gặp nguy hiểm, vui lòng liên lạc giúp.')
+  const [contacts, setContacts] = useState([EMPTY_CONTACT])
+  const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    safetyService.getEmergency()
+      .then((data) => {
+        if (data?.alertMessage) setAlertMessage(data.alertMessage)
+        if (Array.isArray(data?.contacts) && data.contacts.length) setContacts(data.contacts)
+      })
+      .catch(() => { /* defaults */ })
+      .finally(() => setLoading(false))
+  }, [])
+
+  const updateContact = (i, patch) => {
+    setContacts((cur) => cur.map((c, idx) => idx === i ? { ...c, ...patch } : c))
+  }
+
+  const addContact = () => setContacts((cur) => [...cur, EMPTY_CONTACT])
+
+  const removeContact = (i) => setContacts((cur) => cur.filter((_, idx) => idx !== i))
+
+  const handleSave = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      await safetyService.updateEmergency({
+        alertMessage,
+        contacts: contacts.filter((c) => c.name && c.phoneNumber),
+      })
+      toast.success('Đã lưu thông tin khẩn cấp.')
+    } catch (err) {
+      toast.error(err?.message || 'Không lưu được.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) return <div className="loading-block"><span className="spinner" /></div>
+
   return (
-    <AppShell activeNav="safety" focusMode>
-      <div className="emergency-page">
-        <PageHeader title="Thông báo khẩn cấp" backTo="/safety" />
+    <main className="auth-page" style={{ alignItems: 'flex-start' }}>
+      <form onSubmit={handleSave} className="auth-card" style={{ maxWidth: 600 }}>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigate('/safety')} style={{ alignSelf: 'flex-start', marginBottom: 12 }}>
+          ← An toàn
+        </button>
+        <h1>Cảnh báo khẩn cấp</h1>
+        <p className="auth-subtitle">Tin nhắn sẽ được gửi đến các liên hệ khi bạn bấm "Cần hỗ trợ".</p>
 
-        <div className="emergency-layout">
-          <article className="emergency-alert-card">
-            <div className="emergency-alert-card__badge">
-              <span>📡</span>
-              Cảnh báo khẩn cấp
-            </div>
-            <p>
-              <strong>Trần Minh Tuấn</strong> đang yêu cầu hỗ trợ từ buổi hẹn qua SameMess.
-            </p>
-            <p className="emergency-alert-card__time">Cập nhật 2 phút trước</p>
-          </article>
-
-          <article className="emergency-map-card">
-            <div className="emergency-map-card__visual">
-              <span className="emergency-map-card__pin">📍</span>
-            </div>
-            <h2>Phố đi bộ Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh</h2>
-            <p>Vị trí hiện tại của người cần hỗ trợ</p>
-          </article>
-
-          <div className="emergency-actions">
-            <button type="button" className="emergency-btn emergency-btn--urgent">
-              ⭐ Gọi cấp cứu (113/115)
-            </button>
-            <div className="emergency-actions__row">
-              <button type="button" className="emergency-btn emergency-btn--secondary">
-                📞 Gọi cho Tuấn
-              </button>
-              <button type="button" className="emergency-btn emergency-btn--secondary">
-                🧭 Chỉ đường
-              </button>
-            </div>
-            <Link to="/safety-checkin" className="emergency-demo-link">
-              Demo: màn hình xác nhận an toàn →
-            </Link>
+        <div className="auth-form">
+          <div className="field">
+            <label className="field-label">Tin nhắn mẫu</label>
+            <textarea
+              rows={3}
+              value={alertMessage}
+              onChange={(e) => setAlertMessage(e.target.value)}
+              maxLength={300}
+              required
+            />
           </div>
+
+          <strong>Danh bạ khẩn cấp</strong>
+          {contacts.map((c, i) => (
+            <div key={i} className="form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 8 }}>
+              <input
+                placeholder="Tên"
+                value={c.name}
+                onChange={(e) => updateContact(i, { name: e.target.value })}
+              />
+              <input
+                placeholder="Số điện thoại"
+                value={c.phoneNumber}
+                onChange={(e) => updateContact(i, { phoneNumber: e.target.value })}
+              />
+              <input
+                placeholder="Quan hệ (mẹ, bạn…)"
+                value={c.relationship}
+                onChange={(e) => updateContact(i, { relationship: e.target.value })}
+              />
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => removeContact(i)}>
+                ✕
+              </button>
+            </div>
+          ))}
+          <button type="button" className="btn btn-ghost btn-sm" onClick={addContact}>
+            + Thêm liên hệ
+          </button>
+
+          <button type="submit" className="btn btn-primary btn-block" disabled={saving}>
+            {saving ? <span className="spinner" /> : 'Lưu'}
+          </button>
         </div>
-      </div>
-    </AppShell>
+      </form>
+    </main>
   )
 }
-
-export default EmergencyAlert

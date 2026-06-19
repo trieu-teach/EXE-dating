@@ -1,132 +1,108 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import AppShell from '../../../../components/User/AppShell/AppShell.jsx'
-import PageHeader from '../../../../components/User/PageHeader/PageHeader.jsx'
-import Toggle from '../../../../components/User/Toggle/Toggle.jsx'
-import { getUser, saveUser } from '../../../../utils/session.js'
-import '../../../../styles/settings-shared.css'
-import './DiscoverySettings.css'
+import { useNavigate } from 'react-router-dom'
+import { preferencesService } from '../../../../api'
+import { useToast } from '../../../../context/ToastContext.jsx'
 
-function ChevronIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path d="M9 18l6-6-6-6" />
-    </svg>
-  )
-}
-
-function DiscoverySettings() {
-  const saved = getUser()?.discoveryPrefs ?? {}
-  const [globalMode, setGlobalMode] = useState(saved.globalMode ?? false)
-  const [verifiedOnly, setVerifiedOnly] = useState(saved.verifiedOnly ?? true)
-  const [distance, setDistance] = useState(saved.distance ?? 100)
-  const [ageMin, setAgeMin] = useState(saved.ageMin ?? 22)
-  const [ageMax, setAgeMax] = useState(saved.ageMax ?? 35)
-  const [showMe, setShowMe] = useState(saved.showMe ?? 'female')
+export default function DiscoverySettings() {
+  const navigate = useNavigate()
+  const toast = useToast()
+  const [form, setForm] = useState({
+    interestedInGender: 'Everyone',
+    minAge: 18,
+    maxAge: 35,
+    maxDistanceKm: 50,
+  })
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    saveUser({
-      discoveryPrefs: { globalMode, verifiedOnly, distance, ageMin, ageMax, showMe },
-    })
-  }, [globalMode, verifiedOnly, distance, ageMin, ageMax, showMe])
+    preferencesService.get()
+      .then((data) => setForm((f) => ({
+        ...f,
+        ...(data || {}),
+        minAge: data?.minAge ?? f.minAge,
+        maxAge: data?.maxAge ?? f.maxAge,
+        maxDistanceKm: data?.maxDistanceKm ?? f.maxDistanceKm,
+        interestedInGender: data?.interestedInGender ?? f.interestedInGender,
+      })))
+      .catch(() => { /* defaults are fine */ })
+      .finally(() => setLoading(false))
+  }, [])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      await preferencesService.update({
+        interestedInGender: form.interestedInGender,
+        minAge: Number(form.minAge),
+        maxAge: Number(form.maxAge),
+        maxDistanceKm: Number(form.maxDistanceKm),
+      })
+      toast.success('Đã cập nhật tiêu chí.')
+    } catch (err) {
+      toast.error(err?.message || 'Không lưu được.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) return <div className="loading-block"><span className="spinner" /></div>
 
   return (
-    <AppShell activeNav="discovery">
-      <div className="settings-page">
-        <PageHeader title="Cài đặt Khám phá" backTo="/discovery" />
-
-        <div className="settings-panel discovery-settings-panel">
-          <div className="discovery-settings-location">
-            <div>
-              <p className="discovery-settings-location__label">Vị trí</p>
-              <p className="discovery-settings-location__value">Hà Nội, Việt Nam</p>
-            </div>
-            <button type="button" className="settings-btn-outline">
-              Thay đổi
-            </button>
-          </div>
-
-          <Toggle label="Chế độ toàn cầu" checked={globalMode} onChange={setGlobalMode} />
-
-          <div className="settings-slider-row">
-            <label>
-              <span>Khoảng cách</span>
-              <span>{distance} km</span>
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="200"
-              value={distance}
-              onChange={(e) => setDistance(Number(e.target.value))}
-            />
-          </div>
-
-          <div className="settings-slider-row">
-            <label>
-              <span>Độ tuổi</span>
-              <span>
-                {ageMin} – {ageMax}
-              </span>
-            </label>
-            <div className="discovery-settings-age">
-              <input
-                type="range"
-                min="18"
-                max="60"
-                value={ageMin}
-                onChange={(e) => setAgeMin(Math.min(Number(e.target.value), ageMax - 1))}
-              />
-              <input
-                type="range"
-                min="18"
-                max="60"
-                value={ageMax}
-                onChange={(e) => setAgeMax(Math.max(Number(e.target.value), ageMin + 1))}
-              />
-            </div>
-          </div>
-
-          <div className="settings-section">
-            <h2 className="settings-section__title">Cho tôi xem</h2>
-            <div className="settings-show-options">
-              {[
-                { id: 'male', label: 'Nam' },
-                { id: 'female', label: 'Nữ' },
-                { id: 'everyone', label: 'Mọi người' },
-              ].map((opt) => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  className={`settings-show-btn${showMe === opt.id ? ' settings-show-btn--active' : ''}`}
-                  onClick={() => setShowMe(opt.id)}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <section className="settings-section">
-            <h2 className="settings-section__title">Bộ lọc nâng cao</h2>
-            <Toggle
-              label="Chỉ hiện hồ sơ đã xác minh"
-              checked={verifiedOnly}
-              onChange={setVerifiedOnly}
-            />
-            <Link to="/settings/interests" className="settings-row-link">
-              Sở thích
-              <ChevronIcon />
-            </Link>
-          </section>
-
-          <button type="button" className="settings-btn-primary">
-            Áp dụng thay đổi
-          </button>
+    <div className="settings-page">
+      <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigate('/settings')} style={{ alignSelf: 'flex-start' }}>
+        ← Cài đặt
+      </button>
+      <h1>Tiêu chí khám phá</h1>
+      <form onSubmit={handleSubmit} className="card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className="field">
+          <label className="field-label">Đang tìm</label>
+          <select
+            value={form.interestedInGender}
+            onChange={(e) => setForm({ ...form, interestedInGender: e.target.value })}
+          >
+            <option value="Everyone">Tất cả</option>
+            <option value="Male">Nam</option>
+            <option value="Female">Nữ</option>
+          </select>
         </div>
-      </div>
-    </AppShell>
+        <div className="form-grid">
+          <div className="field">
+            <label className="field-label">Tuổi tối thiểu</label>
+            <input
+              type="number"
+              min={18}
+              max={99}
+              value={form.minAge}
+              onChange={(e) => setForm({ ...form, minAge: e.target.value })}
+            />
+          </div>
+          <div className="field">
+            <label className="field-label">Tuổi tối đa</label>
+            <input
+              type="number"
+              min={18}
+              max={99}
+              value={form.maxAge}
+              onChange={(e) => setForm({ ...form, maxAge: e.target.value })}
+            />
+          </div>
+        </div>
+        <div className="field">
+          <label className="field-label">Khoảng cách tối đa (km)</label>
+          <input
+            type="number"
+            min={1}
+            max={500}
+            value={form.maxDistanceKm}
+            onChange={(e) => setForm({ ...form, maxDistanceKm: e.target.value })}
+          />
+        </div>
+        <button type="submit" className="btn btn-primary" disabled={saving}>
+          {saving ? <span className="spinner" /> : 'Lưu'}
+        </button>
+      </form>
+    </div>
   )
 }
-
-export default DiscoverySettings

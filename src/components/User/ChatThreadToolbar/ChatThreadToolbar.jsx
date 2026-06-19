@@ -1,72 +1,44 @@
-import { Link } from 'react-router-dom'
-import { canSuggestDateFromTree, loveTreeToDisplayState } from '../../../utils/loveTreeState.js'
-import './ChatThreadToolbar.css'
+import { useNavigate } from 'react-router-dom'
+import { resolveImageUrl } from '../../../utils/format.js'
+import { TreeIcon } from '../../ui/CustomIcons.jsx'
 
-const STAGE_EMOJI = {
-  sprout: '🌱',
-  sparse: '🌿',
-  seedling: '🪴',
-  budding: '🌸',
-  young: '🌺',
-  blooming: '🌳',
-  radiant: '✨',
-}
-
-function ChatThreadToolbar({ partnerId, partnerName, treeState, topNudge, onNudgeAction, onDismissNudge }) {
-  const display = loveTreeToDisplayState(treeState)
-  const emoji = STAGE_EMOJI[display.stageKey] ?? '🌱'
-  const dateReady = canSuggestDateFromTree(treeState)
-  const showNudge = topNudge && topNudge.id !== 'ready_to_meet' && !topNudge.showMeetupCard
+export default function ChatThreadToolbar({ conversation, onBack }) {
+  const navigate = useNavigate()
+  const other = conversation?.otherDisplayName || conversation?.displayName || 'Đoạn chat'
+  const avatar = resolveImageUrl(conversation?.otherAvatarUrl || conversation?.avatarUrl)
 
   return (
-    <div className="chat-toolbar">
-      <Link
-        to={`/love-tree?partner=${partnerId}`}
-        className="chat-toolbar__chip chat-toolbar__chip--tree"
-        title="Chăm cây tình yêu"
-      >
-        <span>{emoji}</span>
-        <span>
-          Cấp {display.level} · {display.attachmentPercent}%
-        </span>
-      </Link>
-
-      {dateReady ? (
-        <Link to={`/meet-up/${partnerId}`} className="chat-toolbar__chip chat-toolbar__chip--meet">
-          📅 Gợi ý hẹn gặp
-        </Link>
-      ) : (
-        <span className="chat-toolbar__chip chat-toolbar__chip--muted" title="Chăm cây đến cấp 4">
-          🔒 Hẹn gặp sau
-        </span>
-      )}
-
-      {showNudge && (
-        <button
-          type="button"
-          className="chat-toolbar__nudge"
-          onClick={() => onNudgeAction?.(topNudge)}
-        >
-          {topNudge.icon} {topNudge.actionLabel}
-        </button>
-      )}
-
-      {showNudge && (
-        <button
-          type="button"
-          className="chat-toolbar__dismiss"
-          onClick={() => onDismissNudge?.(topNudge)}
-          aria-label="Bỏ qua nhắc nhở"
-        >
-          ✕
-        </button>
-      )}
-
-      {!showNudge && dateReady && (
-        <span className="chat-toolbar__hint">Sẵn sàng hẹn {partnerName} ngoài đời</span>
-      )}
-    </div>
+    <header className="chat-toolbar">
+      <button type="button" className="chat-toolbar-back" onClick={onBack} aria-label="Quay lại">
+        ←
+      </button>
+      <div
+        className="chat-toolbar-avatar"
+        style={avatar ? { backgroundImage: `url(${avatar})` } : undefined}
+        onClick={() => conversation?.otherUserId && navigate(`/profile/${conversation.otherUserId}`)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' && conversation?.otherUserId) navigate(`/profile/${conversation.otherUserId}`) }}
+        aria-label={`Mở hồ sơ của ${other}`}
+      />
+      <div className="chat-toolbar-info">
+        <div className="chat-toolbar-name">{other}</div>
+        {conversation?.matchId && (
+          <div className="chat-toolbar-status"><TreeIcon size={12} /> Match · cây tình yêu chung</div>
+        )}
+      </div>
+      <div className="chat-toolbar-actions">
+        {conversation?.matchId && (
+          <button
+            type="button"
+            className="chat-toolbar-action"
+            onClick={() => navigate(`/love-tree?matchId=${conversation.matchId}`)}
+            title="Cây tình yêu"
+          >
+            <TreeIcon size={18} />
+          </button>
+        )}
+      </div>
+    </header>
   )
 }
-
-export default ChatThreadToolbar

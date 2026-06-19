@@ -1,0 +1,32 @@
+.rep-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--color-surface-2);
+  color: var(--color-text-soft);
+  border: 1px solid var(--color-border);
+  line-height: 1;
+  white-space: nowrap;
+}
+.rep-badge.rep-md { padding: 6px 14px; font-size: 0.9rem; gap: 6px; }
+.rep-badge.rep-sm .rep-emoji { font-size: 14px; }
+.rep-badge.rep-md .rep-emoji { font-size: 18px; }
+.rep-badge.is-loading { opacity: 0.6; }
+
+.rep-badge.rep-verified {
+  background: rgba(22, 163, 74, 0.10);
+  color: var(--color-success);
+  border-color: rgba(22, 163, 74, 0.35);
+}
+.rep-badge.rep-limited {
+  background: rgba(245, 158, 11, 0.10);
+  color: #b45309;
+  border-color: rgba(245, 158, 11, 0.30);
+}
+.rep-value { font-variant-numeric: tabular-nums; font-weight: 800; }
+.rep-cap { font-size: 0.78em; opacity: 0.7; font-weight: 600; }
+.rep-label { font-weight: 600; opacity: 0.85; }

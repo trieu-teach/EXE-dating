@@ -1,96 +1,191 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { premiumService } from '../../../api/index.js'
-import AppShell from '../../../components/User/AppShell/AppShell.jsx'
-import AsyncContent from '../../../components/User/AsyncContent/AsyncContent.jsx'
-import PageHeader from '../../../components/User/PageHeader/PageHeader.jsx'
-import { useAsync } from '../../../hooks/useAsync.js'
-import { useMutation } from '../../../hooks/useMutation.js'
-import '../../../styles/events-shared.css'
+import { useEffect, useState } from 'react'
+import { subscriptionService } from '../../../api'
+import { useToast } from '../../../context/ToastContext.jsx'
+import { CrownIcon, CheckIcon, ZapIcon, HeartIcon, EyeIcon, ShieldIcon } from '../../../components/ui/CustomIcons.jsx'
+import { motion } from 'framer-motion'
 import './Premium.css'
 
-function Premium() {
-  const [selected, setSelected] = useState('6months')
-  const { data, loading, error, refetch } = useAsync(() => premiumService.getPlans(), [])
-  const { mutate: subscribe, loading: subscribing } = useMutation((planId) =>
-    premiumService.subscribe(planId),
-  )
-  const plans = data?.plans ?? []
-  const features = data?.features ?? []
+const FEATURE_HIGHLIGHTS = [
+  { icon: ZapIcon, name: 'Undo Swipe', desc: 'Lấy lại người vừa bỏ lỡ' },
+  { icon: EyeIcon, name: 'Xem ai thích bạn', desc: 'Không cần đoán nữa' },
+  { icon: HeartIcon, name: 'Tăng lượt hiển thị', desc: 'Hiện lên đầu danh sách' },
+  { icon: ShieldIcon, name: 'Không quảng cáo', desc: 'Trải nghiệm không gián đoạn' },
+]
+
+export default function Premium() {
+  const toast = useToast()
+  const [plans, setPlans] = useState([])
+  const [current, setCurrent] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [ordering, setOrdering] = useState(null)
+
+  useEffect(() => {
+    Promise.all([subscriptionService.plans(), subscriptionService.me().catch(() => null)])
+      .then(([pl, me]) => {
+        setPlans(Array.isArray(pl) ? pl : (pl?.items ?? []))
+        setCurrent(me)
+      })
+      .catch((err) => toast.error(err?.message || 'Không tải được gói.'))
+      .finally(() => setLoading(false))
+  }, [toast])
+
+  const handleOrder = async (planCode) => {
+    setOrdering(planCode)
+    try {
+      const res = await subscriptionService.order(planCode)
+      if (res?.paymentUrl) {
+        window.open(res.paymentUrl, '_blank', 'noopener,noreferrer')
+        toast.info('Đã mở trang thanh toán. Sau khi hoàn tất, hãy quay lại.')
+      } else if (res?.txnRef) {
+        await subscriptionService.mockConfirm(res.txnRef)
+        toast.success('Đã kích hoạt gói (mock).')
+        const me = await subscriptionService.me()
+        setCurrent(me)
+      }
+    } catch (err) {
+      toast.error(err?.message || 'Không tạo được đơn.')
+    } finally {
+      setOrdering(null)
+    }
+  }
+
+  if (loading) return <div className="loading-block"><span className="spinner" /></div>
 
   return (
-    <AppShell activeNav="profile">
-      <div className="premium-page">
-        <PageHeader title="Nâng cấp Premium" backTo="/profile" />
-
-        <AsyncContent loading={loading} error={error} onRetry={refetch}>
-        <div className="premium-layout">
-          <section className="premium-hero">
-            <img
-              src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=900&q=80&auto=format&fit=crop"
-              alt=""
-            />
-            <div className="premium-hero__overlay">
-              <h1>Mở khóa những kết nối sâu sắc hơn</h1>
-              <p>Dành cho người nghiêm túc hẹn hò trên SameMess</p>
-            </div>
-          </section>
-
-          <section className="premium-features">
-            <h2>Đặc quyền Premium</h2>
-            <ul>
-              {features.map((f) => (
-                <li key={f.text}>
-                  <span>{f.icon}</span>
-                  {f.text}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="premium-plans">
-            <h2>Chọn gói</h2>
-            <div className="premium-plans__grid">
-              {plans.map((plan) => (
-                <button
-                  key={plan.id}
-                  type="button"
-                  className={`premium-plan-card${selected === plan.id ? ' premium-plan-card--active' : ''}${plan.popular ? ' premium-plan-card--popular' : ''}`}
-                  onClick={() => setSelected(plan.id)}
-                >
-                  {plan.badge && <span className="premium-plan-card__badge">{plan.badge}</span>}
-                  <strong>{plan.label}</strong>
-                  <span className="premium-plan-card__price">
-                    {plan.price}
-                    <small>{plan.per}</small>
-                  </span>
-                  <span className="premium-plan-card__choose">Chọn gói</span>
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <div className="premium-footer">
-            <button
-              type="button"
-              className="events-btn-pill premium-footer__cta"
-              disabled={subscribing}
-              onClick={() => subscribe(selected)}
-            >
-              {subscribing ? 'Đang xử lý...' : 'Nâng cấp ngay'}
-            </button>
-            <p className="premium-footer__note">
-              Hủy bất cứ lúc nào. Thanh toán an toàn qua ví hoặc thẻ.
-            </p>
-            <Link to="/events" className="premium-footer__events">
-              Xem sự kiện Premium →
-            </Link>
+    <div className="premium-root">
+      {/* Hero */}
+      <div className="premium-hero">
+        <div className="premium-hero-content">
+          <div className="premium-hero-icon">
+            <CrownIcon size={30} />
+          </div>
+          <h1 className="premium-hero-title">
+            SameMess <span>Premium</span>
+          </h1>
+          <p className="premium-hero-subtitle">
+            Mở khoá trải nghiệm không giới hạn. Kết nối nhanh hơn, hiệu quả hơn.
+          </p>
+          <div className="premium-features-strip">
+            {['Undo swipe', 'Xem ai thích bạn', 'Tăng lượt hiển thị', 'Không quảng cáo'].map((f) => (
+              <span key={f} className="premium-feature-pill">
+                <CheckIcon size={12} />
+                {f}
+              </span>
+            ))}
           </div>
         </div>
-        </AsyncContent>
       </div>
-    </AppShell>
+
+      <div className="premium-content">
+        {/* Feature highlights */}
+        <div className="premium-features-grid">
+          {FEATURE_HIGHLIGHTS.map((f) => (
+            <div key={f.name} className="premium-feature-card">
+              <div className="premium-feature-icon">
+                <f.icon size={18} />
+              </div>
+              <div className="premium-feature-name">{f.name}</div>
+              <p className="premium-feature-desc">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Current plan */}
+        {current?.planCode && current.planCode !== 'Free' && (
+          <div className="premium-current">
+            <CrownIcon size={18} />
+            <div className="premium-current-info">
+              <div className="premium-current-plan">Gói {current.planCode} đang hoạt động</div>
+              <div className="premium-current-exp">
+                Hết hạn: {current.expiresAt ? new Date(current.expiresAt).toLocaleDateString('vi-VN') : '—'}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Plans */}
+        <div className="premium-plans-section">
+          <div className="premium-plans-section-title">Chọn gói của bạn</div>
+          <div className="premium-plans-grid">
+            {plans.map((p, i) => {
+              const isPopular = i === 1
+              return (
+                <motion.div
+                  key={p.code}
+                  className={`premium-plan-card${isPopular ? ' popular' : ''}`}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  {isPopular && (
+                    <div className="premium-plan-badge">
+                      <Zap size={10} /> Phổ biến nhất
+                    </div>
+                  )}
+                  <div className="premium-plan-header">
+                    <div className="premium-plan-name">{p.name || p.code}</div>
+                    <div className="premium-plan-price">
+                      <span className="premium-plan-amount">
+                        {p.priceVnd ? `${p.priceVnd.toLocaleString('vi-VN')}` : '—'}
+                      </span>
+                      {p.priceVnd && <span className="premium-plan-currency">đ</span>}
+                    </div>
+                  </div>
+                  {p.duration && (
+                    <div className="premium-plan-duration">/{p.duration} ngày</div>
+                  )}
+                  {Array.isArray(p.features) && p.features.length > 0 && (
+                    <ul className="premium-plan-features">
+                      {p.features.map((f, fi) => (
+                        <li key={fi}>
+                          <CheckIcon size={13} className="premium-check-icon" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <button
+                    type="button"
+                    className={`premium-plan-btn${isPopular ? '' : ' is-secondary'}`}
+                    onClick={() => handleOrder(p.code)}
+                    disabled={ordering === p.code}
+                  >
+                    {ordering === p.code ? <span className="spinner" /> : 'Đăng ký ngay'}
+                  </button>
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+
+        {import.meta.env.DEV && (
+          <div className="premium-dev-card">
+            <strong>Dev tools</strong>
+            <p>Tạo đơn và mock-confirm để mô phỏng thanh toán thành công.</p>
+            <button
+              type="button"
+              className="premium-plan-btn is-secondary"
+              onClick={async () => {
+                try {
+                  const plan = plans[0]
+                  if (!plan) return
+                  const order = await subscriptionService.order(plan.code)
+                  if (order?.txnRef) {
+                    await subscriptionService.mockConfirm(order.txnRef)
+                    toast.success('Mock-confirm thành công.')
+                    const me = await subscriptionService.me()
+                    setCurrent(me)
+                  }
+                } catch (err) {
+                  toast.error(err?.message || 'Lỗi.')
+                }
+              }}
+            >
+              Mock confirm
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
-
-export default Premium

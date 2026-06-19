@@ -1,108 +1,164 @@
-import { Link } from 'react-router-dom'
-import { chatService, dailyService } from '../../../api/index.js'
-import AppShell from '../../../components/User/AppShell/AppShell.jsx'
-import AsyncContent from '../../../components/User/AsyncContent/AsyncContent.jsx'
-import PageHeader from '../../../components/User/PageHeader/PageHeader.jsx'
-import { DEFAULT_USER_AVATAR } from '../../../data/portraitPhotos.js'
-import { useAsync } from '../../../hooks/useAsync.js'
-import './DailyConnection.css'
+import { useCallback, useEffect, useState } from 'react'
+import { dailyService, gamificationService, connectionRemindersService } from '../../../api'
+import { useToast } from '../../../context/ToastContext.jsx'
 
-function DailyConnection() {
-  const { data, loading, error, refetch } = useAsync(() => dailyService.getConnection(), [])
+export default function DailyConnection() {
+  const toast = useToast()
+  const [quests, setQuests] = useState([])
+  const [totalXp, setTotalXp] = useState(0)
+  const [userXp, setUserXp] = useState(0)
+  const [tasks, setTasks] = useState([])
+  const [inventory, setInventory] = useState([])
+  const [reminders, setReminders] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
 
-  const { data: convData } = useAsync(() => chatService.getConversations(), [])
-  const primaryMatch = convData?.conversations?.[0]
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const [d, t, inv, r] = await Promise.all([
+        dailyService.get(),
+        gamificationService.tasks().catch(() => null),
+        gamificationService.inventory().catch(() => null),
+        connectionRemindersService.reminders().catch(() => null),
+      ])
+      setQuests(Array.isArray(d?.quests) ? d.quests : [])
+      setTotalXp(d?.totalXp ?? 0)
+      setUserXp(d?.userXp ?? 0)
+      setTasks(Array.isArray(t?.tasks) ? t.tasks : (Array.isArray(t) ? t : []))
+      setInventory(Array.isArray(inv?.items) ? inv.items : (Array.isArray(inv) ? inv : []))
+      setReminders(Array.isArray(r?.items) ? r.items : (Array.isArray(r) ? r : []))
+    } catch (err) {
+      toast.error(err?.message || 'Không tải được dữ liệu hằng ngày.')
+    } finally {
+      setLoading(false)
+    }
+  }, [toast])
 
-  const quests = data?.quests ?? []
+  useEffect(() => { load() }, [load])
+
+  const handleComplete = async (questIds) => {
+    setSubmitting(true)
+    try {
+      await dailyService.complete(questIds)
+      toast.success('Đã nhận XP!')
+      await load()
+    } catch (err) {
+      toast.error(err?.message || 'Không nhận được XP.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (loading) return <div className="loading-block"><span className="spinner" /></div>
+
+  const pct = totalXp > 0 ? Math.round((userXp / totalXp) * 100) : 0
 
   return (
-    <AppShell activeNav="love">
-      <div className="daily-page dating-page">
-        <PageHeader title="Kết nối hằng ngày" backTo="/love-tree" />
+    <div className="connection-page">
+      <h1>Hằng ngày</h1>
 
-        <AsyncContent loading={loading} error={error} onRetry={refetch}>
-        <div className="daily-layout">
-          <section className="daily-hero dating-panel">
-            <div className="daily-couple">
-              <div className="daily-couple__avatar daily-couple__avatar--a">
-                <img src={DEFAULT_USER_AVATAR} alt="" />
-              </div>
-              <span className="daily-couple__line" />
-              <span className="daily-couple__heart">💕</span>
-              <span className="daily-couple__line" />
-              <div className="daily-couple__avatar daily-couple__avatar--b">
-                {primaryMatch?.partnerImage ? (
-                  <img src={primaryMatch.partnerImage} alt="" />
+      <section className="card">
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+          <strong>Tiến trình hôm nay</strong>
+          <span style={{ color: 'var(--color-text-soft)' }}>{userXp} / {totalXp} XP</span>
+        </div>
+        <div className="daily-progress" style={{ marginTop: 8 }}>
+          <div className="daily-progress-fill" style={{ width: `${pct}%` }} />
+        </div>
+      </section>
+
+      <section>
+        <h2 style={{ fontSize: '1rem', marginBottom: 8 }}>Nhiệm vụ</h2>
+        {quests.length === 0 ? (
+          <div className="empty">Không có nhiệm vụ nào hôm nay.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {quests.map((q) => (
+              <div key={q.code || q.id} className={`quest-item${q.completed ? ' is-done' : ''}`}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600 }}>{q.title || q.name}</div>
+                  {q.description && (
+                    <div style={{ fontSize: 13, color: 'var(--color-text-soft)' }}>{q.description}</div>
+                  )}
+                </div>
+                <span className="tag tag-primary">+{q.xp ?? 0} XP</span>
+                {q.completed ? (
+                  <span className="tag">✓ Hoàn thành</span>
                 ) : (
-                  <span>👤</span>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => handleComplete([q.code || q.id])}
+                    disabled={submitting}
+                  >
+                    Nhận
+                  </button>
                 )}
               </div>
-            </div>
-
-            {primaryMatch && (
-              <p className="daily-partner-note">
-                Hôm nay hãy nhớ đến <strong>{primaryMatch.partnerName}</strong> — mỗi tin nhắn là
-                bước gần hơn tới buổi hẹn thật.
-              </p>
+            ))}
+            {quests.some((q) => !q.completed) && (
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => handleComplete(quests.filter((q) => !q.completed).map((q) => q.code || q.id))}
+                disabled={submitting}
+              >
+                Nhận tất cả
+              </button>
             )}
+          </div>
+        )}
+      </section>
 
-            <div className="daily-streak">
-              <span className="daily-streak__flame">🔥</span>
-              <div>
-                <strong>
-                  Chuỗi ngày: {data?.streakDay ?? '—'} / {data?.streakTotal ?? 7}
-                </strong>
-                <p>Hoàn thành nhiệm vụ hôm nay để giữ lửa yêu thương!</p>
+      {tasks.length > 0 && (
+        <section>
+          <h2 style={{ fontSize: '1rem', marginBottom: 8 }}>Nhiệm vụ dài hạn</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {tasks.map((t) => (
+              <div key={t.id || t.code} className="quest-item">
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600 }}>{t.title || t.name}</div>
+                  {t.description && (
+                    <div style={{ fontSize: 13, color: 'var(--color-text-soft)' }}>{t.description}</div>
+                  )}
+                </div>
+                <span className="tag tag-primary">+{t.xp ?? 0} XP</span>
               </div>
-            </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-            <div className="daily-reward">
-              <div className="daily-reward__head">
-                <span>🎁 Gói câu hỏi sâu + voucher hẹn hò</span>
-                <strong>{data?.rewardProgress ?? 0}%</strong>
+      {inventory.length > 0 && (
+        <section>
+          <h2 style={{ fontSize: '1rem', marginBottom: 8 }}>Kho đồ</h2>
+          <div className="events-grid">
+            {inventory.map((it, i) => (
+              <div key={it.id || i} className="event-card">
+                <div className="event-card-cover" style={{ background: 'var(--color-primary-soft)' }} />
+                <div className="event-card-body">
+                  <div className="event-card-title">{it.name || it.title}</div>
+                  <div className="event-card-meta">SL: {it.quantity ?? 1}</div>
+                </div>
               </div>
-              <div className="daily-reward__bar">
-                <span style={{ width: `${data?.rewardProgress ?? 0}%` }} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {reminders.length > 0 && (
+        <section>
+          <h2 style={{ fontSize: '1rem', marginBottom: 8 }}>Lời nhắc kết nối</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {reminders.map((r, i) => (
+              <div key={r.id || i} className="quest-item">
+                <span>💡 {r.title || r.body || r.code}</span>
               </div>
-              <p>Hoàn thành nhiệm vụ &quot;Nhớ nhau&quot; + &quot;Lên kế hoạch gặp mặt&quot; để mở khóa</p>
-            </div>
-          </section>
-
-          <section className="daily-quests">
-            <h2>Nhiệm vụ hôm nay</h2>
-            <ul>
-              {quests.map((q) => (
-                <li key={q.id} className="daily-quest-card dating-card">
-                  <span className="daily-quest-card__icon">{q.icon}</span>
-                  <div>
-                    {q.type === 'joint' && <span className="daily-quest-card__tag">Cùng nhau</span>}
-                    <h3>{q.title}</h3>
-                    <p>{q.desc}</p>
-                    {q.cta && (
-                      <Link
-                        to={primaryMatch ? `/chat/${primaryMatch.id}` : q.cta}
-                        className="daily-quest-card__link"
-                      >
-                        {q.id === 'meetup-plan' ? '🤝 Đặt lịch hẹn' : '💬 Nhắn tin ngay'}
-                      </Link>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-
-            <Link
-              to={primaryMatch ? `/chat/${primaryMatch.id}` : '/chat'}
-              className="daily-complete-btn"
-            >
-              🤝 Hoàn thành cùng nhau
-            </Link>
-          </section>
-        </div>
-        </AsyncContent>
-      </div>
-    </AppShell>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
   )
 }
-
-export default DailyConnection

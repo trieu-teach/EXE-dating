@@ -1,111 +1,67 @@
-import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import Toast from '../../../components/User/Toast/Toast.jsx'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useToast } from '../../../context/ToastContext.jsx'
+import { authService } from '../../../api'
+import { validateEmail } from '../../../utils/validation.js'
+import ThemeToggle from '../../../components/User/ThemeToggle/ThemeToggle.jsx'
 
-const MOCK_OTP = '123456'
-import { hasErrors, validateEmail } from '../../../utils/validation.js'
-import AuthThemeBar from '../../../components/User/AuthThemeBar/AuthThemeBar.jsx'
-import LovePageDecor from '../../../components/User/LovePageDecor/LovePageDecor.jsx'
-import '../../../styles/auth-form.css'
-import './ForgotPassword.css'
-
-function ForgotPassword() {
-  const navigate = useNavigate()
+export default function ForgotPassword() {
+  const toast = useToast()
   const [email, setEmail] = useState('')
-  const [errors, setErrors] = useState({})
-  const [touched, setTouched] = useState({})
-  const [toast, setToast] = useState(null)
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [sent, setSent] = useState(false)
 
-  function hideToast() {
-    setToast(null)
-  }
-
-  function showToast(message, type = 'info') {
-    setToast({ message, type, id: Date.now() })
-  }
-
-  useEffect(() => {
-    if (!toast) return undefined
-    const timer = setTimeout(hideToast, 4200)
-    return () => clearTimeout(timer)
-  }, [toast])
-
-  function handleBlur() {
-    setTouched({ email: true })
-    setErrors({ email: validateEmail(email) })
-  }
-
-  function handleEmailChange(event) {
-    const value = event.target.value
-    setEmail(value)
-    if (touched.email) {
-      setErrors({ email: validateEmail(value) })
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const v = validateEmail(email)
+    if (v) { setError(v); return }
+    setError('')
+    setSubmitting(true)
+    try {
+      await authService.forgotPassword({ email: email.trim() })
+      setSent(true)
+      toast.success('Đã gửi OTP đến email.')
+    } catch (err) {
+      toast.error(err?.message || 'Không gửi được OTP.')
+    } finally {
+      setSubmitting(false)
     }
-  }
-
-  function handleSubmit(event) {
-    event.preventDefault()
-
-    const formErrors = { email: validateEmail(email) }
-    setErrors(formErrors)
-    setTouched({ email: true })
-
-    if (hasErrors(formErrors)) {
-      showToast('Vui lòng nhập email hợp lệ.', 'warning')
-      return
-    }
-
-    showToast(`Mã OTP đã được gửi. Mã demo: ${MOCK_OTP}`, 'info')
-    navigate('/verify-otp', {
-      state: { email: email.trim().toLowerCase(), purpose: 'reset' },
-    })
   }
 
   return (
-    <div className="forgot-page user-page user-page--centered">
-      <AuthThemeBar />
-      <LovePageDecor />
-      {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={hideToast} />
-      )}
-
-      <div className="forgot-card user-card">
-        <header className="forgot-header">
-          <h1>Quên mật khẩu</h1>
-          <p>Nhập email đã đăng ký để nhận mã OTP</p>
-        </header>
-
-        <form className="forgot-form" onSubmit={handleSubmit} noValidate>
-          <label
-            className={`forgot-field auth-field${touched.email && errors.email ? ' auth-field--error' : ''}`}
-          >
-            <span>Email</span>
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={handleEmailChange}
-              onBlur={handleBlur}
-              placeholder="email@cua-ban.com"
-              autoComplete="email"
-              aria-invalid={touched.email && errors.email ? true : undefined}
-            />
-            {touched.email && errors.email && (
-              <p className="auth-field-error">{errors.email}</p>
-            )}
-          </label>
-
-          <button type="submit" className="forgot-submit">
-            Gửi mã OTP
-          </button>
-        </form>
-
-        <p className="forgot-footer">
-          <Link to="/login">Quay lại đăng nhập</Link>
-        </p>
+    <main className="auth-page">
+      <div className="auth-card">
+        <div className="auth-theme-row">
+          <span style={{ color: 'var(--color-primary)', fontWeight: 800 }}>💗 SameMess</span>
+          <ThemeToggle />
+        </div>
+        <h1>Quên mật khẩu</h1>
+        <p className="auth-subtitle">Nhập email để nhận mã OTP đặt lại mật khẩu.</p>
+        {sent ? (
+          <div className="auth-form">
+            <div className="auth-form-error" style={{ background: 'var(--color-primary-soft)', color: 'var(--color-primary)' }}>
+              Đã gửi mã đến <strong>{email}</strong>. Kiểm tra hộp thư (kể cả spam).
+            </div>
+            <Link to="/reset-password" state={{ email }} className="btn btn-primary btn-block" style={{ textAlign: 'center' }}>
+              Tiếp tục đặt lại mật khẩu
+            </Link>
+            <Link to="/login" className="btn btn-ghost btn-block" style={{ textAlign: 'center' }}>← Quay lại đăng nhập</Link>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="field">
+              <label className="field-label">Email</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              {error && <div className="field-error">{error}</div>}
+            </div>
+            <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+              {submitting ? <span className="spinner" /> : 'Gửi mã OTP'}
+            </button>
+            <Link to="/login" className="auth-form-footer">← Quay lại đăng nhập</Link>
+          </form>
+        )}
       </div>
-    </div>
+    </main>
   )
 }
-
-export default ForgotPassword

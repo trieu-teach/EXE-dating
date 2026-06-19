@@ -1,77 +1,47 @@
-import AppShell from '../../../../components/User/AppShell/AppShell.jsx'
-import PageHeader from '../../../../components/User/PageHeader/PageHeader.jsx'
-import '../../../../styles/settings-shared.css'
-import './Devices.css'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { settingsService } from '../../../../api'
+import { useToast } from '../../../../context/ToastContext.jsx'
+import { timeAgo } from '../../../../utils/format.js'
 
-const DEVICES = [
-  {
-    id: 'iphone',
-    name: 'iPhone 15 Pro',
-    location: 'Hà Nội, Việt Nam',
-    active: true,
-  },
-  {
-    id: 'macbook',
-    name: 'MacBook Air M2',
-    location: 'Hà Nội, Việt Nam',
-    active: false,
-  },
-  {
-    id: 'ipad',
-    name: 'iPad Pro 11-inch',
-    location: 'Đà Nẵng, Việt Nam',
-    active: false,
-  },
-  {
-    id: 'windows',
-    name: 'Windows PC',
-    location: 'TP. Hồ Chí Minh, Việt Nam',
-    active: false,
-  },
-]
+export default function Devices() {
+  const navigate = useNavigate()
+  const toast = useToast()
+  const [devices, setDevices] = useState([])
+  const [loading, setLoading] = useState(true)
 
-function Devices() {
+  useEffect(() => {
+    settingsService.getDevices()
+      .then((list) => setDevices(Array.isArray(list) ? list : (list?.items ?? [])))
+      .catch((err) => toast.error(err?.message || 'Không tải được danh sách thiết bị.'))
+      .finally(() => setLoading(false))
+  }, [toast])
+
+  if (loading) return <div className="loading-block"><span className="spinner" /></div>
+
   return (
-    <AppShell activeNav="profile">
-      <div className="settings-page">
-        <PageHeader title="Quản lý thiết bị" backTo="/settings" />
-
-        <div className="settings-panel devices-panel">
-          <section className="devices-section">
-            <h2 className="settings-section__title">Thiết bị hiện tại</h2>
-            {DEVICES.filter((d) => d.active).map((device) => (
-              <article key={device.id} className="device-card device-card--current">
-                <div>
-                  <h3>{device.name}</h3>
-                  <p>{device.location}</p>
+    <div className="settings-page">
+      <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigate('/settings')} style={{ alignSelf: 'flex-start' }}>
+        ← Cài đặt
+      </button>
+      <h1>Thiết bị đã đăng nhập</h1>
+      {devices.length === 0 ? (
+        <div className="empty">Không có thiết bị nào được ghi nhận.</div>
+      ) : (
+        <section className="settings-section">
+          {devices.map((d, i) => (
+            <div key={d.id || i} className="settings-row">
+              <div>
+                <div className="settings-row-label">{d.deviceName || d.userAgent || 'Thiết bị'}</div>
+                <div className="settings-row-desc">
+                  {d.ip ? `IP: ${d.ip} · ` : ''}{d.location || ''} · Hoạt động {timeAgo(d.lastActiveAt || d.createdAt)}
                 </div>
-                <span className="device-card__status">Đang hoạt động</span>
-              </article>
-            ))}
-          </section>
-
-          <section className="devices-section">
-            <h2 className="settings-section__title">Thiết bị khác</h2>
-            {DEVICES.filter((d) => !d.active).map((device) => (
-              <article key={device.id} className="device-card">
-                <div>
-                  <h3>{device.name}</h3>
-                  <p>{device.location}</p>
-                </div>
-                <button type="button" className="settings-btn-outline device-card__logout">
-                  Đăng xuất
-                </button>
-              </article>
-            ))}
-          </section>
-
-          <button type="button" className="devices-logout-all">
-            Đăng xuất khỏi tất cả các thiết bị khác
-          </button>
-        </div>
-      </div>
-    </AppShell>
+              </div>
+              {d.isCurrent && <span className="tag tag-primary">Hiện tại</span>}
+            </div>
+          ))}
+        </section>
+      )}
+    </div>
   )
 }
-
-export default Devices

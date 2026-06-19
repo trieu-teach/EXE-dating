@@ -1,225 +1,172 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import PasswordInput from '../../../components/User/PasswordInput/PasswordInput.jsx'
-import Toast from '../../../components/User/Toast/Toast.jsx'
+import { useAuth } from '../../../context/AuthContext.jsx'
+import { useToast } from '../../../context/ToastContext.jsx'
+import { validateEmail, validatePassword, validateRequired } from '../../../utils/validation.js'
+import ThemeToggle from '../../../components/User/ThemeToggle/ThemeToggle.jsx'
+import { Heart, Eye, EyeOff } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Button } from '../../../components/ui/Button.jsx'
+import { Input } from '../../../components/ui/Input.jsx'
 
-const MOCK_OTP = '123456'
-import { PROFILE_FIELD_NOTES } from '../../../data/profileFields.js'
-import FieldNote from '../../../components/User/FieldNote/FieldNote.jsx'
-import {
-  hasErrors,
-  validateConfirmPassword,
-  validateDisplayName,
-  validateEmail,
-  validatePassword,
-  validateRegisterForm,
-} from '../../../utils/validation.js'
-import AuthThemeBar from '../../../components/User/AuthThemeBar/AuthThemeBar.jsx'
-import LovePageDecor from '../../../components/User/LovePageDecor/LovePageDecor.jsx'
-import '../../../styles/auth-form.css'
 import './Register.css'
 
-const FIELD_VALIDATORS = {
-  name: (values) => validateDisplayName(values.name),
-  email: (values) => validateEmail(values.email),
-  password: (values) => validatePassword(values.password, { forRegister: true }),
-  confirmPassword: (values) =>
-    validateConfirmPassword(values.password, values.confirmPassword),
-}
-
-function Register() {
+export default function Register() {
+  const { register } = useAuth()
   const navigate = useNavigate()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const toast = useToast()
+  const [form, setForm] = useState({
+    displayName: '',
+    email: '',
+    phoneNumber: '',
+    password: '',
+    confirmPassword: '',
+  })
   const [errors, setErrors] = useState({})
-  const [touched, setTouched] = useState({})
-  const [toast, setToast] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [showPw, setShowPw] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
-  function hideToast() {
-    setToast(null)
-  }
-
-  function showToast(message, type = 'info') {
-    setToast({ message, type, id: Date.now() })
-  }
-
-  useEffect(() => {
-    if (!toast) return undefined
-    const timer = setTimeout(hideToast, 4200)
-    return () => clearTimeout(timer)
-  }, [toast])
-
-  const values = { name, email, password, confirmPassword }
-
-  function touchField(field) {
-    setTouched((prev) => ({ ...prev, [field]: true }))
-  }
-
-  function validateField(field, nextValues = values) {
-    return FIELD_VALIDATORS[field]?.(nextValues) ?? ''
-  }
-
-  function handleBlur(field) {
-    touchField(field)
-    setErrors((prev) => ({ ...prev, [field]: validateField(field) }))
-  }
-
-  function updateField(field, value) {
-    const nextValues = { ...values, [field]: value }
-
-    if (field === 'name') setName(value)
-    if (field === 'email') setEmail(value)
-    if (field === 'password') setPassword(value)
-    if (field === 'confirmPassword') setConfirmPassword(value)
-
-    if (touched[field]) {
-      setErrors((prev) => ({ ...prev, [field]: validateField(field, nextValues) }))
+  const validate = () => {
+    const next = {
+      displayName: validateRequired(form.displayName, 'Tên hiển thị'),
+      email: validateEmail(form.email),
+      password: validatePassword(form.password),
     }
-
-    if (field === 'password' && touched.confirmPassword) {
-      setErrors((prev) => ({
-        ...prev,
-        confirmPassword: validateField('confirmPassword', nextValues),
-      }))
-    }
+    if (form.password !== form.confirmPassword) next.confirmPassword = 'Mật khẩu nhập lại không khớp'
+    setErrors(next)
+    return Object.values(next).every((v) => !v)
   }
 
-  function handleSubmit(event) {
-    event.preventDefault()
-
-    const formErrors = validateRegisterForm(values)
-    setErrors(formErrors)
-    setTouched({
-      name: true,
-      email: true,
-      password: true,
-      confirmPassword: true,
-    })
-
-    if (hasErrors(formErrors)) {
-      showToast('Vui lòng kiểm tra lại thông tin nhập vào.', 'warning')
-      return
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!validate()) return
+    setSubmitting(true)
+    try {
+      await register({
+        email: form.email.trim(),
+        password: form.password,
+        displayName: form.displayName.trim(),
+        phoneNumber: form.phoneNumber.trim() || undefined,
+      })
+      toast.success('Đã gửi mã OTP đến email của bạn.')
+      navigate('/verify-otp', { replace: true, state: { email: form.email.trim() } })
+    } catch (err) {
+      toast.error(err?.message || 'Đăng ký thất bại.')
+    } finally {
+      setSubmitting(false)
     }
-
-    showToast(`Mã OTP đã được gửi. Mã demo: ${MOCK_OTP}`, 'info')
-    navigate('/verify-otp', {
-      state: {
-        email: email.trim().toLowerCase(),
-        purpose: 'register',
-        registerData: {
-          name: name.trim(),
-          email: email.trim().toLowerCase(),
-          password,
-        },
-      },
-    })
   }
 
   return (
-    <div className="register-page user-page user-page--centered">
-      <AuthThemeBar />
-      <LovePageDecor />
-      {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={hideToast} />
-      )}
+    <div className="auth-page">
+      <div className="auth-blob auth-blob-1" />
+      <div className="auth-blob auth-blob-2" />
 
-      <div className="register-card user-card">
-        <header className="register-header">
-          <h1>Đăng ký</h1>
-          <p>Chào mừng bạn đến với SameMess</p>
-        </header>
+      <motion.div
+        className="auth-card"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+      >
+        <div className="auth-header">
+          <div className="auth-logo">
+            <Heart size={18} className="auth-logo-icon" fill="currentColor" />
+          </div>
+          <span className="auth-logo-text">SameMess</span>
+          <div className="auth-theme-btn">
+            <ThemeToggle />
+          </div>
+        </div>
 
-        <form className="register-form" onSubmit={handleSubmit} noValidate>
-          <label
-            className={`register-field auth-field${touched.name && errors.name ? ' auth-field--error' : ''}`}
-          >
-            <span>Tên hiển thị</span>
-            <input
-              type="text"
-              name="name"
-              value={name}
-              onChange={(e) => updateField('name', e.target.value)}
-              onBlur={() => handleBlur('name')}
-              placeholder="Nguyễn Minh Anh"
-              autoComplete="name"
-              aria-invalid={touched.name && errors.name ? true : undefined}
-            />
-            <FieldNote>{PROFILE_FIELD_NOTES.displayName}</FieldNote>
-            {touched.name && errors.name && (
-              <p className="auth-field-error">{errors.name}</p>
-            )}
-          </label>
+        <div className="auth-hero">
+          <h1>Tạo tài khoản mới</h1>
+          <p>Bắt đầu hành trình kết nối của bạn ngay hôm nay</p>
+        </div>
 
-          <label
-            className={`register-field auth-field${touched.email && errors.email ? ' auth-field--error' : ''}`}
-          >
-            <span>Email</span>
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={(e) => updateField('email', e.target.value)}
-              onBlur={() => handleBlur('email')}
-              placeholder="email@cua-ban.com"
-              autoComplete="email"
-              aria-invalid={touched.email && errors.email ? true : undefined}
-            />
-            <FieldNote>{PROFILE_FIELD_NOTES.email}</FieldNote>
-            {touched.email && errors.email && (
-              <p className="auth-field-error">{errors.email}</p>
-            )}
-          </label>
+        <motion.form
+          className="auth-form"
+          onSubmit={handleSubmit}
+          noValidate
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+        >
+          <Input
+            label="Tên hiển thị"
+            placeholder="Tên bạn là gì?"
+            value={form.displayName}
+            onChange={(e) => setForm({ ...form, displayName: e.target.value })}
+            maxLength={50}
+            error={errors.displayName}
+          />
 
-          <label
-            className={`register-field auth-field${touched.password && errors.password ? ' auth-field--error' : ''}`}
-          >
-            <span>Mật khẩu</span>
-            <PasswordInput
-              name="password"
-              value={password}
-              onChange={(e) => updateField('password', e.target.value)}
-              onBlur={() => handleBlur('password')}
+          <Input
+            label="Email"
+            type="email"
+            autoComplete="email"
+            placeholder="your@email.com"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            error={errors.email}
+          />
+
+          <Input
+            label="Số điện thoại"
+            type="tel"
+            autoComplete="tel"
+            placeholder="+84..."
+            value={form.phoneNumber}
+            onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+          />
+
+          <div className="auth-pw-wrap">
+            <Input
+              label="Mật khẩu"
+              type={showPw ? 'text' : 'password'}
               autoComplete="new-password"
-              classPrefix="register"
-              hasError={Boolean(touched.password && errors.password)}
+              placeholder="Tối thiểu 8 ký tự"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              error={errors.password}
             />
-            <FieldNote>{PROFILE_FIELD_NOTES.password}</FieldNote>
-            {touched.password && errors.password && (
-              <p className="auth-field-error">{errors.password}</p>
-            )}
-          </label>
+            <button type="button" className="auth-pw-toggle" onClick={() => setShowPw(!showPw)}>
+              {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
 
-          <label
-            className={`register-field auth-field${touched.confirmPassword && errors.confirmPassword ? ' auth-field--error' : ''}`}
-          >
-            <span>Xác nhận mật khẩu</span>
-            <PasswordInput
-              name="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => updateField('confirmPassword', e.target.value)}
-              onBlur={() => handleBlur('confirmPassword')}
+          <div className="auth-pw-wrap">
+            <Input
+              label="Nhập lại mật khẩu"
+              type={showConfirm ? 'text' : 'password'}
               autoComplete="new-password"
-              classPrefix="register"
-              hasError={Boolean(touched.confirmPassword && errors.confirmPassword)}
+              placeholder="Nhập lại mật khẩu"
+              value={form.confirmPassword}
+              onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+              error={errors.confirmPassword}
             />
-            {touched.confirmPassword && errors.confirmPassword && (
-              <p className="auth-field-error">{errors.confirmPassword}</p>
-            )}
-          </label>
+            <button type="button" className="auth-pw-toggle" onClick={() => setShowConfirm(!showConfirm)}>
+              {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
 
-          <button type="submit" className="register-submit">
-            Đăng ký
-          </button>
-        </form>
+          <Button type="submit" variant="primary" size="full" disabled={submitting}>
+            {submitting ? <span className="spinner" /> : 'Tạo tài khoản'}
+          </Button>
+        </motion.form>
 
-        <p className="register-footer">
-          Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
+        <div className="auth-divider"><span>Hoặc</span></div>
+
+        <p className="auth-switch">
+          Đã có tài khoản? <Link to="/login" className="auth-link-bold">Đăng nhập</Link>
         </p>
-      </div>
+
+        <p className="auth-terms">
+          Bằng việc đăng ký, bạn đồng ý với{' '}
+          <a href="#" className="auth-link-primary">Điều khoản</a> và{' '}
+          <a href="#" className="auth-link-primary">Chính sách bảo mật</a>.
+        </p>
+      </motion.div>
     </div>
   )
 }
-
-export default Register

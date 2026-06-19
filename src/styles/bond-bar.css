@@ -1,0 +1,86 @@
+/* ── Bond bar (inside chat) ─────────────────────── */
+.bond-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(255, 79, 139, 0.06), rgba(177, 75, 255, 0.05));
+  border: 1.5px solid rgba(255, 79, 139, 0.2);
+  border-radius: var(--radius-xl);
+}
+.bond-bar-left { flex-shrink: 0; }
+.bond-bar-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.05);
+}
+.bond-bar-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.bond-bar-top { display: flex; align-items: center; gap: 6px; }
+.bond-bar-level {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+.bond-bar-streak {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+}
+.bond-bar-duo {
+  font-size: 0.75rem;
+}
+.bond-bar-progress {
+  height: 5px;
+  background: rgba(255, 79, 139, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bond-bar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: 999px;
+  transition: width 0.8s ease;
+}
+.bond-bar-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.bond-bar-xp {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+.bond-bar-link {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.bond-bar-link:hover { text-decoration: underline; }
+.bond-bar-water-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 79, 139, 0.3);
+  background: rgba(255, 79, 139, 0.08);
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: background var(--transition-base), transform var(--transition-fast), box-shadow var(--transition-base);
+}
+.bond-bar-water-btn:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: #fff;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 79, 139, 0.35);
+}
+.bond-bar-water-btn:disabled { opacity: 0.5; cursor: not-allowed; }

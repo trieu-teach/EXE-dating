@@ -1,0 +1,379 @@
+/* =========================================================
+ * Meetup Section — modern dating UI
+ * LoveTree page tab: §0 lock, §1 venues, §2 share,
+ *   §3 propose form, §4 meetup status cards
+ * ========================================================= */
+
+/* ── Section wrapper ─────────────────────────────── */
+.meetup-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+  padding: 0 0 8px;
+}
+
+/* ── §0 Locked state ───────────────────────────── */
+.meetup-locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 12px;
+  text-align: center;
+}
+.meetup-locked-scene {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.meetup-locked-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 79, 139, 0.12) 0%, transparent 70%);
+  animation: tree-pulse 3s ease-in-out infinite;
+}
+.meetup-locked-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: grayscale(0.4) opacity(0.8);
+}
+.meetup-locked h3 { margin: 0; font-size: 1rem; font-weight: 800; color: var(--color-text); }
+.meetup-locked p  { margin: 0; color: var(--color-text-soft); font-size: 0.85rem; }
+.meetup-locked-sub {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  background: rgba(255, 79, 139, 0.06);
+  border: 1px solid rgba(255, 79, 139, 0.2);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  font-weight: 600;
+}
+
+/* ── §2 Share bar ──────────────────────────────── */
+.meetup-share-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(255, 79, 139, 0.08), rgba(177, 75, 255, 0.06));
+  border: 1px solid rgba(255, 79, 139, 0.25);
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* ── §1 Venue grid ──────────────────────────────── */
+.meetup-venues-toolbar { display: flex; flex-direction: column; gap: 8px; }
+.meetup-filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.meetup-select {
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color var(--transition-base);
+}
+.meetup-select:focus { border-color: var(--color-primary); outline: none; }
+.meetup-venues-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+@media (max-width: 600px) { .meetup-venues-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 400px) { .meetup-venues-grid { grid-template-columns: 1fr; } }
+
+.meetup-venue-card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+}
+.meetup-venue-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 6px 20px rgba(255, 79, 139, 0.15);
+  transform: translateY(-2px);
+}
+.meetup-venue-card.is-selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(255, 79, 139, 0.3);
+}
+.meetup-venue-img {
+  width: 100%;
+  aspect-ratio: 3/2;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-surface-2);
+  position: relative;
+}
+.meetup-venue-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+.meetup-venue-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 900;
+  box-shadow: var(--shadow-sm);
+}
+.meetup-venue-info { padding: 10px; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.meetup-venue-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.meetup-venue-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-soft);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.meetup-venue-address {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.meetup-venue-detail-btn {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  color: #fff;
+}
+.meetup-venue-card:hover .meetup-venue-detail-btn { opacity: 1; }
+
+/* ── §3+§4 Proposals ─────────────────────────── */
+.meetup-proposals { display: flex; flex-direction: column; gap: 10px; }
+.meetup-section-title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.meetup-card {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+}
+.meetup-card-icon { font-size: 28px; flex-shrink: 0; }
+.meetup-card-body { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.meetup-card-title { font-weight: 800; font-size: 0.9rem; color: var(--color-text); }
+.meetup-card-venue { font-size: 0.85rem; color: var(--color-text-soft); font-weight: 600; }
+.meetup-card-time  { font-size: 0.85rem; color: var(--color-text); font-weight: 700; }
+.meetup-card-note  { font-size: 0.82rem; color: var(--color-text-muted); margin: 0; line-height: 1.4; }
+.meetup-card-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+
+.meetup-card-incoming {
+  background: rgba(255, 209, 102, 0.08);
+  border-color: rgba(255, 209, 102, 0.4);
+}
+.meetup-card-incoming .meetup-card-icon { filter: hue-rotate(10deg); }
+.meetup-card-pending {
+  background: rgba(255, 255, 255, 0.3);
+  border-style: dashed;
+  opacity: 0.85;
+}
+.meetup-card-accepted {
+  background: rgba(22, 197, 94, 0.07);
+  border-color: rgba(22, 197, 94, 0.35);
+}
+
+/* ── §3 Propose form ──────────────────────────── */
+.meetup-propose-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--color-surface-2);
+  border: 1.5px solid rgba(255, 79, 139, 0.2);
+  border-radius: var(--radius-lg);
+}
+.meetup-propose-venue {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+  font-weight: 600;
+  padding: 8px 10px;
+  background: rgba(255, 79, 139, 0.06);
+  border: 1px solid rgba(255, 79, 139, 0.2);
+  border-radius: var(--radius-md);
+}
+.meetup-datetime, .meetup-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.88rem;
+  transition: border-color var(--transition-base);
+}
+.meetup-datetime:focus, .meetup-textarea:focus { border-color: var(--color-primary); outline: none; }
+.meetup-textarea { resize: vertical; }
+.meetup-propose-actions { display: flex; gap: 8px; }
+
+/* ── Empty state ────────────────────────────── */
+.meetup-empty {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+  background: var(--color-surface-2);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  line-height: 1.5;
+}
+.meetup-empty-hint { font-size: 0.8rem; color: var(--color-text-muted); margin-top: 6px; }
+
+/* ── Venue detail modal ──────────────────────── */
+.venue-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 280px;
+  max-width: 480px;
+}
+.venue-detail-cover {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: var(--radius-md);
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-surface-2);
+}
+.venue-detail-header { display: flex; flex-direction: column; gap: 8px; }
+.venue-detail-name { margin: 0; font-size: 1.2rem; font-weight: 900; }
+.venue-detail-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.venue-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+.venue-detail-label { color: var(--color-text-soft); font-weight: 700; flex-shrink: 0; }
+.venue-detail-desc {
+  font-size: 0.88rem;
+  color: var(--color-text-soft);
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* ── VenueMessage (chat card) ────────────────── */
+.venue-msg-card {
+  max-width: 270px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+.venue-msg-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 6px 20px rgba(255, 79, 139, 0.15);
+}
+.venue-msg-card-img {
+  width: 100%;
+  height: 110px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-surface-2);
+}
+.venue-msg-card-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.venue-msg-card-name { font-weight: 800; font-size: 0.88rem; }
+.venue-msg-card-meta {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  font-size: 0.75rem; color: var(--color-text-soft); align-items: center;
+}
+.venue-msg-category { font-weight: 700; color: var(--color-text); }
+.venue-msg-price { color: var(--color-primary); font-weight: 700; }
+.venue-msg-address { font-size: 0.75rem; color: var(--color-text-muted); }
+.venue-msg-meta   { font-size: 0.72rem; color: var(--color-text-muted); }
+.venue-msg-propose-btn { margin-top: 6px; width: 100%; font-size: 0.78rem; }
+
+/* Compact chip */
+.venue-msg-compact {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px 5px 5px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer; font-size: 0.82rem; font-weight: 700;
+  max-width: 200px;
+  transition: border-color var(--transition-base);
+}
+.venue-msg-compact:hover { border-color: var(--color-primary); }
+.venue-msg-compact-img {
+  width: 26px; height: 26px; border-radius: 50%;
+  background-size: cover; background-position: center;
+  background-color: var(--color-surface-2); flex-shrink: 0;
+}
+.venue-msg-compact-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── Chat meetup (already defined in chat.css) ──── */

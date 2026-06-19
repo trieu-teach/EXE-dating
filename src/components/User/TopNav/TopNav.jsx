@@ -1,96 +1,74 @@
-import { Link, useLocation } from 'react-router-dom'
-import { getAvatarUrl } from '../../../utils/profilePhotos.js'
-import ThemeToggle from '../ThemeToggle/ThemeToggle.jsx'
-import './TopNav.css'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../../context/AuthContext.jsx'
+import NotificationBell from '../NotificationBell/NotificationBell.jsx'
+import ReputationBadge from '../ReputationBadge/ReputationBadge.jsx'
+import { resolveImageUrl } from '../../../utils/format.js'
+import { Heart, Flame, Calendar, Search, Shield, Settings, Leaf, Star } from 'lucide-react'
 
-const NAV_ITEMS = [
-  { id: 'discovery', to: '/discovery', label: 'Khám phá' },
-  { id: 'events', to: '/events', label: 'Sự kiện' },
-  { id: 'chat', to: '/chat', label: 'Tin nhắn' },
-  { id: 'search', to: '/search', label: 'Tìm kiếm' },
-  { id: 'love', to: '/love-tree', label: 'Cây yêu' },
+const NAV_LINKS = [
+  { to: '/discovery', label: 'Khám phá', Icon: Flame },
+  { to: '/matches', label: 'Match', Icon: Heart },
+  { to: '/chat', label: 'Tin nhắn', Icon: null },
+  { to: '/love-tree', label: 'Cây', Icon: Leaf },
+  { to: '/daily-connection', label: 'Hằng ngày', Icon: Star },
+  { to: '/events', label: 'Sự kiện', Icon: Calendar },
+  { to: '/search', label: 'Tìm kiếm', Icon: Search },
+  { to: '/premium', label: 'Premium', Icon: null },
+  { to: '/safety', label: 'An toàn', Icon: Shield },
+  { to: '/profile', label: 'Hồ sơ', Icon: null },
+  { to: '/settings', label: 'Cài đặt', Icon: Settings },
 ]
 
-function TopNav({ activeNav }) {
-  const { pathname } = useLocation()
-
-  function isActive(id) {
-    if (activeNav) return activeNav === id
-    if (id === 'discovery') return pathname === '/discovery' || pathname === '/match-success'
-    if (id === 'search') return pathname === '/search'
-    if (id === 'events') return pathname.startsWith('/events')
-    if (id === 'chat') return pathname.startsWith('/chat')
-    if (id === 'love') return pathname.startsWith('/love-tree')
-    return false
-  }
-
-  const avatarUrl = getAvatarUrl()
-
-  const profileActive =
-    pathname.startsWith('/profile') ||
-    pathname.startsWith('/settings') ||
-    pathname === '/premium' ||
-    pathname.startsWith('/safety') ||
-    pathname === '/emergency-alert' ||
-    pathname === '/safety-checkin'
+export default function TopNav() {
+  const { user, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+  const avatar = resolveImageUrl(user?.avatarUrl || user?.photoUrl)
 
   return (
-    <header className="top-nav">
-      <div className="top-nav__inner">
-        <Link to="/discovery" className="top-nav__logo">
-          <span className="top-nav__logo-mark" aria-hidden="true">
-            ♥
-          </span>
-          SameMess
-        </Link>
-
-        <nav className="top-nav__links" aria-label="Điều hướng chính">
-          {NAV_ITEMS.map(({ id, to, label, disabled }) =>
-            disabled ? (
-              <span key={id} className="top-nav__link top-nav__link--disabled">
-                {label}
-              </span>
-            ) : (
-              <Link
-                key={id}
-                to={to}
-                className={`top-nav__link${isActive(id) ? ' top-nav__link--active' : ''}`}
-                aria-current={isActive(id) ? 'page' : undefined}
-              >
-                {label}
-              </Link>
-            ),
-          )}
-        </nav>
-
-        <div className="top-nav__actions">
-          <ThemeToggle className="theme-toggle--compact top-nav__theme" />
-          <Link
-            to="/settings/discovery"
-            className="top-nav__icon-btn"
-            aria-label="Bộ lọc khám phá"
-          >
-            <FilterIcon />
-          </Link>
-          <Link
-            to="/profile"
-            className={`top-nav__avatar${profileActive ? ' top-nav__avatar--active' : ''}`}
-            aria-label="Hồ sơ của tôi"
-          >
-            <img src={avatarUrl} alt="" />
-          </Link>
+    <header className="topnav">
+      <Link to={isAuthenticated ? '/discovery' : '/login'} className="topnav-brand">
+        <div className="topnav-logo">
+          <Heart size={16} fill="currentColor" />
         </div>
+        <span className="topnav-logo-text">SameMess</span>
+      </Link>
+
+      {isAuthenticated && (
+        <nav className="topnav-links" aria-label="Menu chính">
+          {NAV_LINKS.map((l) => (
+            <NavLink
+              key={l.to}
+              to={l.to}
+              className={({ isActive }) => `topnav-link${isActive ? ' active' : ''}`}
+            >
+              {l.label}
+            </NavLink>
+          ))}
+        </nav>
+      )}
+
+      <div className="topnav-right">
+        {isAuthenticated ? (
+          <>
+            <NotificationBell />
+            <ReputationBadge size="sm" showLabel={false} />
+            <div
+              className="topnav-avatar"
+              style={avatar ? { backgroundImage: `url(${avatar})` } : {}}
+              onClick={() => navigate('/profile')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter') navigate('/profile') }}
+              aria-label="Hồ sơ"
+            />
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="topnav-auth-link">Đăng nhập</Link>
+            <Link to="/register" className="topnav-auth-btn">Đăng ký</Link>
+          </>
+        )}
       </div>
     </header>
   )
 }
-
-function FilterIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path d="M4 6h16M7 12h10M10 18h4" />
-    </svg>
-  )
-}
-
-export default TopNav

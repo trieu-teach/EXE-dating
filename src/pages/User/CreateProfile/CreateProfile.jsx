@@ -1,151 +1,166 @@
-import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import LovePageDecor from '../../../components/User/LovePageDecor/LovePageDecor.jsx'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useToast } from '../../../context/ToastContext.jsx'
+import { profileService } from '../../../api'
 import ProfileInfoForm from '../../../components/User/ProfileInfoForm/ProfileInfoForm.jsx'
-import ProfilePhotoGrid from '../../../components/User/ProfilePhotoGrid/ProfilePhotoGrid.jsx'
-import { EMPTY_PROFILE_FORM } from '../../../data/profileFields.js'
-import {
-  getProfilePhotos,
-  persistProfilePhotos,
-  photosToSlotArray,
-} from '../../../utils/profilePhotos.js'
-import { isVerificationRequired } from '../../../utils/identityVerification.js'
-import { markOnboarded, getUser, saveUser } from '../../../utils/session.js'
-import { hasErrors, validateProfileForm } from '../../../utils/validation.js'
-import './CreateProfile.css'
+import ProfilePhotoManager from '../../../components/User/ProfilePhotoManager/ProfilePhotoManager.jsx'
+import OnboardingShell from '../../../components/User/OnboardingShell/OnboardingShell.jsx'
 
-const MAX_PHOTOS = 6
-
-function BackIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path d="M15 18l-6-6 6-6" />
-    </svg>
-  )
-}
-
-function CreateProfile() {
+export default function CreateProfile() {
   const navigate = useNavigate()
-  const [photoSlots, setPhotoSlots] = useState(() =>
-    photosToSlotArray(getProfilePhotos(), MAX_PHOTOS),
-  )
-  const [formError, setFormError] = useState('')
+  const toast = useToast()
+  const [profile, setProfile] = useState(null)
+  const [step, setStep] = useState(1) // 1=info, 2=location, 3=photos
+  const [loading, setLoading] = useState(true)
+  const [completing, setCompleting] = useState(false)
 
-  const user = getUser()
-  const initialForm = useMemo(
-    () => ({
-      ...EMPTY_PROFILE_FORM,
-      displayName: user?.profile?.fullName ?? user?.name ?? '',
-      username: user?.username ?? '',
-      age: user?.profile?.age ?? '',
-      city: user?.profile?.city ?? '',
-      occupation: user?.profile?.occupation ?? '',
-      bio: user?.profile?.bio ?? '',
-      personality: user?.profile?.personality ?? 'Cân bằng',
-      shareSexualOrientation: Boolean(user?.profile?.sexualOrientation),
-      sexualOrientation: user?.profile?.sexualOrientation ?? '',
-    }),
-    [user],
-  )
+  useEffect(() => {
+    profileService.me()
+      .then((data) => setProfile(data))
+      .catch(() => navigate('/login', { replace: true }))
+      .finally(() => setLoading(false))
+  }, [navigate])
 
-  function handleContinue(form) {
-    const formErrors = validateProfileForm(form)
-    if (hasErrors(formErrors)) {
-      setFormError('Vui lòng kiểm tra các trường bắt buộc.')
+  const handleInfoSaved = async () => {
+    const updated = await profileService.me()
+    setProfile(updated)
+    setStep(2)
+  }
+
+  const handleSaveLocation = async (e) => {
+    e.preventDefault()
+    const lat = Number(profile?.latitude)
+    const lng = Number(profile?.longitude)
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat === 0 || lng === 0) {
+      toast.error('Vui lòng quay lại bước Vị trí để cập nhật toạ độ trước.')
       return
     }
-    setFormError('')
+    setStep(3)
+  }
 
-    const filled = photoSlots.filter(Boolean)
-    persistProfilePhotos(filled)
-
-    saveUser({
-      name: form.displayName,
-      username: form.username,
-      profile: {
-        fullName: form.displayName,
-        age: form.age,
-        city: form.city,
-        occupation: form.occupation,
-        bio: form.bio,
-        personality: form.personality,
-        sexualOrientation: form.shareSexualOrientation ? form.sexualOrientation : '',
-      },
-      photoCount: filled.length,
-    })
-    navigate('/account-verification')
+  const handleFinish = async () => {
+    setCompleting(true)
+    try {
+      const updated = await profileService.me()
+      setProfile(updated)
+      if (updated?.isProfileCompleted) {
+        toast.success('Hồ sơ đã hoàn tất!')
+        navigate('/onboarding/verify-face', { replace: true })
+      } else {
+        toast.warn('Hồ sơ chưa đủ: cần thêm ảnh chính và các trường bắt buộc.')
+      }
+    } finally {
+      setCompleting(false)
+    }
   }
 
   return (
-    <div className="create-profile-page user-page">
-      <LovePageDecor />
-      <div className="create-profile-shell">
-        <header className="create-profile-topbar">
-          <button
-            type="button"
-            className="create-profile-back"
-            onClick={() => navigate(-1)}
-            aria-label="Quay lại"
-          >
-            <BackIcon />
-          </button>
-          <h1 className="create-profile-title">Tạo hồ sơ</h1>
-          <span className="create-profile-topbar-spacer" aria-hidden="true" />
-        </header>
+    <OnboardingShell
+      step="profile"
+      eyebrow="Bước 3 · Hồ sơ"
+      title={step === 1 ? 'Giới thiệu về bạn' : step === 2 ? 'Xác nhận vị trí' : 'Thêm ảnh của bạn'}
+      subtitle={
+        step === 1
+          ? 'Một vài thông tin cơ bản để mọi người biết bạn là ai.'
+          : step === 2
+            ? 'Chúng tôi đã lưu vị trí ở bước trước. Bạn có thể tiếp tục.'
+            : 'Thêm ít nhất 2 ảnh rõ mặt để tăng độ tin cậy.'
+      }
+      heroTitle="Hồ sơ của bạn 🪪"
+      heroText="Càng chi tiết, càng dễ gây ấn tượng. Mọi thông tin đều có thể chỉnh sửa sau."
+      heroEmoji="🪞"
+      loading={loading}
+      progress={50 + Math.round((step / 3) * 25)}
+      actions={
+        <>
+          {step > 1 ? (
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => setStep(step - 1)}
+              disabled={completing}
+            >
+              ← Quay lại
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => navigate('/onboarding/location')}
+              disabled={completing}
+            >
+              ← Vị trí
+            </button>
+          )}
+          {step < 3 ? (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => (step === 2 ? document.getElementById('cp-form-loc')?.requestSubmit() : setStep(step + 1))}
+              disabled={completing}
+            >
+              Tiếp tục · Ảnh →
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleFinish}
+              disabled={completing}
+            >
+              {completing ? <span className="spinner" /> : 'Hoàn tất · Xác minh khuôn mặt →'}
+            </button>
+          )}
+        </>
+      }
+    >
+      {step === 1 && (
+        <ProfileInfoForm initial={profile} onSaved={handleInfoSaved} />
+      )}
 
-        <div className="create-profile-progress">
-          <div className="create-profile-progress-labels">
-            <span>Thông tin cá nhân</span>
-            <span>Bước 2 / 4</span>
+      {step === 2 && (
+        <form id="cp-form-loc" onSubmit={handleSaveLocation} className="onboarding-form">
+          <div className="onboarding-banner onboarding-banner-info">
+            📍 Vị trí của bạn đã được lưu ở bước trước. Bạn có thể thay đổi trong Cài đặt sau.
           </div>
-          <div className="create-profile-progress-track">
-            <div className="create-profile-progress-fill" style={{ width: '50%' }} />
-          </div>
-        </div>
-
-        <main className="create-profile-main">
-          <section className="create-profile-section">
-            <h2>Giới thiệu bản thân</h2>
-            <p className="create-profile-desc">
-              Hãy chia sẻ chút về bạn để SameMess gợi ý những người phù hợp nhất.
-            </p>
-
-            {formError && <p className="create-profile-form-error">{formError}</p>}
-
-            <ProfileInfoForm
-              initialValues={initialForm}
-              onSubmit={handleContinue}
-              submitLabel="Tiếp tục"
-            />
-
-            <div className="create-profile-photos">
-              <h3>Ảnh giao diện / hồ sơ (tối đa {MAX_PHOTOS})</h3>
-              <p className="create-profile-photo-tip create-profile-photo-tip--req">
-                Chọn từ thư viện máy, thư viện mẫu hoặc tìm trên Google — ảnh đầu tiên là ảnh đại diện.
-              </p>
-              <ProfilePhotoGrid
-                photos={photoSlots}
-                maxPhotos={MAX_PHOTOS}
-                onChange={setPhotoSlots}
-              />
-            </div>
-
-            <div className="create-profile-actions">
-              {!isVerificationRequired() && (
-                <Link
-                  to="/discovery"
-                  className="create-profile-skip"
-                  onClick={() => markOnboarded()}
-                >
-                  Bỏ qua xác minh (uy tín thấp hơn)
-                </Link>
+          <div className="onboarding-map-card">
+            <div className="onboarding-map-pin" aria-hidden>📍</div>
+            <div className="onboarding-map-meta">
+              {profile?.latitude != null && profile?.longitude != null ? (
+                <>
+                  {profile?.city && <div><strong>{profile.city}</strong></div>}
+                  <div>
+                    {Number(profile.latitude).toFixed(5)}, {Number(profile.longitude).toFixed(5)}
+                  </div>
+                </>
+              ) : (
+                <div>Chưa có vị trí. Vui lòng quay lại bước trước.</div>
               )}
             </div>
-          </section>
-        </main>
-      </div>
-    </div>
+            <div className="onboarding-map-actions">
+              <button
+                type="button"
+                className="btn btn-soft"
+                onClick={() => navigate('/onboarding/location')}
+              >
+                Cập nhật vị trí
+              </button>
+            </div>
+          </div>
+        </form>
+      )}
+
+      {step === 3 && (
+        <div className="onboarding-form">
+          <ProfilePhotoManager
+            photos={profile?.photos}
+            onChange={async () => {
+              const updated = await profileService.me()
+              setProfile(updated)
+            }}
+          />
+        </div>
+      )}
+    </OnboardingShell>
   )
 }
-
-export default CreateProfile

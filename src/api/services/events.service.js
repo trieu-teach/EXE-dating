@@ -1,102 +1,44 @@
-import { API_ENDPOINTS } from '../config.js'
-import { get, post, withMockFallback } from '../http.js'
-import {
-  EVENTS,
-  EVENT_CATEGORIES,
-  FEATURED_EVENT_ID,
-  HISTORY_EVENTS,
-  PREMIUM_FEATURES,
-  PREMIUM_PLANS,
-  getEventById,
-} from '../../data/events.js'
+/**
+ * Events service — STAGE 10.
+ *
+ *   GET  /api/events                          EventDto[]
+ *   GET  /api/events/{id}                     EventDto
+ *   POST /api/events/{id}/register            { registrationId, status }
+ *   GET  /api/events/history
+ *   GET  /api/events/reward?eventId=          { xp, badge }
+ */
 
-function delay(ms = 300) {
-  return new Promise((r) => setTimeout(r, ms))
+import { API_ENDPOINTS } from '../config.js'
+import { get, post } from '../http.js'
+
+function withQuery(path, params = {}) {
+  const qs = new URLSearchParams()
+  for (const [k, v] of Object.entries(params)) {
+    if (v === undefined || v === null || v === '') continue
+    qs.set(k, String(v))
+  }
+  const s = qs.toString()
+  return s ? `${path}?${s}` : path
 }
 
 export const eventsService = {
-  async getList() {
-    return withMockFallback(
-      () => get(API_ENDPOINTS.events.list),
-      async () => {
-        await delay()
-        return {
-          categories: EVENT_CATEGORIES,
-          featuredId: FEATURED_EVENT_ID,
-          events: EVENTS,
-        }
-      },
-    )
+  list() {
+    return get(API_ENDPOINTS.events.list)
   },
 
-  async getById(eventId) {
-    return withMockFallback(
-      () => get(API_ENDPOINTS.events.detail(eventId)),
-      async () => {
-        await delay()
-        const event = getEventById(eventId)
-        if (!event) throw new Error('NOT_FOUND')
-        return { event }
-      },
-    )
+  detail(eventId) {
+    return get(API_ENDPOINTS.events.detail(eventId))
   },
 
-  async register(eventId) {
-    return withMockFallback(
-      () => post(API_ENDPOINTS.events.register(eventId)),
-      async () => {
-        await delay()
-        return { success: true, eventId, rewardEligible: true }
-      },
-    )
+  register(eventId) {
+    return post(API_ENDPOINTS.events.register(eventId))
   },
 
-  async getHistory() {
-    return withMockFallback(
-      () => get(API_ENDPOINTS.events.history),
-      async () => {
-        await delay()
-        return {
-          totalAttended: 12,
-          monthDelta: 2,
-          events: HISTORY_EVENTS,
-        }
-      },
-    )
+  history() {
+    return get(API_ENDPOINTS.events.history)
   },
 
-  async getReward(eventId) {
-    return withMockFallback(
-      () => get(`${API_ENDPOINTS.events.reward}?eventId=${eventId}`),
-      async () => {
-        await delay()
-        return {
-          code: 'SAMEMESS50',
-          title: 'Giảm 50% cho buổi hẹn đầu tiên',
-          venue: 'The Blue Note Coffee & Lounge',
-          expiresAt: '2025-12-31',
-          trustScoreDelta: 10,
-        }
-      },
-    )
-  },
-}
-
-export const premiumService = {
-  async getPlans() {
-    return withMockFallback(
-      () => get(API_ENDPOINTS.premium.plans),
-      async () => {
-        await delay()
-        return { plans: PREMIUM_PLANS, features: PREMIUM_FEATURES }
-      },
-    )
-  },
-
-  async subscribe(planId) {
-    return withMockFallback(
-      () => post(API_ENDPOINTS.premium.subscribe, { planId }),
-      async () => ({ success: true, planId }),
-    )
+  reward(eventId) {
+    return get(withQuery(API_ENDPOINTS.events.reward, { eventId }))
   },
 }

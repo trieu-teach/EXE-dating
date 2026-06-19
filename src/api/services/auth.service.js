@@ -1,55 +1,61 @@
-import { API_ENDPOINTS } from '../config.js'
-import { post, withMockFallback } from '../http.js'
-import { saveUser } from '../../utils/session.js'
+/**
+ * Auth service — covers STAGE 0 of E2E_USER_FLOW.
+ *
+ * Endpoints (CURSOR_API_GUIDE.md §5.BướcA):
+ *   POST /api/auth/register          → { message, email }
+ *   POST /api/auth/verify-email      → AuthResponseDto { accessToken, user }
+ *   POST /api/auth/login             → AuthResponseDto
+ *   POST /api/auth/refresh           → AuthResponseDto   (cookie)
+ *   POST /api/auth/logout
+ *   GET  /api/auth/me
+ *   POST /api/auth/forgot-password   → { message }
+ *   POST /api/auth/reset-password    → { message }
+ */
 
-function delay(ms = 400) {
-  return new Promise((r) => setTimeout(r, ms))
-}
+import { API_ENDPOINTS } from '../config.js'
+import { get, post } from '../http.js'
+import { setAccessToken } from '../tokenStore.js'
 
 export const authService = {
+  register(payload) {
+    return post(API_ENDPOINTS.auth.register, payload)
+  },
+
+  async verifyEmail({ email, otpCode }) {
+    const res = await post(API_ENDPOINTS.auth.verifyEmail, { email, otpCode })
+    if (res?.accessToken) setAccessToken(res.accessToken)
+    return res
+  },
+
   async login({ email, password }) {
-    return withMockFallback(
-      () => post(API_ENDPOINTS.auth.login, { email, password }),
-      async () => {
-        await delay()
-        const user = { email: email.trim().toLowerCase(), token: 'mock-jwt-token' }
-        saveUser(user)
-        return { user, token: user.token }
-      },
-    )
+    const res = await post(API_ENDPOINTS.auth.login, { email, password })
+    if (res?.accessToken) setAccessToken(res.accessToken)
+    return res
   },
 
-  async register(payload) {
-    return withMockFallback(
-      () => post(API_ENDPOINTS.auth.register, payload),
-      async () => {
-        await delay()
-        return { success: true, requiresOtp: true }
-      },
-    )
+  async refresh() {
+    const res = await post(API_ENDPOINTS.auth.refresh)
+    if (res?.accessToken) setAccessToken(res.accessToken)
+    return res
   },
 
-  async verifyOtp(payload) {
-    return withMockFallback(
-      () => post(API_ENDPOINTS.auth.verifyOtp, payload),
-      async () => {
-        await delay()
-        return { success: true }
-      },
-    )
+  async logout() {
+    try {
+      await post(API_ENDPOINTS.auth.logout)
+    } finally {
+      setAccessToken(null)
+    }
   },
 
-  async forgotPassword(payload) {
-    return withMockFallback(
-      () => post(API_ENDPOINTS.auth.forgotPassword, payload),
-      async () => ({ success: true }),
-    )
+  me() {
+    return get(API_ENDPOINTS.auth.me)
   },
 
-  async resetPassword(payload) {
-    return withMockFallback(
-      () => post(API_ENDPOINTS.auth.resetPassword, payload),
-      async () => ({ success: true }),
-    )
+  forgotPassword({ email }) {
+    return post(API_ENDPOINTS.auth.forgotPassword, { email })
+  },
+
+  resetPassword({ email, otpCode, newPassword }) {
+    return post(API_ENDPOINTS.auth.resetPassword, { email, otpCode, newPassword })
   },
 }

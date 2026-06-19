@@ -1,93 +1,58 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import AppShell from '../../../components/User/AppShell/AppShell.jsx'
-import './SafetyCheckin.css'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { safetyService } from '../../../api'
+import { useToast } from '../../../context/ToastContext.jsx'
 
-function SafetyCheckin() {
-  const [seconds, setSeconds] = useState(24)
-  const [pin, setPin] = useState('')
+export default function SafetyCheckin() {
+  const navigate = useNavigate()
+  const toast = useToast()
+  const [submitting, setSubmitting] = useState(null)
 
-  useEffect(() => {
-    if (seconds <= 0) return undefined
-    const t = setInterval(() => setSeconds((s) => s - 1), 1000)
-    return () => clearInterval(t)
-  }, [seconds])
-
-  function appendDigit(d) {
-    if (pin.length >= 4) return
-    setPin((p) => p + d)
-  }
-
-  function backspace() {
-    setPin((p) => p.slice(0, -1))
+  const handle = async (status) => {
+    setSubmitting(status)
+    try {
+      await safetyService.checkin({ status })
+      if (status === 'safe') {
+        toast.success('Đã ghi nhận: Bạn an toàn 💚')
+      } else {
+        toast.warn('Đã ghi nhận: cần hỗ trợ. Đang thông báo danh bạ khẩn cấp…')
+      }
+    } catch (err) {
+      toast.error(err?.message || 'Không check-in được.')
+    } finally {
+      setSubmitting(null)
+    }
   }
 
   return (
-    <AppShell activeNav="safety" focusMode>
-      <div className="checkin-page">
-        <div className="checkin-card">
-          <span className="checkin-card__heart">💗</span>
-          <h1>Bạn vẫn ổn chứ?</h1>
-          <p className="checkin-card__desc">
-            Hệ thống nhận tín hiệu khẩn cấp. Xác nhận nếu đây chỉ là nhầm lẫn.
-          </p>
-
-          <div className="checkin-timer">
-            <svg viewBox="0 0 120 120" className="checkin-timer__ring">
-              <circle cx="60" cy="60" r="52" className="checkin-timer__bg" />
-              <circle
-                cx="60"
-                cy="60"
-                r="52"
-                className="checkin-timer__progress"
-                style={{ strokeDashoffset: 326 - (seconds / 30) * 326 }}
-              />
-            </svg>
-            <div className="checkin-timer__text">
-              <strong>{seconds}</strong>
-              <span>giây còn lại</span>
-            </div>
-          </div>
-
-          <p className="checkin-pin-label">Nhập mã PIN để hủy</p>
-          <div className="checkin-pin-dots">
-            {[0, 1, 2, 3].map((i) => (
-              <span key={i} className={pin.length > i ? 'checkin-pin-dots__filled' : ''} />
-            ))}
-          </div>
-
-          <div className="checkin-numpad">
-            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'].map((key) => (
-              <button
-                key={key || 'empty'}
-                type="button"
-                className={`checkin-numpad__key${key === '' ? ' checkin-numpad__key--empty' : ''}`}
-                onClick={() => {
-                  if (key === 'del') backspace()
-                  else if (key) appendDigit(key)
-                }}
-                disabled={key === ''}
-              >
-                {key === 'del' ? '⌫' : key}
-              </button>
-            ))}
-          </div>
-
-          <button type="button" className="checkin-btn checkin-btn--primary">
-            ✓ Tôi ổn, hãy hủy báo động
+    <main className="auth-page" style={{ alignItems: 'flex-start' }}>
+      <div className="auth-card" style={{ maxWidth: 460 }}>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigate('/safety')} style={{ alignSelf: 'flex-start', marginBottom: 12 }}>
+          ← An toàn
+        </button>
+        <h1>Check-in an toàn</h1>
+        <p className="auth-subtitle">Hãy cho SameMess biết bạn đang ổn sau cuộc hẹn.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+          <button
+            type="button"
+            className="btn btn-primary btn-block"
+            onClick={() => handle('safe')}
+            disabled={submitting !== null}
+            style={{ padding: '14px 0', fontSize: 16 }}
+          >
+            {submitting === 'safe' ? <span className="spinner" /> : '🟢 Tôi an toàn'}
           </button>
-          <button type="button" className="checkin-btn checkin-btn--outline">
-            🔐 Xác thực Face ID / Vân tay
+          <button
+            type="button"
+            className="btn btn-danger btn-block"
+            onClick={() => handle('help')}
+            disabled={submitting !== null}
+            style={{ padding: '14px 0', fontSize: 16 }}
+          >
+            {submitting === 'help' ? <span className="spinner" /> : '🚨 Cần hỗ trợ ngay'}
           </button>
-
-          <p className="checkin-footer">
-            Sau khi hết giờ, vị trí và thông tin khẩn cấp sẽ gửi tới người thân.
-            <Link to="/emergency-alert"> Xem thông báo khẩn cấp</Link>
-          </p>
         </div>
       </div>
-    </AppShell>
+    </main>
   )
 }
-
-export default SafetyCheckin

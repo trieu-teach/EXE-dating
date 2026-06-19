@@ -1,31 +1,28 @@
-export { API_BASE_URL, API_ENDPOINTS, USE_MOCK_API } from './config.js'
+export { API_BASE_URL, API_ENDPOINTS, CHAT_HUB_URL, VAPID_PUBLIC_KEY } from './config.js'
 export { ApiError, normalizeError } from './errors.js'
-export { request, get, post, put, patch, del, withMockFallback } from './http.js'
+export { getAccessToken, setAccessToken, subscribeAccessToken } from './tokenStore.js'
+export { request, get, post, put, patch, del, upload } from './http.js'
 
 export { authService } from './services/auth.service.js'
-export { chatService } from './services/chat.service.js'
-export { discoveryService } from './services/discovery.service.js'
-export { eventsService, premiumService } from './services/events.service.js'
 export { profileService } from './services/profile.service.js'
-export { datesService } from './services/dates.service.js'
-export { dailyService } from './services/daily.service.js'
-export { loveTreeService } from './services/loveTree.service.js'
-export { safetyService } from './services/safety.service.js'
+export { preferencesService } from './services/preferences.service.js'
+export { discoveryService } from './services/discovery.service.js'
 export { searchService } from './services/search.service.js'
-export { settingsService } from './services/settings.service.js'
+export { swipesService } from './services/swipes.service.js'
+export { matchesService } from './services/matches.service.js'
+export { chatService } from './services/chat.service.js'
+export { aiSuggestionsService } from './services/aiSuggestions.service.js'
+export { notificationsService } from './services/notifications.service.js'
+export { plantsService } from './services/plants.service.js'
+export { gamificationService } from './services/gamification.service.js'
+export { dailyService } from './services/daily.service.js'
 export { connectionRemindersService } from './services/connectionReminders.service.js'
-
-// Admin services
-export {
-  adminAuthService,
-  adminDashboardService,
-  adminUsersService,
-  adminVerificationsService,
-  adminReportsService,
-  adminEventsService,
-  adminPremiumService,
-  adminInterestsService,
-  adminSettingsService,
-  adminPhotosService,
-  adminAuditService,
-} from './services/admin.service.js'
+export { reputationService } from './services/reputation.service.js'
+export { subscriptionService } from './services/subscription.service.js'
+export { eventsService } from './services/events.service.js'
+export { safetyService } from './services/safety.service.js'
+export { settingsService } from './services/settings.service.js'
+export { blocksService, reportsService } from './services/moderation.service.js'
+export { imageSearchService } from './services/imageSearch.service.js'
+export { venuesService } from './services/venues.service.js'
+export { meetupService } from './services/meetup.service.js'

@@ -1,183 +1,119 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import OtpInput from '../../../components/User/OtpInput/OtpInput.jsx'
-import Toast from '../../../components/User/Toast/Toast.jsx'
+import { useAuth } from '../../../context/AuthContext.jsx'
+import { useToast } from '../../../context/ToastContext.jsx'
+
 import { validateOtp } from '../../../utils/validation.js'
 
-const MOCK_OTP = '123456'
-import AuthThemeBar from '../../../components/User/AuthThemeBar/AuthThemeBar.jsx'
-import LovePageDecor from '../../../components/User/LovePageDecor/LovePageDecor.jsx'
-import { TRUST_SCORE_UNVERIFIED } from '../../../utils/identityVerification.js'
-import { saveUser } from '../../../utils/session.js'
-import '../../../styles/auth-form.css'
-import './VerifyOtp.css'
-
-const PURPOSE_CONFIG = {
-  register: {
-    title: 'Xác thực OTP',
-    subtitle: 'Nhập mã 6 số để tiếp tục tạo hồ sơ',
-    submitLabel: 'Xác nhận',
-    backTo: '/register',
-    backLabel: 'Quay lại đăng ký',
-  },
-  reset: {
-    title: 'Xác thực OTP',
-    subtitle: 'Nhập mã 6 số để đặt lại mật khẩu',
-    submitLabel: 'Xác nhận',
-    backTo: '/forgot-password',
-    backLabel: 'Quay lại',
-  },
-}
-
-const RESEND_COOLDOWN_SEC = 60
-
-function VerifyOtp() {
-  const navigate = useNavigate()
+export default function VerifyOtp() {
   const location = useLocation()
-  const {
-    email = 'minhanh@gmail.com',
-    purpose = 'register',
-    registerData,
-  } = location.state ?? {}
-
-  const config = PURPOSE_CONFIG[purpose] ?? PURPOSE_CONFIG.register
-  const [otp, setOtp] = useState('')
+  const navigate = useNavigate()
+  const { verifyEmail, register } = useAuth()
+  const toast = useToast()
+  const email = location.state?.email || ''
+  const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [error, setError] = useState('')
-  const [touched, setTouched] = useState(false)
-  const [resendCooldown, setResendCooldown] = useState(0)
-  const [toast, setToast] = useState(null)
-
-  function hideToast() {
-    setToast(null)
-  }
-
-  function showToast(message, type = 'info') {
-    setToast({ message, type, id: Date.now() })
-  }
+  const [submitting, setSubmitting] = useState(false)
+  const [resending, setResending] = useState(false)
+  const inputs = useRef([])
 
   useEffect(() => {
-    if (!toast) return undefined
-    const timer = setTimeout(hideToast, 4200)
-    return () => clearTimeout(timer)
-  }, [toast])
+    if (!email) navigate('/register', { replace: true })
+  }, [email, navigate])
 
-  useEffect(() => {
-    if (resendCooldown <= 0) return undefined
+  useEffect(() => { inputs.current[0]?.focus() }, [])
 
-    const timer = setInterval(() => {
-      setResendCooldown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [resendCooldown])
-
-  const maskedEmail = email.replace(/(.{2})(.*)(@.*)/, '$1***$3')
-
-  function handleResend() {
-    if (resendCooldown > 0) return
-    showToast(`Mã OTP (demo): ${MOCK_OTP}`, 'info')
-    setResendCooldown(RESEND_COOLDOWN_SEC)
+  const setDigit = (i, v) => {
+    const digit = v.replace(/\D/g, '').slice(0, 1)
+    const next = [...otp]
+    next[i] = digit
+    setOtp(next)
+    if (digit && i < 5) inputs.current[i + 1]?.focus()
   }
 
-  function handleSubmit(event) {
-    event.preventDefault()
-    setTouched(true)
+  const handleKey = (i, e) => {
+    if (e.key === 'Backspace' && !otp[i] && i > 0) inputs.current[i - 1]?.focus()
+  }
 
-    const otpError = validateOtp(otp)
-    setError(otpError)
+  const handlePaste = (e) => {
+    const text = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
+    if (!text) return
+    e.preventDefault()
+    const next = [...otp]
+    for (let i = 0; i < text.length; i++) next[i] = text[i]
+    setOtp(next)
+    inputs.current[Math.min(5, text.length - 1)]?.focus()
+  }
 
-    if (otpError) {
-      showToast('Vui lòng nhập đúng mã OTP 6 chữ số.', 'warning')
-      return
+  const handleSubmit = async (e) => {
+    e?.preventDefault?.()
+    const code = otp.join('')
+    const v = validateOtp(code)
+    if (v) { setError(v); return }
+    setSubmitting(true)
+    setError('')
+    try {
+      await verifyEmail({ email, otpCode: code })
+      toast.success('Xác thực thành công!')
+      navigate('/onboarding/preferences', { replace: true })
+    } catch (err) {
+      setError(err?.message || 'OTP không đúng hoặc đã hết hạn.')
+    } finally {
+      setSubmitting(false)
     }
+  }
 
-    if (otp.trim() !== MOCK_OTP) {
-      const message = 'Mã OTP không đúng. Vui lòng thử lại.'
-      setError(message)
-      showToast(message, 'error')
-      return
+  const handleResend = async () => {
+    setResending(true)
+    try {
+      // re-call register to trigger another OTP email
+      await register({ email, password: '__noop__', displayName: '__noop__' }).catch(() => null)
+      toast.info('Đã gửi lại mã OTP (nếu email hợp lệ).')
+    } finally {
+      setResending(false)
     }
-
-    if (purpose === 'register') {
-      const data = registerData ?? {
-        email,
-        name: 'Nguyễn Minh Anh',
-      }
-
-      saveUser({
-        email: data.email,
-        name: data.name,
-        onboarded: false,
-        identityVerified: false,
-        trustScore: TRUST_SCORE_UNVERIFIED,
-      })
-      showToast('Xác thực email thành công! Hãy tạo hồ sơ của bạn.', 'success')
-      setTimeout(() => navigate('/create-profile'), 1200)
-      return
-    }
-
-    showToast('Xác thực OTP thành công!', 'success')
-    navigate('/reset-password', { state: { email } })
   }
 
   return (
-    <div className="verify-otp-page user-page user-page--centered">
-      <AuthThemeBar />
-      <LovePageDecor />
-      {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={hideToast} />
-      )}
-
-      <div className="verify-otp-card user-card">
-        <header className="verify-otp-header">
-          <h1>{config.title}</h1>
-          <p>{config.subtitle}</p>
-          <p className="verify-otp-email">{maskedEmail}</p>
-          <p className="verify-otp-demo">Mã OTP demo: {MOCK_OTP}</p>
-        </header>
-
-        <form className="verify-otp-form" onSubmit={handleSubmit} noValidate>
-          <div className={`verify-otp-field auth-field${touched && error ? ' auth-field--error' : ''}`}>
-            <OtpInput
-              value={otp}
-              onChange={(value) => {
-                setOtp(value)
-                if (touched) setError(validateOtp(value))
-              }}
-              hasError={Boolean(touched && error)}
-            />
-            {touched && error && <p className="auth-field-error">{error}</p>}
+    <main className="auth-page">
+      <div className="auth-card">
+        <h1>Nhập mã OTP</h1>
+        <p className="auth-subtitle">
+          Mã 6 số đã gửi đến <strong>{email}</strong>
+        </p>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }} onPaste={handlePaste}>
+            {otp.map((d, i) => (
+              <input
+                key={i}
+                ref={(el) => { inputs.current[i] = el }}
+                value={d}
+                onChange={(e) => setDigit(i, e.target.value)}
+                onKeyDown={(e) => handleKey(i, e)}
+                inputMode="numeric"
+                maxLength={1}
+                style={{ width: 44, textAlign: 'center', fontSize: 22 }}
+                aria-label={`OTP digit ${i + 1}`}
+              />
+            ))}
           </div>
-
-          <button type="submit" className="verify-otp-submit">
-            {config.submitLabel}
+          {error && <div className="auth-form-error">{error}</div>}
+          <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+            {submitting ? <span className="spinner" /> : 'Xác nhận'}
           </button>
-        </form>
-
-        <p className="verify-otp-resend">
-          Không nhận được mã?{' '}
           <button
             type="button"
-            className="verify-otp-resend-btn"
+            className="btn btn-ghost btn-block"
             onClick={handleResend}
-            disabled={resendCooldown > 0}
+            disabled={resending}
           >
-            {resendCooldown > 0 ? `Gửi lại (${resendCooldown}s)` : 'Gửi lại mã OTP'}
+            {resending ? 'Đang gửi lại…' : 'Gửi lại mã'}
           </button>
-        </p>
-
-        <p className="verify-otp-footer">
-          <Link to={config.backTo}>{config.backLabel}</Link>
+        </form>
+        <p className="auth-form-footer">
+          <Link to="/register">← Đăng ký lại</Link>
         </p>
       </div>
-    </div>
+    </main>
   )
 }
-
-export default VerifyOtp

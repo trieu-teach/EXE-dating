@@ -1,0 +1,709 @@
+/* =========================================================
+ * Love Tree — modern dating UI
+ * ========================================================= */
+
+.love-tree-page {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--space-5);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .love-tree-page { grid-template-columns: 1fr; }
+}
+
+/* ── Left: tree card ─────────────────────────────────── */
+.love-tree-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+/* Hero header with match info */
+.love-tree-hero {
+  position: relative;
+  background: linear-gradient(135deg, #1a1020 0%, #2d1535 40%, #3d1a40 100%);
+  padding: var(--space-6);
+  overflow: hidden;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.love-tree-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 300px 200px at 20% 60%, rgba(255, 79, 139, 0.2), transparent 70%),
+    radial-gradient(ellipse 250px 250px at 80% 30%, rgba(177, 75, 255, 0.15), transparent 70%);
+  pointer-events: none;
+}
+.love-tree-hero-float {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.love-tree-hero-float span {
+  position: absolute;
+  font-size: 1.2rem;
+  opacity: 0.15;
+  animation: float-particle 6s ease-in-out infinite;
+}
+.love-tree-hero-float span:nth-child(1) { top: 15%; left: 10%; animation-delay: 0s; }
+.love-tree-hero-float span:nth-child(2) { top: 25%; left: 85%; animation-delay: 1s; }
+.love-tree-hero-float span:nth-child(3) { top: 60%; left: 70%; animation-delay: 2s; }
+.love-tree-hero-float span:nth-child(4) { top: 70%; left: 20%; animation-delay: 3s; }
+.love-tree-hero-float span:nth-child(5) { top: 40%; left: 50%; animation-delay: 1.5s; }
+
+@keyframes float-particle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33%       { transform: translateY(-10px) rotate(5deg); }
+  66%       { transform: translateY(5px) rotate(-3deg); }
+}
+
+.love-tree-hero-content { position: relative; z-index: 1; }
+.love-tree-hero-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 6px;
+}
+.love-tree-hero-name {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 12px rgba(255, 79, 139, 0.4);
+}
+.love-tree-hero-sub {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+.love-tree-hero-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.love-tree-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(4px);
+}
+.love-tree-hero-badge.is-fire  { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border-color: rgba(245, 158, 11, 0.4); }
+.love-tree-hero-badge.is-duo   { background: rgba(22, 197, 94, 0.2);  color: #4ade80; border-color: rgba(22, 197, 94, 0.4); }
+
+/* Tab bar */
+.love-tree-tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+}
+.love-tree-tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  position: relative;
+  transition: color var(--transition-base);
+}
+.love-tree-tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-primary);
+  transform: scaleX(0);
+  transition: transform var(--transition-base);
+  border-radius: 2px 2px 0 0;
+}
+.love-tree-tab-btn.is-active {
+  color: var(--color-primary);
+}
+.love-tree-tab-btn.is-active::after {
+  transform: scaleX(1);
+}
+.love-tree-tab-btn:hover:not(.is-active) {
+  color: var(--color-text);
+  background: var(--color-surface-2);
+}
+
+/* Tree scene */
+.love-tree-scene {
+  position: relative;
+  background: linear-gradient(180deg, #1a1020 0%, #0d0810 100%);
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Starfield background */
+.love-tree-scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 70%, rgba(255, 255, 255, 0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 20%, rgba(255, 255, 255, 0.25) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 10% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 85%, rgba(255, 255, 255, 0.18) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 10%, rgba(255, 255, 255, 0.22) 0%, transparent 100%),
+    radial-gradient(2px 2px at 90% 15%, rgba(255, 79, 139, 0.3) 0%, transparent 100%),
+    radial-gradient(2px 2px at 5% 45%, rgba(177, 75, 255, 0.25) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Ground */
+.love-tree-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(180deg, #1a1020 0%, #0d0810 100%);
+  border-top: 1px solid rgba(255, 79, 139, 0.2);
+}
+
+/* Tree glow aura */
+.love-tree-glow {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 79, 139, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+  animation: tree-pulse 3s ease-in-out infinite;
+}
+@keyframes tree-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50%       { transform: scale(1.2); opacity: 1; }
+}
+
+.love-tree-img-wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.love-tree-img {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.5));
+}
+.love-tree-img.is-bounce {
+  animation: tree-bounce 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.love-tree-img.is-levelup {
+  animation: tree-levelup 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes tree-bounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.18) rotate(-2deg); }
+  60%  { transform: scale(0.96) rotate(2deg); }
+  100% { transform: scale(1); }
+}
+@keyframes tree-levelup {
+  0%   { transform: scale(1) translateY(0); }
+  30%  { transform: scale(1.25) translateY(-20px); }
+  60%  { transform: scale(1.1) translateY(0); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+.love-tree-level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-pill);
+  backdrop-filter: blur(8px);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(255, 79, 139, 0.5);
+}
+.love-tree-level-badge .level-num {
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.love-tree-stage-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Growth progress */
+.love-tree-growth-section {
+  padding: var(--space-5);
+  background: var(--color-surface);
+}
+.love-tree-growth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.love-tree-growth-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-soft);
+}
+.love-tree-growth-pct {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+.love-tree-growth-bar {
+  height: 8px;
+  background: var(--color-surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+.love-tree-growth-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: 999px;
+  transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+.love-tree-growth-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 1.8s linear infinite;
+}
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+.love-tree-growth-detail {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+/* Water materials */
+.love-tree-water-section {
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+.love-tree-water-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.love-tree-water-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.love-tree-water-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color var(--transition-base), transform var(--transition-fast), box-shadow var(--transition-base);
+  font-family: inherit;
+}
+.love-tree-water-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+.love-tree-water-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+.love-tree-water-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.love-tree-water-btn[data-mat="Water"]:hover:not(:disabled)  { border-color: #3b82f6; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2); }
+.love-tree-water-btn[data-mat="Sun"]:hover:not(:disabled)    { border-color: #f59e0b; box-shadow: 0 8px 24px rgba(245, 158, 11, 0.2); }
+.love-tree-water-btn[data-mat="Fertilizer"]:hover:not(:disabled) { border-color: #16a34a; box-shadow: 0 8px 24px rgba(22, 163, 74, 0.2); }
+
+.love-tree-water-btn[data-mat="Water"]   { background: rgba(59, 130, 246, 0.06); }
+.love-tree-water-btn[data-mat="Sun"]     { background: rgba(245, 158, 11, 0.06); }
+.love-tree-water-btn[data-mat="Fertilizer"] { background: rgba(22, 163, 74, 0.06); }
+
+.love-tree-water-emoji {
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  transition: transform var(--transition-fast);
+}
+.love-tree-water-btn:hover:not(:disabled) .love-tree-water-emoji {
+  transform: scale(1.15);
+}
+.love-tree-water-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.love-tree-water-bonus {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-success);
+}
+.love-tree-water-stock {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+.love-tree-water-stock.is-empty {
+  color: var(--color-danger);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* Inventory bar */
+.love-tree-inventory {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px var(--space-5);
+  background: var(--color-surface-2);
+  border-top: 1px solid var(--color-border);
+}
+.love-tree-inv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+.love-tree-inv-chip[data-mat="Water"]      { color: #2563eb; background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.2); }
+.love-tree-inv-chip[data-mat="Sun"]        { color: #d97706; background: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.2); }
+.love-tree-inv-chip[data-mat="Fertilizer"] { color: #16a34a; background: rgba(22, 163, 74, 0.08); border-color: rgba(22, 163, 74, 0.2); }
+
+/* Action buttons */
+.love-tree-actions {
+  display: flex;
+  gap: 8px;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+.love-tree-actions .btn { flex: 1; }
+
+/* ── Right: match list ──────────────────────────────── */
+.love-tree-match-list {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-4));
+}
+.love-tree-match-list-header {
+  padding: var(--space-4) var(--space-5);
+  background: linear-gradient(135deg, var(--color-surface), var(--color-surface-2));
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.love-tree-match-list-header h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+.love-tree-match-count {
+  margin-left: auto;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+}
+.love-tree-match-items { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+.love-tree-match-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: background var(--transition-base), border-color var(--transition-base);
+}
+.love-tree-match-item:hover { background: var(--color-surface-2); }
+.love-tree-match-item.is-active {
+  background: rgba(255, 79, 139, 0.07);
+  border-color: rgba(255, 79, 139, 0.3);
+}
+.love-tree-match-item .avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-surface-2);
+  flex-shrink: 0;
+  border: 2px solid var(--color-border);
+}
+.love-tree-match-item.is-active .avatar { border-color: var(--color-primary); }
+.love-tree-match-meta { flex: 1; min-width: 0; }
+.love-tree-match-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.love-tree-match-sub {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+.love-tree-match-level {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+/* ── Milestone popup ───────────────────────────────── */
+.love-tree-milestone-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 5, 18, 0.75);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  animation: fade-in 0.2s ease;
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.love-tree-milestone {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8) var(--space-6);
+  max-width: 380px;
+  width: calc(100% - 32px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  box-shadow: 0 40px 80px rgba(255, 79, 139, 0.25), var(--shadow-lg);
+  animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+.love-tree-milestone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 300px 150px at 50% 0%, rgba(255, 79, 139, 0.12), transparent 70%),
+    radial-gradient(ellipse 200px 200px at 50% 100%, rgba(177, 75, 255, 0.1), transparent 70%);
+  pointer-events: none;
+}
+.love-tree-milestone > * { position: relative; z-index: 1; }
+@keyframes pop-in {
+  0%   { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+.love-tree-milestone-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  animation: tree-bounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  filter: drop-shadow(0 8px 24px rgba(255, 79, 139, 0.4));
+}
+.love-tree-milestone-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.love-tree-milestone-level-num {
+  font-size: 3.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1;
+}
+.love-tree-milestone p {
+  margin: 0;
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ── Locked state (MeetupSection) ──────────────────── */
+.meetup-locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 12px;
+  text-align: center;
+}
+.meetup-locked-scene {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.meetup-locked-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 79, 139, 0.1) 0%, transparent 70%);
+  animation: tree-pulse 3s ease-in-out infinite;
+}
+.meetup-locked-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  filter: grayscale(0.6) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+  opacity: 0.7;
+}
+.meetup-locked h3 { margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--color-text); }
+.meetup-locked p  { margin: 0; color: var(--color-text-soft); font-size: 0.88rem; }
+.meetup-locked-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.meetup-locked-progress-bar {
+  width: 200px;
+  height: 6px;
+  background: var(--color-surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+.meetup-locked-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: 999px;
+  transition: width 0.8s ease;
+}
+.meetup-locked-progress-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+/* ── Empty / loading states ───────────────────────────── */
+.love-tree-empty {
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--color-text-soft);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+}
+.love-tree-empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+.love-tree-empty p { margin: 0; font-size: 0.9rem; line-height: 1.5; }
+
+/* ── Debug panel ───────────────────────────────────── */
+.love-tree-debug {
+  grid-column: 1 / -1;
+  font-size: 0.78rem;
+}
+.love-tree-debug-toggle {
+  appearance: none;
+  border: 1px dashed var(--color-border);
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--color-text-muted);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.78rem;
+}
+.love-tree-debug-pre {
+  margin: 8px 0 0;
+  padding: 12px;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: var(--radius-md);
+  max-height: 300px;
+  overflow: auto;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  font-family: ui-monospace, monospace;
+  white-space: pre;
+}

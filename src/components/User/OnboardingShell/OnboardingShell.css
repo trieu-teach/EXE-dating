@@ -1,0 +1,2 @@
+/* OnboardingShell uses tokens already defined in onboarding.css.
+   This file exists so JS imports resolve when bundling. */
