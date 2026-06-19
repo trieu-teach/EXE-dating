@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { SearchIcon, SendIcon, Sparkles2Icon, HeartChatIcon, Check2Icon, LightbulbIcon, XSmallIcon, ArrowUpIcon } from '../../../components/ui/CustomIcons.jsx'
 import { chatService, plantsService, connectionRemindersService, meetupService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
+import { useAuth } from '../../../context/AuthContext.jsx'
 import { timeAgo } from '../../../utils/format.js'
 import ChatThreadToolbar from '../../../components/User/ChatThreadToolbar/ChatThreadToolbar.jsx'
 import AISuggestionPanel from '../../../components/User/AISuggestionPanel/AISuggestionPanel.jsx'
@@ -21,6 +22,12 @@ function formatMeetupTime(iso) {
       year: 'numeric', hour: '2-digit', minute: '2-digit',
     })
   } catch { return iso }
+}
+
+function isOwn(msg, currentUserId) {
+  if (!msg) return false
+  if (currentUserId && msg.senderId != null) return String(msg.senderId) === String(currentUserId)
+  return !!msg.isMine
 }
 
 const convListVariants = {
@@ -51,6 +58,7 @@ export default function Chat() {
   const { conversationId } = useParams()
   const navigate = useNavigate()
   const toast = useToast()
+  const { user } = useAuth()
   const messagesEnd = useRef(null)
 
   const [conversations, setConversations] = useState([])
@@ -282,14 +290,14 @@ export default function Chat() {
                     return (
                       <motion.div
                         key={m.id}
-                        className={`chat-msg${m.isMine ? ' is-mine' : ''}`}
+                        className={`chat-msg${isOwn(m, user?.id) ? ' is-mine' : ''}`}
                         variants={msgVariants}
                         initial="hidden"
                         animate="show"
                       >
                         <VenueMessage
                           venue={{ id: m.venueId, name: m.venueName, imageUrl: m.venueImageUrl, address: m.venueAddress, category: m.venueCategory, distanceKm: m.distanceKm }}
-                          meta={m.isMine ? 'Bạn đã chia sẻ' : `${conversation?.otherDisplayName} đã chia sẻ`}
+                          meta={isOwn(m, user?.id) ? 'Bạn đã chia sẻ' : `${conversation?.otherDisplayName} đã chia sẻ`}
                           onClick={() => openVenueDetail({ id: m.venueId, venueName: m.venueName })}
                         />
                         <div className="chat-msg-time">{timeAgo(m.sentAt)}</div>
@@ -299,7 +307,7 @@ export default function Chat() {
                   return (
                     <motion.div
                       key={m.id}
-                      className={`chat-msg${m.isMine ? ' is-mine' : ''}`}
+                      className={`chat-msg${isOwn(m, user?.id) ? ' is-mine' : ''}`}
                       variants={msgVariants}
                       initial="hidden"
                       animate="show"
