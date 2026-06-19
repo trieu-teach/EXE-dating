@@ -34,17 +34,29 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  // Bootstrap: if we have a token (e.g. from refresh on a previous tab),
-  // confirm /me so the UI knows the session is alive.
+  // Bootstrap: the access token only lives in memory, so it's always empty
+  // after a hard refresh. Try a silent refresh via the HttpOnly cookie first;
+  // only if that fails do we treat the session as logged out.
   useEffect(() => {
     let cancelled = false
-    if (!getAccessToken()) {
-      setBootstrapping(false)
-      return
+    async function bootstrap() {
+      if (!getAccessToken()) {
+        try {
+          const res = await authService.refresh()
+          if (res?.user) {
+            saveUser({ ...res.user })
+            setUser({ ...getUser() })
+          }
+        } catch {
+          /* no valid refresh cookie — stay logged out */
+        }
+      }
+      if (!cancelled && getAccessToken() && !getUser()) {
+        await refreshMe().catch(() => { /* http.js handles 401 */ })
+      }
+      if (!cancelled) setBootstrapping(false)
     }
-    refreshMe()
-      .catch(() => { /* http.js handles 401 */ })
-      .finally(() => { if (!cancelled) setBootstrapping(false) })
+    bootstrap()
     return () => { cancelled = true }
   }, [refreshMe])
 

@@ -60,7 +60,7 @@ export default function Matches() {
         {/* Match list */}
         <section className="matches-section">
           <div className="matches-section-label is-new">
-            <Heart size={14} />
+            <HeartIcon size={14} />
             Match mới
           </div>
           {matches.length === 0 ? (
