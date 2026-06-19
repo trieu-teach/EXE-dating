@@ -138,7 +138,7 @@ export default function Discovery() {
           >
             <div
               className="swipe-card-photo"
-              style={{ backgroundImage: `url(${resolveImageUrl(current.photoUrl || current.avatarUrl)})` }}
+              style={{ backgroundImage: `url(${resolveImageUrl(current.photos?.find(p => p.isPrimary)?.url || current.photos?.[0]?.url)})` }}
             />
             <div className="swipe-card-gradient" />
             <div className="swipe-card-overlay">
@@ -160,10 +160,10 @@ export default function Discovery() {
                 {current.displayName}, {current.age ?? ''}
               </div>
               <div className="swipe-card-meta">
-                {current.city && (
+                {current.location && (
                   <span>
                     <PinIcon size={11} />
-                    {current.city}
+                    {current.location}
                   </span>
                 )}
                 {current.distanceKm != null && (

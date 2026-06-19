@@ -43,8 +43,7 @@ export default function ProfileDetailModal({ profile, open, onClose, onSwipe }) 
 
   const photos = profile.photos ?? []
   const hasMultiple = photos.length > 1
-  const firstPhoto = profile.photoUrl || profile.avatarUrl || photos[0]?.url
-  const allPhotos = firstPhoto ? [{ url: firstPhoto }, ...photos.filter(p => p.url !== firstPhoto)] : photos
+  const allPhotos = photos.length > 0 ? photos : []
 
   const handleSwipe = async (action) => {
     if (swiping) return
@@ -181,12 +180,12 @@ export default function ProfileDetailModal({ profile, open, onClose, onSwipe }) 
 
             {/* Meta: location + distance */}
             <div className="pdm-meta">
-              {profile.city && (
-                <span className="pdm-meta-item">
-                  <PinIcon size={13} />
-                  {profile.city}
-                </span>
-              )}
+            {profile.location && (
+              <span className="pdm-meta-item">
+                <PinIcon size={13} />
+                {profile.location}
+              </span>
+            )}
               {profile.distanceKm != null && (
                 <span className="pdm-meta-item">
                   {formatDistance(profile.distanceKm)} từ bạn
