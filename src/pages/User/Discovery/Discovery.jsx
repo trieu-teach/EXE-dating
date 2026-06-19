@@ -43,7 +43,7 @@ export default function Discovery() {
     try {
       const data = await discoveryService.feed({ limit: 10 })
       const list = Array.isArray(data) ? data : (data?.items ?? [])
-      setFeed(append ? [...feed, ...list] : list)
+      setFeed((prev) => append ? [...prev, ...list] : list)
       setCursor(0)
     } catch (err) {
       toast.error(err?.message || 'Không tải được danh sách.')
@@ -72,6 +72,7 @@ export default function Discovery() {
       } else {
         toast.error(err?.message || 'Thao tác thất bại.')
       }
+      setCursor((c) => c + 1)
     } finally {
       setActionLoading(false)
     }
@@ -80,10 +81,12 @@ export default function Discovery() {
   const handleNextBatch = () => load({ append: true })
 
   const handleDetailSwipe = (action, res) => {
+    setDetailModal(null)
     if (res?.isMatch) {
       setMatchModal({ other: detailModal, matchId: res.matchId })
+    } else {
+      setCursor((c) => c + 1)
     }
-    setDetailModal(null)
   }
 
   if (loading && feed.length === 0) {
@@ -253,11 +256,11 @@ export default function Discovery() {
                 >
                   <div
                     className="match-success-photo"
-                    style={{ backgroundImage: `url(${resolveImageUrl(user?.photoUrl || user?.avatarUrl)})` }}
+                    style={{ backgroundImage: `url(${resolveImageUrl(user?.photos?.[0]?.url || user?.photos?.find(p => p.isPrimary)?.url)})` }}
                   />
                   <div
                     className="match-success-photo"
-                    style={{ backgroundImage: `url(${resolveImageUrl(matchModal.other.photoUrl || matchModal.other.avatarUrl)})` }}
+                    style={{ backgroundImage: `url(${resolveImageUrl(matchModal.other.photos?.[0]?.url || matchModal.other.photos?.find(p => p.isPrimary)?.url)})` }}
                   />
                 </motion.div>
                 <motion.p
