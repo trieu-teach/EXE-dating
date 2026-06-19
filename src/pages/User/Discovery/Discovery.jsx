@@ -9,6 +9,7 @@ import {
   HeartIcon, XIcon, StarIcon, MatchHeartIcon, SparkleIcon,
   RefreshIcon, PinIcon
 } from '../../../components/ui/CustomIcons.jsx'
+import ProfileDetailModal from '../../../components/User/ProfileDetailModal/ProfileDetailModal.jsx'
 import './Discovery.css'
 
 const cardVariants = {
@@ -35,6 +36,7 @@ export default function Discovery() {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
   const [matchModal, setMatchModal] = useState(null)
+  const [detailModal, setDetailModal] = useState(null)
 
   const load = async ({ append = false } = {}) => {
     setLoading(true)
@@ -76,6 +78,13 @@ export default function Discovery() {
   }
 
   const handleNextBatch = () => load({ append: true })
+
+  const handleDetailSwipe = (action, res) => {
+    if (res?.isMatch) {
+      setMatchModal({ other: detailModal, matchId: res.matchId })
+    }
+    setDetailModal(null)
+  }
 
   if (loading && feed.length === 0) {
     return (
@@ -121,6 +130,11 @@ export default function Discovery() {
             initial="initial"
             animate="animate"
             exit="exit"
+            onClick={() => setDetailModal(current)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setDetailModal(current) }}
+            aria-label={`Xem chi tiết ${current.displayName}`}
           >
             <div
               className="swipe-card-photo"
@@ -279,6 +293,13 @@ export default function Discovery() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ProfileDetailModal
+        profile={detailModal}
+        open={!!detailModal}
+        onClose={() => setDetailModal(null)}
+        onSwipe={handleDetailSwipe}
+      />
     </div>
   )
 }

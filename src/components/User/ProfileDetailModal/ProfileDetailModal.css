@@ -1,0 +1,433 @@
+/* ── ProfileDetailModal ──────────────────────────────────── */
+
+.pdm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 300;
+  padding: 0;
+}
+
+.pdm-container {
+  background: var(--color-surface, #ffffff);
+  border-radius: 28px 28px 0 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 -8px 60px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.pdm-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Photo ───────────────────────────────────────────────── */
+.pdm-photo-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  flex-shrink: 0;
+  border-radius: 28px 28px 0 0;
+  overflow: hidden;
+  background: var(--color-surface-2, #e5e5ea);
+}
+
+.pdm-photo {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+.pdm-photo-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.12) 45%,
+    transparent 65%
+  );
+  pointer-events: none;
+}
+
+/* ── Close ──────────────────────────────────────────────── */
+.pdm-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.38);
+  color: #ffffff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.18s, transform 0.18s;
+}
+
+.pdm-close:hover {
+  background: rgba(0, 0, 0, 0.58);
+  transform: scale(1.08);
+}
+
+.pdm-close:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 2px;
+}
+
+/* ── Photo Badges ────────────────────────────────────────── */
+.pdm-photo-badges {
+  position: absolute;
+  bottom: 20px;
+  left: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  z-index: 5;
+}
+
+.pdm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.pdm-badge-verified {
+  background: rgba(52, 168, 85, 0.82);
+  color: #ffffff;
+  border: 1px solid rgba(52, 168, 85, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.pdm-badge-boosted {
+  background: rgba(249, 115, 22, 0.85);
+  color: #ffffff;
+  border: 1px solid rgba(249, 115, 22, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.pdm-badge-rep {
+  background: rgba(255, 193, 7, 0.85);
+  color: #1c1c1e;
+  border: 1px solid rgba(255, 193, 7, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ── Photo Navigation ─────────────────────────────────────── */
+.pdm-photo-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 5;
+}
+
+.pdm-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.pdm-dot.active {
+  background: #ffffff;
+  transform: scale(1.25);
+}
+
+.pdm-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.18s, transform 0.18s;
+}
+
+.pdm-arrow:hover {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.pdm-arrow-left {
+  left: 12px;
+}
+
+.pdm-arrow-right {
+  right: 12px;
+}
+
+/* ── Info Section ────────────────────────────────────────── */
+.pdm-info {
+  padding: 20px 20px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pdm-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pdm-name {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: var(--color-text, #1c1c1e);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0;
+}
+
+.pdm-age {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text-soft, #8e8e93);
+}
+
+.pdm-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--color-text-soft, #8e8e93);
+}
+
+.pdm-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pdm-goal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pdm-goal-label {
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #aeaeb2);
+  font-weight: 500;
+}
+
+.pdm-goal-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-primary, #ff4f8b);
+  background: rgba(255, 79, 139, 0.1);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.pdm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border, rgba(0, 0, 0, 0.07));
+}
+
+.pdm-row:last-of-type {
+  border-bottom: none;
+}
+
+.pdm-row-label {
+  font-size: 0.83rem;
+  color: var(--color-text-soft, #8e8e93);
+  font-weight: 500;
+}
+
+.pdm-row-value {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-text, #1c1c1e);
+}
+
+.pdm-bio {
+  background: var(--color-surface-2, #f2f2f7);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.pdm-bio p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--color-text, #1c1c1e);
+  white-space: pre-wrap;
+}
+
+/* ── Interests ───────────────────────────────────────────── */
+.pdm-interests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.pdm-interest-tag {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(177, 75, 255, 0.1);
+  color: var(--color-accent, #b14bff);
+  border: 1px solid rgba(177, 75, 255, 0.2);
+}
+
+/* ── Swipe Actions ────────────────────────────────────────── */
+.pdm-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 16px 20px 28px;
+  flex-shrink: 0;
+}
+
+.pdm-action {
+  border: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  outline: none;
+  transition: opacity 0.18s, box-shadow 0.22s;
+}
+
+.pdm-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pdm-action:focus-visible {
+  outline: 3px solid var(--color-primary, #ff4f8b);
+  outline-offset: 3px;
+}
+
+/* Pass */
+.pdm-action-pass {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text-muted, #8e8e93);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 5px rgba(0, 0, 0, 0.07);
+  border: 1.5px solid var(--color-border, rgba(0, 0, 0, 0.08));
+}
+
+/* Super */
+.pdm-action-super {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent, #b14bff), #9333ea);
+  color: #ffffff;
+  box-shadow: 0 0 28px rgba(177, 75, 255, 0.55), 0 6px 20px rgba(177, 75, 255, 0.4);
+}
+
+/* Like */
+.pdm-action-like {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary, #ff4f8b), #ff2d6b);
+  color: #ffffff;
+  box-shadow: 0 0 32px rgba(255, 79, 139, 0.6), 0 8px 28px rgba(255, 79, 139, 0.5);
+}
+
+/* ── Dark Mode ────────────────────────────────────────────── */
+[data-theme='dark'] .pdm-container {
+  background: var(--color-surface, #1c1c1e);
+}
+
+[data-theme='dark'] .pdm-name {
+  color: #f5f5f7;
+}
+
+[data-theme='dark'] .pdm-bio {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .pdm-bio p {
+  color: #e5e5ea;
+}
+
+[data-theme='dark'] .pdm-row {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .pdm-row-label {
+  color: #8e8e93;
+}
+
+[data-theme='dark'] .pdm-row-value {
+  color: #f5f5f7;
+}
+
+[data-theme='dark'] .pdm-action-pass {
+  background: var(--color-surface-2, #2c2c2e);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #8e8e93;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (min-width: 520px) {
+  .pdm-backdrop {
+    align-items: center;
+    padding: 24px;
+  }
+
+  .pdm-container {
+    border-radius: 28px;
+    max-height: 88vh;
+  }
+
+  .pdm-photo-wrap {
+    border-radius: 28px 28px 0 0;
+  }
+}
