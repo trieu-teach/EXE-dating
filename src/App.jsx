@@ -25,6 +25,8 @@ import Chat from './pages/User/Chat/Chat.jsx'
 import Profile from './pages/User/Profile/Profile.jsx'
 import Reputation from './pages/User/Reputation/Reputation.jsx'
 import LikedMe from './pages/User/LikedMe/LikedMe.jsx'
+import DatePass from './pages/User/DatePass/DatePass.jsx'
+import AdminDashboard from './pages/Admin/AdminDashboard.jsx'
 import LoveTree from './pages/User/LoveTree/LoveTree.jsx'
 import Tasks from './pages/User/Tasks/Tasks.jsx'
 import MeetUpPlan from './pages/User/MeetUpPlan/MeetUpPlan.jsx'
@@ -43,6 +45,9 @@ import SecuritySettings from './pages/User/Settings/SecuritySettings/SecuritySet
 import Logout from './pages/User/Logout/Logout.jsx'
 
 function PublicOrShell({ children, variant }) {
+  const { user } = useAuth()
+  // Admin không dùng app người dùng — đẩy thẳng về dashboard
+  if (user?.role === 'Admin') return <Navigate to="/admin" replace />
   return <AppShell variant={variant}>{children}</AppShell>
 }
 
@@ -96,6 +101,8 @@ export default function App() {
             <Route path="/profile/:userId" element={<Onboarded><PublicOrShell><Profile /></PublicOrShell></Onboarded>} />
             <Route path="/reputation" element={<Onboarded><PublicOrShell><Reputation /></PublicOrShell></Onboarded>} />
             <Route path="/liked-me" element={<Onboarded><PublicOrShell><LikedMe /></PublicOrShell></Onboarded>} />
+            <Route path="/date-pass" element={<Onboarded><PublicOrShell variant="full"><DatePass /></PublicOrShell></Onboarded>} />
+            <Route path="/admin" element={<AuthOnly><AdminDashboard /></AuthOnly>} />
             <Route path="/love-tree" element={<Onboarded><PublicOrShell variant="full"><LoveTree /></PublicOrShell></Onboarded>} />
             <Route path="/love-tree/:matchId" element={<Onboarded><PublicOrShell variant="full"><LoveTree /></PublicOrShell></Onboarded>} />
             <Route path="/tasks" element={<Onboarded><PublicOrShell><Tasks /></PublicOrShell></Onboarded>} />

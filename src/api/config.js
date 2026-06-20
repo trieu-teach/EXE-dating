@@ -55,6 +55,26 @@ export const API_ENDPOINTS = {
   discovery: {
     feed: '/api/discovery',
   },
+  datepass: {
+    combos: '/api/datepass/combos',
+    eligibleMatches: '/api/datepass/eligible-matches',
+    order: '/api/datepass/order',
+    confirm: (id) => `/api/datepass/order/${id}/confirm`,
+    redeem: (id) => `/api/datepass/order/${id}/redeem`,
+    my: '/api/datepass/my',
+    revenue: '/api/datepass/revenue',
+  },
+  admin: {
+    dashboard: '/api/admin/dashboard',
+    charts: '/api/admin/charts',
+    verifications: '/api/admin/verifications',
+    approveVerification: (uid) => `/api/admin/verifications/${uid}/approve`,
+    rejectVerification: (uid) => `/api/admin/verifications/${uid}/reject`,
+    venues: '/api/admin/venues',
+    venue: (id) => `/api/admin/venues/${id}`,
+    combos: '/api/admin/combos',
+    combo: (id) => `/api/admin/combos/${id}`,
+  },
   matches: {
     list: '/api/matches',
     delete: (id) => `/api/matches/${id}`,

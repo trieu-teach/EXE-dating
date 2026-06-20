@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../context/AuthContext.jsx'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { validateEmail, validatePassword, validateRequired } from '../../../utils/validation.js'
-import ThemeToggle from '../../../components/User/ThemeToggle/ThemeToggle.jsx'
 import { Heart, Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Button } from '../../../components/ui/Button.jsx'
@@ -74,9 +73,6 @@ export default function Register() {
             <Heart size={18} className="auth-logo-icon" fill="currentColor" />
           </div>
           <span className="auth-logo-text">SameMess</span>
-          <div className="auth-theme-btn">
-            <ThemeToggle />
-          </div>
         </div>
 
         <div className="auth-hero">

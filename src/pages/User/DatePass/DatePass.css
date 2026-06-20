@@ -1,0 +1,209 @@
+/* ══════════ Date Pass — combo ưu đãi hẹn hò ══════════ */
+.dp-root { max-width: 920px; margin: 0 auto; padding: 0 16px 64px; }
+
+/* Hero */
+.dp-hero {
+  text-align: center;
+  padding: 34px 20px 26px;
+}
+.dp-hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--color-primary);
+}
+.dp-hero h1 { font-size: clamp(1.6rem, 5vw, 2.3rem); font-weight: 900; letter-spacing: -0.03em; margin: 8px 0 8px; color: var(--color-text); }
+.dp-hero p { font-size: 0.92rem; color: var(--color-text-soft); max-width: 520px; margin: 0 auto; line-height: 1.6; }
+
+/* Tabs */
+.dp-tabs { display: flex; gap: 8px; max-width: 520px; margin: 0 auto 8px; }
+.dp-tab {
+  flex: 1; padding: 11px; border-radius: 12px; border: 1.5px solid var(--color-border);
+  background: var(--color-surface); color: var(--color-text-soft);
+  font-family: inherit; font-size: 0.88rem; font-weight: 800; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all 0.15s;
+}
+.dp-tab.is-active {
+  color: #fff; border-color: transparent;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 6px 18px rgba(255, 79, 139, 0.3);
+}
+.dp-tab-count {
+  min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
+  background: var(--color-surface-2); color: var(--color-primary);
+  font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center;
+}
+.dp-tab.is-active .dp-tab-count { background: rgba(255,255,255,0.25); color: #fff; }
+
+.dp-body { margin-top: 18px; }
+.dp-empty { text-align: center; padding: 48px 16px; color: var(--color-text-muted); display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+/* Venue block */
+.dp-venue-block { margin-bottom: 26px; }
+.dp-venue-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.dp-venue-cat { font-size: 26px; }
+.dp-venue-name { font-size: 1.05rem; font-weight: 800; color: var(--color-text); }
+.dp-venue-addr { font-size: 0.78rem; color: var(--color-text-muted); }
+
+/* Combo cards */
+.dp-combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.dp-combo-card {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.dp-combo-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+.dp-combo-img {
+  height: 120px; background-size: cover; background-position: center;
+  background-color: var(--color-surface-2); position: relative;
+}
+.dp-combo-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: linear-gradient(135deg, #ff4f8b, #ff2d6b); color: #fff;
+  font-size: 0.8rem; font-weight: 900; padding: 4px 10px; border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(255,79,139,0.4);
+}
+.dp-combo-body { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.dp-combo-title { font-weight: 800; font-size: 0.95rem; color: var(--color-text); }
+.dp-combo-desc { font-size: 0.8rem; color: var(--color-text-soft); line-height: 1.4; flex: 1; }
+.dp-combo-price { display: flex; align-items: baseline; gap: 8px; margin-top: 2px; }
+.dp-price-sale { font-size: 1.15rem; font-weight: 900; color: var(--color-primary); }
+.dp-price-orig { font-size: 0.82rem; color: var(--color-text-muted); text-decoration: line-through; }
+.dp-combo-card { cursor: pointer; }
+.dp-combo-cta { margin-top: 6px; font-size: 0.82rem; font-weight: 800; color: var(--color-primary); }
+
+/* Modal chi tiết combo */
+.dp-detail {
+  width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
+  background: var(--color-surface); border-radius: 22px; overflow: hidden;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.45); display: flex; flex-direction: column;
+}
+.dp-detail-img {
+  height: 220px; background-size: cover; background-position: center;
+  background-color: var(--color-surface-2); position: relative;
+}
+.dp-detail-badge {
+  position: absolute; top: 14px; left: 14px;
+  background: linear-gradient(135deg,#ff4f8b,#ff2d6b); color:#fff;
+  font-weight: 900; font-size: 0.85rem; padding: 5px 12px; border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(255,79,139,0.4);
+}
+.dp-detail-close {
+  position: absolute; top: 12px; right: 12px; width: 34px; height: 34px;
+  border: none; border-radius: 50%; cursor: pointer;
+  background: rgba(0,0,0,0.5); color: #fff; font-size: 16px; backdrop-filter: blur(4px);
+}
+.dp-detail-body { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+.dp-detail-venue { font-size: 0.85rem; font-weight: 700; color: var(--color-text-soft); }
+.dp-detail-title { font-size: 1.35rem; font-weight: 900; color: var(--color-text); margin: 0; letter-spacing: -0.02em; }
+.dp-detail-desc { font-size: 0.92rem; color: var(--color-text-soft); line-height: 1.6; margin: 0; }
+.dp-detail-addr { font-size: 0.82rem; color: var(--color-text-muted); }
+.dp-detail-price { display: flex; align-items: baseline; gap: 10px; margin: 8px 0 4px; }
+.dp-detail-price .dp-price-sale { font-size: 1.5rem; }
+.dp-detail-forwho { font-size: 0.8rem; color: var(--color-text-muted); }
+
+/* Vouchers */
+.dp-voucher-list { display: flex; flex-direction: column; gap: 12px; max-width: 620px; margin: 0 auto; }
+.dp-voucher {
+  display: flex; align-items: center; gap: 14px; padding: 14px;
+  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px;
+  position: relative;
+}
+.dp-voucher.is-paid { border-color: rgba(22,163,74,0.4); }
+.dp-voucher.is-redeemed { opacity: 0.7; }
+.dp-voucher-qr { width: 74px; height: 74px; flex-shrink: 0; border-radius: 12px; overflow: hidden; background: var(--color-surface-2); display: grid; place-items: center; }
+.dp-voucher-qr img { width: 100%; height: 100%; }
+.dp-voucher-qr-lock { font-size: 28px; }
+.dp-voucher-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.dp-voucher-title { font-weight: 800; color: var(--color-text); }
+.dp-voucher-venue { font-size: 0.8rem; color: var(--color-text-soft); }
+.dp-voucher-code { font-size: 0.82rem; font-weight: 800; letter-spacing: 1px; color: var(--color-primary); }
+.dp-voucher-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
+.dp-voucher-exp { font-size: 0.74rem; font-weight: 700; color: var(--color-text-muted); }
+.dp-voucher-exp.is-expired { color: #ef4444; }
+.dp-voucher-status { font-size: 0.7rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; }
+.dp-voucher-status.is-paid { background: rgba(22,163,74,0.12); color: #16a34a; }
+.dp-voucher-status.is-pending { background: var(--color-surface-2); color: var(--color-text-muted); }
+.dp-voucher-status.is-redeemed { background: var(--color-surface-2); color: var(--color-text-muted); }
+.dp-redeem-btn {
+  flex-shrink: 0; padding: 9px 14px; border: none; border-radius: 10px; cursor: pointer;
+  font-family: inherit; font-weight: 800; font-size: 0.8rem; color: #fff;
+  background: #16a34a; transition: filter 0.15s;
+}
+.dp-redeem-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.dp-redeem-btn:disabled { opacity: 0.6; }
+.dp-voucher-done { color: #16a34a; flex-shrink: 0; }
+
+/* Revenue dashboard */
+.dp-revenue { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; max-width: 760px; margin: 0 auto; }
+.dp-stat {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: 18px; padding: 22px 18px; text-align: center;
+}
+.dp-stat-value { font-size: 1.6rem; font-weight: 900; color: var(--color-text); letter-spacing: -0.02em; }
+.dp-stat-label { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 4px; font-weight: 600; }
+.dp-stat.is-gmv .dp-stat-value { color: var(--color-accent); }
+.dp-stat.is-commission {
+  background: linear-gradient(135deg, rgba(255,79,139,0.1), rgba(177,75,255,0.08));
+  border-color: rgba(255,79,139,0.3);
+}
+.dp-stat.is-commission .dp-stat-value { color: var(--color-primary); }
+
+/* Modal */
+.dp-backdrop {
+  position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.dp-modal {
+  width: 100%; max-width: 420px; max-height: 88vh; overflow-y: auto;
+  background: var(--color-surface); border-radius: 22px; padding: 24px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 12px;
+}
+.dp-modal-title { font-size: 1.2rem; font-weight: 900; color: var(--color-text); }
+.dp-modal-combo {
+  display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px;
+  background: var(--color-primary-soft); border: 1px solid rgba(255,79,139,0.2);
+}
+.dp-modal-combo strong { color: var(--color-text); }
+.dp-modal-combo span { font-size: 0.82rem; color: var(--color-text-soft); }
+.dp-field-label { font-size: 0.78rem; font-weight: 800; color: var(--color-text-soft); margin-top: 4px; }
+.dp-field-hint { font-size: 0.74rem; color: var(--color-text-muted); margin-top: -4px; }
+.dp-match-list { display: flex; flex-direction: column; gap: 8px; }
+.dp-match-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 12px;
+  border: 1.5px solid var(--color-border); background: var(--color-surface); cursor: pointer;
+  font-family: inherit; text-align: left; transition: border-color 0.15s, background 0.15s;
+}
+.dp-match-item.is-sel { border-color: var(--color-primary); background: var(--color-primary-soft); }
+.dp-match-avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background-size: cover; background-position: center; background-color: var(--color-surface-2);
+  display: grid; place-items: center; font-weight: 800; color: var(--color-text-soft);
+}
+.dp-match-name { flex: 1; font-weight: 700; color: var(--color-text); }
+.dp-match-lv { font-size: 0.72rem; font-weight: 800; color: #16a34a; background: rgba(22,163,74,0.12); padding: 2px 8px; border-radius: 999px; }
+.dp-match-check { color: var(--color-primary); }
+.dp-email {
+  width: 100%; padding: 11px 14px; border-radius: 12px; border: 1.5px solid var(--color-border);
+  background: var(--color-surface); color: var(--color-text); font-size: 0.9rem;
+}
+.dp-email:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-soft); }
+.dp-modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.dp-pay-btn {
+  width: 100%; padding: 14px; border: none; border-radius: 14px; cursor: pointer;
+  font-family: inherit; font-weight: 800; font-size: 0.95rem; color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 6px 20px rgba(255,79,139,0.4);
+}
+.dp-pay-btn:disabled { opacity: 0.6; }
+.dp-need-match { text-align: center; padding: 16px; color: var(--color-text-soft); display: flex; flex-direction: column; gap: 10px; align-items: center; }
+
+/* Success */
+.dp-success { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.dp-success-icon { font-size: 48px; }
+.dp-success h2 { font-size: 1.2rem; font-weight: 900; color: var(--color-text); margin: 0; }
+.dp-success-qr { width: 200px; height: 200px; border: 1px solid var(--color-border); border-radius: 14px; }
+.dp-success-code { font-size: 1.1rem; font-weight: 900; letter-spacing: 2px; color: var(--color-primary); }
+.dp-success p { font-size: 0.84rem; color: var(--color-text-soft); line-height: 1.6; margin: 0; }
+
+[data-theme='dark'] .dp-modal, [data-theme='dark'] .dp-combo-card, [data-theme='dark'] .dp-voucher, [data-theme='dark'] .dp-stat { background: var(--color-surface, #1c1722); }

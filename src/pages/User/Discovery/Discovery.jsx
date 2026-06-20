@@ -9,6 +9,8 @@ import {
   HeartIcon, XIcon, StarIcon, MatchHeartIcon, SparkleIcon,
   RefreshIcon, PinIcon, ShieldCheckIcon,
 } from '../../../components/ui/CustomIcons.jsx'
+import FallingPetals from '../../../components/ui/FallingPetals.jsx'
+import MatchesSidebar from '../../../components/User/MatchesSidebar/MatchesSidebar.jsx'
 import './Discovery.css'
 
 const GOAL_LABEL = {
@@ -114,14 +116,18 @@ export default function Discovery() {
   if (!current) {
     return (
       <div className="disc-root">
-        <div className="discovery-empty">
-          <div className="discovery-empty-icon"><SparkleIcon size={56} /></div>
-          <h2>Hết người mới rồi!</h2>
-          <p>Bạn đã xem hết gợi ý hôm nay. Quay lại sau hoặc tải lại nhé.</p>
-          <div className="discovery-empty-actions">
-            <button className="btn btn-primary btn-block" onClick={() => load({ append: true })}>
-              <RefreshIcon size={15} /> Tải lại gợi ý
-            </button>
+        <MatchesSidebar />
+        <div className="disc-main">
+          <FallingPetals count={20} />
+          <div className="discovery-empty">
+            <div className="discovery-empty-icon"><SparkleIcon size={56} /></div>
+            <h2>Hết người mới rồi!</h2>
+            <p>Bạn đã xem hết gợi ý hôm nay. Quay lại sau hoặc tải lại nhé.</p>
+            <div className="discovery-empty-actions">
+              <button className="btn btn-primary btn-block" onClick={() => load({ append: true })}>
+                <RefreshIcon size={15} /> Tải lại gợi ý
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -138,6 +144,10 @@ export default function Discovery() {
 
   return (
     <div className="disc-root">
+      <MatchesSidebar />
+      <div className="disc-main">
+      <FallingPetals count={26} />
+
       <AnimatePresence mode="wait">
         <motion.div
           key={current.userId}
@@ -278,6 +288,7 @@ export default function Discovery() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   )
 }

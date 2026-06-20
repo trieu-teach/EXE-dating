@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { authService } from '../../../api'
 import { validateEmail } from '../../../utils/validation.js'
-import ThemeToggle from '../../../components/User/ThemeToggle/ThemeToggle.jsx'
 
 export default function ForgotPassword() {
   const toast = useToast()
@@ -34,7 +33,6 @@ export default function ForgotPassword() {
       <div className="auth-card">
         <div className="auth-theme-row">
           <span style={{ color: 'var(--color-primary)', fontWeight: 800 }}>💗 SameMess</span>
-          <ThemeToggle />
         </div>
         <h1>Quên mật khẩu</h1>
         <p className="auth-subtitle">Nhập email để nhận mã OTP đặt lại mật khẩu.</p>
