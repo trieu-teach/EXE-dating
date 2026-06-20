@@ -15,7 +15,6 @@ const SECTIONS = [
     title: 'Cá nhân',
     items: [
       { to: '/settings/discovery', label: 'Tiêu chí khám phá', desc: 'Giới tính, tuổi, khoảng cách', Icon: CompassIcon },
-      { to: '/settings/interests', label: 'Sở thích', desc: 'Quản lý sở thích của bạn', Icon: StarIcon },
     ],
   },
   {
@@ -29,7 +28,6 @@ const SECTIONS = [
   {
     title: 'Tài khoản',
     items: [
-      { to: '/safety', label: 'An toàn & PIN', desc: 'Cài đặt PIN, check-in', Icon: HeartIcon },
       { to: '/account-verification', label: 'Xác minh khuôn mặt', desc: 'Xác minh danh tính', Icon: ShieldCheckIcon },
       { to: '/premium', label: 'Gói Premium', desc: 'Mở khóa tính năng cao cấp', Icon: CrownIcon, highlight: true },
     ],

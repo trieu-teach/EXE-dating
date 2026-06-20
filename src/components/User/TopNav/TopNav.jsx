@@ -3,7 +3,7 @@ import { useAuth } from '../../../context/AuthContext.jsx'
 import NotificationBell from '../NotificationBell/NotificationBell.jsx'
 import ReputationBadge from '../ReputationBadge/ReputationBadge.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
-import { Heart, Flame, Calendar, Search, Shield, Settings, Leaf, Star } from 'lucide-react'
+import { Heart, Flame, Calendar, Settings, Leaf, Star } from 'lucide-react'
 
 const NAV_LINKS = [
   { to: '/discovery', label: 'Khám phá', Icon: Flame },
@@ -12,9 +12,7 @@ const NAV_LINKS = [
   { to: '/love-tree', label: 'Cây', Icon: Leaf },
   { to: '/daily-connection', label: 'Hằng ngày', Icon: Star },
   { to: '/events', label: 'Sự kiện', Icon: Calendar },
-  { to: '/search', label: 'Tìm kiếm', Icon: Search },
   { to: '/premium', label: 'Premium', Icon: null },
-  { to: '/safety', label: 'An toàn', Icon: Shield },
   { to: '/profile', label: 'Hồ sơ', Icon: null },
   { to: '/settings', label: 'Cài đặt', Icon: Settings },
 ]

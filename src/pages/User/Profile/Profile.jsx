@@ -6,7 +6,8 @@ import { useAuth } from '../../../context/AuthContext.jsx'
 import { resolveImageUrl, formatDate } from '../../../utils/format.js'
 import ProfileInfoForm from '../../../components/User/ProfileInfoForm/ProfileInfoForm.jsx'
 import ProfilePhotoManager from '../../../components/User/ProfilePhotoManager/ProfilePhotoManager.jsx'
-import { EditIcon, PinIcon, CalendarIcon2, HeartIcon, EyeIcon, ShieldIcon, MessageIcon, CameraIcon } from '../../../components/ui/CustomIcons.jsx'
+import ProfilePreviewModal from '../../../components/User/ProfilePreviewModal/ProfilePreviewModal.jsx'
+import { PinIcon, EyeIcon, ShieldIcon, MessageIcon, ChevronRightIcon, StarIcon } from '../../../components/ui/CustomIcons.jsx'
 import { motion } from 'framer-motion'
 import { cn } from '../../../lib/utils'
 
@@ -19,7 +20,7 @@ export default function Profile() {
   const { user: me, updateProfile } = useAuth()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   const targetId = userId || me?.id || me?.userId
 
@@ -38,49 +39,30 @@ export default function Profile() {
   const isMe = !userId || userId === me?.id || userId === me?.userId
 
   const photos = profile.photos || []
-  const coverUrl = photos[0]?.url || profile.coverUrl
   const avatarUrl = profile.avatarUrl || photos[0]?.url
+  const displayName = profile.displayName || me?.displayName || 'Người dùng'
 
   return (
     <div className="profile-root">
-      {/* Cinematic Hero */}
-      <div className="profile-hero">
-        <div
-          className="profile-cover"
-          style={coverUrl ? { backgroundImage: `url(${resolveImageUrl(coverUrl)})` } : {}}
-        >
-          <div className="profile-cover-gradient" />
-        </div>
-
-        {/* Avatar overlapping cover */}
-        <div className="profile-avatar-wrap">
-          <div
-            className="profile-avatar"
-            style={avatarUrl ? { backgroundImage: `url(${resolveImageUrl(avatarUrl)})` } : {}}
-          />
-          {isMe && (
-            <button
-              className="profile-avatar-edit-btn"
-              onClick={() => setEditing((e) => !e)}
-              title={editing ? 'Đóng chỉnh sửa' : 'Chỉnh sửa ảnh'}
-            >
-              <CameraIcon size={14} />
-            </button>
-          )}
-          {profile.isVerified && (
-            <div className="profile-verified">
-              <ShieldIcon size={12} />
-            </div>
-          )}
-        </div>
-      </div>
-
       {/* Info card */}
       <div className="profile-info-card">
-        <div className="profile-name-row">
-          <div>
+        {/* Header: avatar + name + action */}
+        <div className="profile-header">
+          <div
+            className="profile-avatar"
+            style={avatarUrl ? { backgroundImage: `url(${resolveImageUrl(avatarUrl)})` } : undefined}
+          >
+            {!avatarUrl && (
+              <span className="profile-avatar-fallback">{displayName.charAt(0).toUpperCase()}</span>
+            )}
+            {profile.isVerified && (
+              <div className="profile-verified"><ShieldIcon size={11} /></div>
+            )}
+          </div>
+
+          <div className="profile-header-info">
             <h1 className="profile-name">
-              {profile.displayName || me?.displayName}
+              {displayName}
               {profile.age && <span className="profile-age">, {profile.age}</span>}
             </h1>
             {profile.city && (
@@ -92,116 +74,101 @@ export default function Profile() {
           </div>
 
           {isMe ? (
-            <button
-              className="profile-edit-btn"
-              onClick={() => setEditing((e) => !e)}
-            >
-              <EditIcon size={15} />
-              {editing ? 'Đóng' : 'Sửa'}
+            <button className="profile-edit-btn" onClick={() => setPreviewOpen(true)} title="Xem trước hồ sơ">
+              <EyeIcon size={15} />
+              Xem trước
             </button>
           ) : (
-            <button
-              className="profile-msg-btn"
-              onClick={() => navigate('/matches')}
-            >
+            <button className="profile-msg-btn" onClick={() => navigate('/matches')}>
               <MessageIcon size={15} />
               Nhắn tin
             </button>
           )}
         </div>
 
-        {/* Stats */}
-        <div className="profile-stats">
-          <div className="profile-stat">
-            <div className="profile-stat-value">{profile.matchCount ?? '—'}</div>
-            <div className="profile-stat-label">Match</div>
-          </div>
-          <div className="profile-stat-divider" />
-          <div className="profile-stat">
-            <div className="profile-stat-value">{profile.profileViews ?? '—'}</div>
-            <div className="profile-stat-label">Lượt xem</div>
-          </div>
-          <div className="profile-stat-divider" />
-          <div className="profile-stat">
-            <div className="profile-stat-value">
-              {profile.reputationScore ?? profile.reputation ?? '—'}
+        {/* ── Người khác: chỉ xem ── */}
+        {!isMe && (
+          <>
+            {profile.bio && (
+              <div className="profile-card">
+                <div className="profile-card-label">Giới thiệu</div>
+                <p className="profile-bio">{profile.bio}</p>
+              </div>
+            )}
+            <div className="profile-card">
+              <div className="profile-card-label">Chi tiết</div>
+              <div className="profile-details">
+                {profile.gender && (
+                  <div className="profile-detail-row">
+                    <span className="profile-detail-label">Giới tính</span>
+                    <span className="profile-detail-value">
+                      {profile.gender === 'Male' ? 'Nam' : profile.gender === 'Female' ? 'Nữ' : profile.gender}
+                    </span>
+                  </div>
+                )}
+                {profile.dateOfBirth && (
+                  <div className="profile-detail-row">
+                    <span className="profile-detail-label">Ngày sinh</span>
+                    <span className="profile-detail-value">{formatDate(profile.dateOfBirth)}</span>
+                  </div>
+                )}
+                {profile.height && (
+                  <div className="profile-detail-row">
+                    <span className="profile-detail-label">Chiều cao</span>
+                    <span className="profile-detail-value">{profile.height} cm</span>
+                  </div>
+                )}
+                {profile.datingGoal && (
+                  <div className="profile-detail-row">
+                    <span className="profile-detail-label">Mục đích</span>
+                    <span className="profile-detail-value">{profile.datingGoal}</span>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="profile-stat-label">Reputation</div>
-          </div>
-        </div>
-
-        {/* Bio */}
-        {profile.bio && (
-          <div className="profile-card">
-            <div className="profile-card-label">Giới thiệu</div>
-            <p className="profile-bio">{profile.bio}</p>
-          </div>
+          </>
         )}
 
-        {/* Interest tags */}
-        {profile.interests?.length > 0 && (
-          <div className="profile-card">
-            <div className="profile-card-label">Sở thích</div>
-            <div className="profile-tags">
-              {profile.interests.map((tag) => (
-                <span key={tag.id || tag} className="profile-tag">
-                  {tag.emoji || ''} {tag.name || tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Info rows */}
-        <div className="profile-card">
-          <div className="profile-card-label">Chi tiết</div>
-          <div className="profile-details">
-            {profile.gender && (
-              <div className="profile-detail-row">
-                <span className="profile-detail-label">Giới tính</span>
-                <span className="profile-detail-value">
-                  {profile.gender === 'Male' ? 'Nam' : profile.gender === 'Female' ? 'Nữ' : profile.gender}
-                </span>
-              </div>
-            )}
-            {profile.dateOfBirth && (
-              <div className="profile-detail-row">
-                <span className="profile-detail-label">Ngày sinh</span>
-                <span className="profile-detail-value">{formatDate(profile.dateOfBirth)}</span>
-              </div>
-            )}
-            {profile.height && (
-              <div className="profile-detail-row">
-                <span className="profile-detail-label">Chiều cao</span>
-                <span className="profile-detail-value">{profile.height} cm</span>
-              </div>
-            )}
-            {profile.datingGoal && (
-              <div className="profile-detail-row">
-                <span className="profile-detail-label">Mục đích</span>
-                <span className="profile-detail-value">{profile.datingGoal}</span>
-              </div>
-            )}
-            <div className="profile-detail-row">
-              <span className="profile-detail-label">Trạng thái</span>
-              <span className={cn('profile-badge', profile.isProfileCompleted ? 'is-complete' : 'is-incomplete')}>
-                {profile.isProfileCompleted ? 'Đã hoàn tất' : 'Chưa đủ'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Edit forms */}
-        {editing && isMe && (
+        {/* ── Chính chủ: luôn ở chế độ chỉnh sửa (Bumble) ── */}
+        {isMe && (
           <motion.div
             className="profile-edit-section"
-            layout
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.28, ease: [0.34, 1.56, 0.64, 1] }}
           >
+            {/* Ảnh */}
+            <ProfilePhotoManager
+              photos={photos}
+              onChange={async () => {
+                const updated = await profileService.me()
+                setProfile(updated)
+              }}
+            />
+
+            {/* Xác minh */}
+            <div className="profile-section-label">Xác minh</div>
+            <button type="button" className="profile-row" onClick={() => navigate('/account-verification')}>
+              <span className="profile-row-label">
+                <ShieldIcon size={17} />
+                {profile.isVerified ? 'Tài khoản đã xác minh' : 'Xác minh tài khoản'}
+              </span>
+              {profile.isVerified
+                ? <span className="profile-verify-badge">Đã xác minh</span>
+                : <ChevronRightIcon size={16} className="profile-row-chevron" />}
+            </button>
+
+            {/* Uy tín */}
+            <div className="profile-section-label">Uy tín</div>
+            <button type="button" className="profile-row" onClick={() => navigate('/reputation')}>
+              <span className="profile-row-label"><StarIcon size={16} /> Xem điểm uy tín của tôi</span>
+              <ChevronRightIcon size={16} className="profile-row-chevron" />
+            </button>
+
+            {/* Thông tin */}
+            <div className="profile-section-label">Thông tin của tôi</div>
             <ProfileInfoForm
+              accordion
               initial={profile}
               onSaved={async () => {
                 const updated = await profileService.me()
@@ -210,16 +177,11 @@ export default function Profile() {
                 toast.success('Đã lưu thông tin.')
               }}
             />
-            <ProfilePhotoManager
-              photos={photos}
-              onChange={async () => {
-                const updated = await profileService.me()
-                setProfile(updated)
-              }}
-            />
           </motion.div>
         )}
       </div>
+
+      <ProfilePreviewModal profile={profile} open={previewOpen} onClose={() => setPreviewOpen(false)} />
     </div>
   )
 }

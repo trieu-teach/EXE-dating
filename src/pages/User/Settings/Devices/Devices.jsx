@@ -3,6 +3,28 @@ import { useNavigate } from 'react-router-dom'
 import { settingsService } from '../../../../api'
 import { useToast } from '../../../../context/ToastContext.jsx'
 import { timeAgo } from '../../../../utils/format.js'
+import { ShieldCheckIcon } from '../../../../components/ui/CustomIcons.jsx'
+import '../SettingsHub.css'
+import './Devices.css'
+
+function parseUA(ua = '') {
+  let os = 'Thiết bị lạ'
+  if (/Windows/.test(ua)) os = 'Windows'
+  else if (/Mac OS X|Macintosh/.test(ua)) os = 'macOS'
+  else if (/Android/.test(ua)) os = 'Android'
+  else if (/iPhone|iPad|iOS/.test(ua)) os = 'iOS'
+  else if (/Linux/.test(ua)) os = 'Linux'
+
+  let browser = 'Trình duyệt'
+  if (/Edg\//.test(ua)) browser = 'Edge'
+  else if (/OPR\/|Opera/.test(ua)) browser = 'Opera'
+  else if (/Chrome\//.test(ua)) browser = 'Chrome'
+  else if (/Firefox\//.test(ua)) browser = 'Firefox'
+  else if (/Safari\//.test(ua)) browser = 'Safari'
+
+  const isMobile = /Android|iPhone|iPad|Mobile/.test(ua)
+  return { os, browser, isMobile }
+}
 
 export default function Devices() {
   const navigate = useNavigate()
@@ -20,28 +42,42 @@ export default function Devices() {
   if (loading) return <div className="loading-block"><span className="spinner" /></div>
 
   return (
-    <div className="settings-page">
-      <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigate('/settings')} style={{ alignSelf: 'flex-start' }}>
-        ← Cài đặt
-      </button>
-      <h1>Thiết bị đã đăng nhập</h1>
-      {devices.length === 0 ? (
-        <div className="empty">Không có thiết bị nào được ghi nhận.</div>
-      ) : (
-        <section className="settings-section">
-          {devices.map((d, i) => (
-            <div key={d.id || i} className="settings-row">
-              <div>
-                <div className="settings-row-label">{d.deviceName || d.userAgent || 'Thiết bị'}</div>
-                <div className="settings-row-desc">
-                  {d.ip ? `IP: ${d.ip} · ` : ''}{d.location || ''} · Hoạt động {timeAgo(d.lastActiveAt || d.createdAt)}
+    <div className="dev-root">
+      <header className="dev-hero">
+        <button type="button" className="dev-back" onClick={() => navigate('/settings/security')}>← Bảo mật</button>
+        <div className="dev-hero-main">
+          <div className="dev-hero-icon"><ShieldCheckIcon size={24} /></div>
+          <div>
+            <h1 className="dev-hero-title">Thiết bị đã đăng nhập</h1>
+            <p className="dev-hero-sub">{devices.length} phiên đang hoạt động trên tài khoản của bạn.</p>
+          </div>
+        </div>
+      </header>
+
+      <div className="dev-body">
+        {devices.length === 0 ? (
+          <div className="empty">Không có thiết bị nào được ghi nhận.</div>
+        ) : (
+          <div className="settings-section-card">
+            {devices.map((d, i) => {
+              const { os, browser, isMobile } = parseUA(d.userAgent)
+              return (
+                <div key={d.id || i} className="settings-item dev-item">
+                  <div className="settings-item-icon dev-item-icon">{isMobile ? '📱' : '💻'}</div>
+                  <div className="settings-item-text">
+                    <div className="settings-item-label">{browser} · {os}</div>
+                    <div className="settings-item-desc">
+                      {d.ipAddress ? `IP ${d.ipAddress} · ` : ''}Đăng nhập {timeAgo(d.createdAt)}
+                    </div>
+                  </div>
+                  {i === 0 && <span className="dev-current">Gần đây nhất</span>}
                 </div>
-              </div>
-              {d.isCurrent && <span className="tag tag-primary">Hiện tại</span>}
-            </div>
-          ))}
-        </section>
-      )}
+              )
+            })}
+          </div>
+        )}
+        <p className="dev-note">Đổi mật khẩu sẽ đăng xuất tất cả thiết bị ở trên.</p>
+      </div>
     </div>
   )
 }

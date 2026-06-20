@@ -30,9 +30,9 @@ export default function EventReward() {
       <h1>Phần thưởng</h1>
       <div className="card" style={{ textAlign: 'center', padding: 32 }}>
         <div style={{ fontSize: 64 }}>🏆</div>
-        <h2 style={{ marginTop: 8 }}>+{reward.xp ?? 0} XP</h2>
+        <h2 style={{ marginTop: 8 }}>Cảm ơn bạn đã tham gia!</h2>
         {reward.badge && (
-          <p style={{ color: 'var(--color-text-soft)' }}>Huy hiệu: {reward.badge}</p>
+          <p style={{ color: 'var(--color-text-soft)' }}>Huy hiệu nhận được: {reward.badge}</p>
         )}
       </div>
     </div>

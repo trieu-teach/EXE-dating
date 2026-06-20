@@ -21,9 +21,10 @@ import OnboardingVerify from './pages/User/OnboardingVerify/OnboardingVerify.jsx
 import AccountVerification from './pages/User/AccountVerification/AccountVerification.jsx'
 import Discovery from './pages/User/Discovery/Discovery.jsx'
 import Matches from './pages/User/Matches/Matches.jsx'
-import Search from './pages/User/Search/Search.jsx'
 import Chat from './pages/User/Chat/Chat.jsx'
 import Profile from './pages/User/Profile/Profile.jsx'
+import Reputation from './pages/User/Reputation/Reputation.jsx'
+import LikedMe from './pages/User/LikedMe/LikedMe.jsx'
 import LoveTree from './pages/User/LoveTree/LoveTree.jsx'
 import Tasks from './pages/User/Tasks/Tasks.jsx'
 import MeetUpPlan from './pages/User/MeetUpPlan/MeetUpPlan.jsx'
@@ -34,17 +35,10 @@ import EventDetail from './pages/User/EventDetail/EventDetail.jsx'
 import EventHistory from './pages/User/EventHistory/EventHistory.jsx'
 import EventReward from './pages/User/EventReward/EventReward.jsx'
 import MatchSuccess from './pages/User/MatchSuccess/MatchSuccess.jsx'
-import Safety from './pages/User/Safety/Safety.jsx'
-import SafetyCheckin from './pages/User/SafetyCheckin/SafetyCheckin.jsx'
-import SafetyPinSetup from './pages/User/SafetyPinSetup/SafetyPinSetup.jsx'
-import SafetyPinForgot from './pages/User/SafetyPinForgot/SafetyPinForgot.jsx'
-import SafetyPinOtp from './pages/User/SafetyPinOtp/SafetyPinOtp.jsx'
-import EmergencyAlert from './pages/User/EmergencyAlert/EmergencyAlert.jsx'
 import SettingsHub from './pages/User/Settings/SettingsHub.jsx'
 import ChangePassword from './pages/User/Settings/ChangePassword/ChangePassword.jsx'
 import Devices from './pages/User/Settings/Devices/Devices.jsx'
 import DiscoverySettings from './pages/User/Settings/DiscoverySettings/DiscoverySettings.jsx'
-import Interests from './pages/User/Settings/Interests/Interests.jsx'
 import SecuritySettings from './pages/User/Settings/SecuritySettings/SecuritySettings.jsx'
 import Logout from './pages/User/Logout/Logout.jsx'
 
@@ -96,11 +90,12 @@ export default function App() {
             <Route path="/" element={<Navigate to="/discovery" replace />} />
             <Route path="/discovery" element={<Onboarded><PublicOrShell variant="full"><Discovery /></PublicOrShell></Onboarded>} />
             <Route path="/matches" element={<Onboarded><PublicOrShell><Matches /></PublicOrShell></Onboarded>} />
-            <Route path="/search" element={<Onboarded><PublicOrShell><Search /></PublicOrShell></Onboarded>} />
             <Route path="/chat" element={<Onboarded><PublicOrShell variant="full"><Chat /></PublicOrShell></Onboarded>} />
             <Route path="/chat/:conversationId" element={<Onboarded><PublicOrShell variant="full"><Chat /></PublicOrShell></Onboarded>} />
             <Route path="/profile" element={<Onboarded><PublicOrShell><Profile /></PublicOrShell></Onboarded>} />
             <Route path="/profile/:userId" element={<Onboarded><PublicOrShell><Profile /></PublicOrShell></Onboarded>} />
+            <Route path="/reputation" element={<Onboarded><PublicOrShell><Reputation /></PublicOrShell></Onboarded>} />
+            <Route path="/liked-me" element={<Onboarded><PublicOrShell><LikedMe /></PublicOrShell></Onboarded>} />
             <Route path="/love-tree" element={<Onboarded><PublicOrShell variant="full"><LoveTree /></PublicOrShell></Onboarded>} />
             <Route path="/love-tree/:matchId" element={<Onboarded><PublicOrShell variant="full"><LoveTree /></PublicOrShell></Onboarded>} />
             <Route path="/tasks" element={<Onboarded><PublicOrShell><Tasks /></PublicOrShell></Onboarded>} />
@@ -113,20 +108,12 @@ export default function App() {
             <Route path="/events/:eventId" element={<Onboarded><PublicOrShell><EventDetail /></PublicOrShell></Onboarded>} />
             <Route path="/account-verification" element={<Onboarded><PublicOrShell><AccountVerification /></PublicOrShell></Onboarded>} />
 
-            {/* Safety */}
-            <Route path="/safety" element={<Onboarded><PublicOrShell><Safety /></PublicOrShell></Onboarded>} />
-            <Route path="/safety-checkin" element={<Onboarded><PublicOrShell><SafetyCheckin /></PublicOrShell></Onboarded>} />
-            <Route path="/safety-pin-setup" element={<Onboarded><PublicOrShell><SafetyPinSetup /></PublicOrShell></Onboarded>} />
-            <Route path="/safety-pin-forgot" element={<Onboarded><PublicOrShell><SafetyPinForgot /></PublicOrShell></Onboarded>} />
-            <Route path="/safety-pin-otp" element={<Onboarded><PublicOrShell><SafetyPinOtp /></PublicOrShell></Onboarded>} />
-            <Route path="/emergency-alert" element={<Onboarded><PublicOrShell><EmergencyAlert /></PublicOrShell></Onboarded>} />
 
             {/* Settings */}
             <Route path="/settings" element={<Onboarded><PublicOrShell><SettingsHub /></PublicOrShell></Onboarded>} />
             <Route path="/settings/security" element={<Onboarded><PublicOrShell><SecuritySettings /></PublicOrShell></Onboarded>} />
             <Route path="/settings/devices" element={<Onboarded><PublicOrShell><Devices /></PublicOrShell></Onboarded>} />
             <Route path="/settings/discovery" element={<Onboarded><PublicOrShell><DiscoverySettings /></PublicOrShell></Onboarded>} />
-            <Route path="/settings/interests" element={<Onboarded><PublicOrShell><Interests /></PublicOrShell></Onboarded>} />
             <Route path="/settings/change-password" element={<Onboarded><PublicOrShell><ChangePassword /></PublicOrShell></Onboarded>} />
 
             <Route path="*" element={<NotFound />} />

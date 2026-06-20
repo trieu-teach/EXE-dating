@@ -1,92 +1,52 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../../../context/AuthContext.jsx'
-import { useToast } from '../../../../context/ToastContext.jsx'
-import { settingsService } from '../../../../api'
+import { ShieldIcon, KeyIcon, ShieldCheckIcon, ChevronRightIcon, LogOutIcon } from '../../../../components/ui/CustomIcons.jsx'
+import '../SettingsHub.css'
+import './SecuritySettings.css'
 
 export default function SecuritySettings() {
   const { logout } = useAuth()
-  const toast = useToast()
-  const [security, setSecurity] = useState(null)
-  const [saving, setSaving] = useState(false)
-
-  useEffect(() => {
-    settingsService.getSecurity()
-      .then(setSecurity)
-      .catch((err) => toast.error(err?.message || 'Không tải được cài đặt bảo mật.'))
-  }, [toast])
-
-  const update = async (patch) => {
-    setSaving(true)
-    try {
-      const updated = await settingsService.updateSecurity(patch)
-      setSecurity(updated)
-      toast.success('Đã lưu.')
-    } catch (err) {
-      toast.error(err?.message || 'Không lưu được.')
-    } finally {
-      setSaving(false)
-    }
-  }
 
   return (
-    <div className="settings-page">
-      <h1>Cài đặt bảo mật</h1>
-
-      <section className="settings-section">
-        <h2>Bảo mật đăng nhập</h2>
-        <div className="settings-row">
-          <div>
-            <div className="settings-row-label">Xác thực 2 yếu tố</div>
-            <div className="settings-row-desc">Yêu cầu mã OTP khi đăng nhập.</div>
-          </div>
-          <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <input
-              type="checkbox"
-              checked={Boolean(security?.twoFactorEnabled)}
-              onChange={(e) => update({ twoFactorEnabled: e.target.checked })}
-              disabled={saving}
-            />
-          </label>
+    <div className="sec-root">
+      <header className="sec-hero">
+        <div className="sec-hero-icon"><ShieldIcon size={26} /></div>
+        <div>
+          <h1 className="sec-hero-title">Bảo mật tài khoản</h1>
+          <p className="sec-hero-sub">Quản lý mật khẩu và các phiên đăng nhập của bạn.</p>
         </div>
-        <div className="settings-row">
-          <div>
-            <div className="settings-row-label">Cảnh báo đăng nhập</div>
-            <div className="settings-row-desc">Gửi thông báo khi có đăng nhập mới.</div>
+      </header>
+
+      <div className="sec-body">
+        <div className="settings-section">
+          <div className="settings-section-title">Tài khoản</div>
+          <div className="settings-section-card">
+            <Link to="/settings/change-password" className="settings-item">
+              <div className="settings-item-icon"><KeyIcon size={18} /></div>
+              <div className="settings-item-text">
+                <div className="settings-item-label">Đổi mật khẩu</div>
+                <div className="settings-item-desc">Cập nhật mật khẩu — sẽ thu hồi mọi phiên đăng nhập</div>
+              </div>
+              <ChevronRightIcon size={16} className="settings-item-arrow" />
+            </Link>
+            <Link to="/settings/devices" className="settings-item">
+              <div className="settings-item-icon"><ShieldCheckIcon size={18} /></div>
+              <div className="settings-item-text">
+                <div className="settings-item-label">Thiết bị đã đăng nhập</div>
+                <div className="settings-item-desc">Xem và thu hồi các phiên trên thiết bị khác</div>
+              </div>
+              <ChevronRightIcon size={16} className="settings-item-arrow" />
+            </Link>
           </div>
-          <input
-            type="checkbox"
-            checked={Boolean(security?.loginAlertsEnabled)}
-            onChange={(e) => update({ loginAlertsEnabled: e.target.checked })}
-            disabled={saving}
-          />
         </div>
-      </section>
 
-      <section className="settings-section">
-        <h2>Mật khẩu</h2>
-        <Link to="/settings/change-password" className="btn btn-ghost">Đổi mật khẩu</Link>
-        <p style={{ fontSize: 13, color: 'var(--color-text-soft)', marginTop: 8 }}>
-          ⚠️ Đổi mật khẩu sẽ thu hồi mọi phiên đăng nhập — bạn sẽ cần đăng nhập lại.
-        </p>
-      </section>
-
-      <section className="settings-section">
-        <h2>Thiết bị</h2>
-        <Link to="/settings/devices" className="btn btn-ghost">Xem các thiết bị đã đăng nhập</Link>
-      </section>
-
-      <section className="settings-section">
-        <h2>An toàn</h2>
-        <Link to="/safety" className="btn btn-ghost">Cài đặt an toàn & PIN</Link>
-      </section>
-
-      <section className="settings-section">
-        <h2>Phiên đăng nhập</h2>
-        <button type="button" className="btn btn-danger" onClick={logout}>
-          Đăng xuất
-        </button>
-      </section>
+        <div className="settings-section">
+          <div className="settings-section-title">Phiên đăng nhập</div>
+          <button type="button" className="settings-logout-btn" onClick={logout}>
+            <LogOutIcon size={16} /> Đăng xuất
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

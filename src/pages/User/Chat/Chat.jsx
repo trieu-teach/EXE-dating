@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SearchIcon, SendIcon, Sparkles2Icon, HeartChatIcon, Check2Icon, LightbulbIcon, XSmallIcon, ArrowUpIcon } from '../../../components/ui/CustomIcons.jsx'
-import { chatService, plantsService, connectionRemindersService, meetupService } from '../../../api'
+import { chatService, plantsService, connectionRemindersService, meetupService, venuesService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { useAuth } from '../../../context/AuthContext.jsx'
-import { timeAgo } from '../../../utils/format.js'
+import { timeAgo, resolveImageUrl, formatDistance } from '../../../utils/format.js'
 import ChatThreadToolbar from '../../../components/User/ChatThreadToolbar/ChatThreadToolbar.jsx'
 import AISuggestionPanel from '../../../components/User/AISuggestionPanel/AISuggestionPanel.jsx'
 import LoveTreeBondBar from '../../../components/User/LoveTreeBondBar/LoveTreeBondBar.jsx'
@@ -71,11 +71,20 @@ export default function Chat() {
   const [plant, setPlant] = useState(null)
   const [watering, setWatering] = useState(false)
   const [nudges, setNudges] = useState([])
-  const [meetups, setMeetups] = useState([])
   const [detailVenue, setDetailVenue] = useState(null)
   const [detailOpen, setDetailOpen] = useState(false)
-  const [responding, setResponding] = useState(null)
   const [search, setSearch] = useState('')
+  // Đề xuất hẹn ngay từ chat (sau khi chia sẻ/ xem 1 quán)
+  const [proposeVenue, setProposeVenue] = useState(null)
+  const [proposeAt, setProposeAt] = useState('')
+  const [proposeNote, setProposeNote] = useState('')
+  const [proposing, setProposing] = useState(false)
+  const [flagged, setFlagged] = useState(false)
+  // Chia sẻ quán vào chat
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [pickerVenues, setPickerVenues] = useState([])
+  const [pickerLoading, setPickerLoading] = useState(false)
+  const [sharingId, setSharingId] = useState(null)
 
   // Load conversation list
   useEffect(() => {
@@ -104,7 +113,6 @@ export default function Chat() {
     setMessages([])
     setPlant(null)
     setNudges([])
-    setMeetups([])
 
     chatService.messages(conversation.id, { limit: 50 })
       .then((list) => { if (!cancelled) setMessages(Array.isArray(list) ? list : (list?.items ?? [])) })
@@ -119,9 +127,6 @@ export default function Chat() {
         .catch(() => {})
       connectionRemindersService.nudges(conversation.id)
         .then((n) => { if (!cancelled) setNudges(Array.isArray(n?.items) ? n.items : (Array.isArray(n) ? n : [])) })
-        .catch(() => {})
-      meetupService.list(conversation.id)
-        .then((list) => { if (!cancelled) setMeetups(Array.isArray(list) ? list : (list?.items ?? [])) })
         .catch(() => {})
     }
 
@@ -146,7 +151,13 @@ export default function Chat() {
       setMessages((cur) => [...cur, msg])
       setText('')
     } catch (err) {
-      toast.error(err?.message || 'Gửi tin thất bại.')
+      const msg = err?.message || ''
+      // Tin nhắn bị AI kiểm duyệt chặn → đã bị trừ uy tín
+      if (err?.status === 400 && /tiêu chuẩn cộng đồng|vi phạm|bị chặn/i.test(msg)) {
+        setFlagged(true)
+      } else {
+        toast.error(msg || 'Gửi tin thất bại.')
+      }
     } finally {
       setSending(false)
     }
@@ -166,18 +177,38 @@ export default function Chat() {
     }
   }
 
-  const handleMeetupRespond = async (meetupId, action) => {
-    setResponding(meetupId)
+  // Mở form đặt lịch cho 1 quán (từ thẻ quán đã chia sẻ trong chat)
+  const openPropose = (venue) => {
+    setDetailOpen(false)
+    const d = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+    d.setMinutes(0, 0, 0)
+    const off = d.getTimezoneOffset()
+    setProposeAt(new Date(d.getTime() - off * 60000).toISOString().slice(0, 16))
+    setProposeNote('')
+    setProposeVenue(venue || detailVenue)
+  }
+
+  const submitPropose = async (e) => {
+    e?.preventDefault?.()
+    if (!conversation?.id || !proposeVenue) return
+    if (new Date(proposeAt).getTime() <= Date.now()) {
+      toast.warn('Vui lòng chọn thời gian trong tương lai.')
+      return
+    }
+    setProposing(true)
     try {
-      await meetupService.respond(meetupId, action)
-      toast.success(action === 'accept' ? 'Đã đồng ý hẹn! 💕' : 'Đã từ chối.')
-      setMeetups((cur) =>
-        cur.map((m) => m.id === meetupId ? { ...m, status: action === 'accept' ? 'Accepted' : 'Declined' } : m),
-      )
+      await meetupService.propose(conversation.id, {
+        venueId: proposeVenue.id || proposeVenue.venueId,
+        proposedAt: new Date(proposeAt).toISOString(),
+        note: proposeNote.trim() || undefined,
+      })
+      toast.success('Đã gửi lời mời hẹn! 💕 Xem & phản hồi ở tab Hẹn hò trên Cây tình yêu.')
+      setProposeVenue(null)
     } catch (err) {
-      toast.error(err?.message || 'Không thể phản hồi.')
+      if (err?.status === 403) toast.error('Chăm cây đạt Level 4 để mở khóa hẹn hò.')
+      else toast.error(err?.message || 'Gửi đề xuất thất bại.')
     } finally {
-      setResponding(null)
+      setProposing(false)
     }
   }
 
@@ -191,6 +222,40 @@ export default function Chat() {
   const openVenueDetail = (venue) => {
     setDetailVenue(venue)
     setDetailOpen(true)
+  }
+
+  // Mở picker chọn quán để chia sẻ vào chat
+  const openVenuePicker = () => {
+    if (!conversation?.matchId) {
+      toast.info('Chưa thể tải địa điểm cho cuộc trò chuyện này.')
+      return
+    }
+    setPickerOpen(true)
+    setPickerLoading(true)
+    setPickerVenues([])
+    venuesService.nearby(conversation.matchId, { radiusKm: 15 })
+      .then((list) => setPickerVenues(Array.isArray(list) ? list : (list?.items ?? [])))
+      .catch((err) => {
+        if (err?.status === 403) toast.error('Chăm cây đạt Level 4 để mở khóa địa điểm hẹn hò.')
+        else toast.error('Không tải được danh sách quán.')
+        setPickerOpen(false)
+      })
+      .finally(() => setPickerLoading(false))
+  }
+
+  const shareVenue = async (v) => {
+    if (!conversation?.id) return
+    setSharingId(v.id)
+    try {
+      const msg = await meetupService.shareVenue(conversation.id, v.id)
+      setMessages((cur) => [...cur, msg])
+      setPickerOpen(false)
+      toast.success('Đã chia sẻ địa điểm vào trò chuyện! 📍')
+    } catch (err) {
+      toast.error(err?.message || 'Chia sẻ thất bại.')
+    } finally {
+      setSharingId(null)
+    }
   }
 
   const filtered = conversations.filter((c) =>
@@ -318,47 +383,6 @@ export default function Chat() {
                   )
                 })}
 
-                {meetups.filter((mu) => mu.status === 'Proposed' && !mu.isMine).map((mu) => (
-                  <motion.div
-                    key={mu.id}
-                    className="chat-meetup-proposal"
-                    variants={msgVariants}
-                    initial="hidden"
-                    animate="show"
-                  >
-                    <div className="chat-meetup-proposal-header">💌 {conversation?.otherDisplayName} đề xuất hẹn</div>
-                    <div className="chat-meetup-proposal-card">
-                      <div className="chat-meetup-proposal-venue">📍 {mu.venueName || `Quán #${mu.venueId}`}</div>
-                      <div className="chat-meetup-proposal-time">⏰ {formatMeetupTime(mu.proposedAt)}</div>
-                      {mu.note && <div className="chat-meetup-proposal-note">{mu.note}</div>}
-                      <div className="chat-meetup-proposal-actions">
-                        <button className="chat-meetup-accept-btn" disabled={responding === mu.id} onClick={() => handleMeetupRespond(mu.id, 'accept')}>
-                          {responding === mu.id ? <span className="spinner" /> : '💕 Đồng ý'}
-                        </button>
-                        <button className="chat-meetup-decline-btn" disabled={responding === mu.id} onClick={() => handleMeetupRespond(mu.id, 'decline')}>
-                          Không
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-
-                {meetups.filter((mu) => mu.status === 'Accepted').map((mu) => (
-                  <motion.div
-                    key={mu.id}
-                    className="chat-meetup-accepted"
-                    variants={msgVariants}
-                    initial="hidden"
-                    animate="show"
-                  >
-                    <div className="chat-meetup-accepted-icon"><Check2Icon size={18} /></div>
-                    <div>
-                      <div className="chat-meetup-accepted-title">Buổi hẹn đã chốt!</div>
-                      <div className="chat-meetup-accepted-detail">{mu.venueName} · {formatMeetupTime(mu.proposedAt)}</div>
-                    </div>
-                  </motion.div>
-                ))}
-
                 <div ref={messagesEnd} />
               </div>
 
@@ -381,9 +405,114 @@ export default function Chat() {
                 </div>
               )}
 
-              <VenueDetailModal venue={detailVenue} open={detailOpen} onClose={() => setDetailOpen(false)} onPropose={() => toast.info('Mở mục Hẹn hò trên Cây tình yêu để đề xuất.')} />
+              <VenueDetailModal venue={detailVenue} open={detailOpen} onClose={() => setDetailOpen(false)} onPropose={(v) => openPropose(v)} />
+
+              {/* Modal đặt lịch hẹn cho quán đã chia sẻ */}
+              <AnimatePresence>
+                {proposeVenue && (
+                  <motion.div className="chat-propose-backdrop"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    onClick={() => setProposeVenue(null)}>
+                    <motion.form className="chat-propose-modal" onSubmit={submitPropose}
+                      initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, y: 20 }} onClick={(e) => e.stopPropagation()}>
+                      <div className="chat-propose-title">💕 Lên kế hoạch hẹn hò</div>
+                      <div className="chat-propose-venue">📍 <strong>{proposeVenue.name || proposeVenue.venueName || 'Quán đã chọn'}</strong></div>
+                      <div className="field">
+                        <label className="field-label">Thời gian</label>
+                        <input type="datetime-local" value={proposeAt}
+                          onChange={(e) => setProposeAt(e.target.value)} required />
+                      </div>
+                      <div className="field">
+                        <label className="field-label">Lời nhắn (tuỳ chọn)</label>
+                        <textarea rows={2} value={proposeNote} maxLength={300}
+                          onChange={(e) => setProposeNote(e.target.value)}
+                          placeholder="Mình hẹn nhau ở đây nhé ☕" />
+                      </div>
+                      <div className="chat-propose-actions">
+                        <button type="submit" className="btn btn-primary btn-sm" disabled={proposing}>
+                          {proposing ? <span className="spinner" /> : 'Gửi lời mời'}
+                        </button>
+                        <button type="button" className="btn btn-ghost btn-sm" onClick={() => setProposeVenue(null)}>Hủy</button>
+                      </div>
+                    </motion.form>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Picker chọn quán để chia sẻ vào chat */}
+              <AnimatePresence>
+                {pickerOpen && (
+                  <motion.div className="chat-propose-backdrop"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    onClick={() => setPickerOpen(false)}>
+                    <motion.div className="chat-venue-picker"
+                      initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, y: 20 }} onClick={(e) => e.stopPropagation()}>
+                      <div className="chat-propose-title">📍 Chia sẻ địa điểm</div>
+                      {pickerLoading ? (
+                        <div className="loading-block" style={{ padding: 20 }}><span className="spinner" /></div>
+                      ) : pickerVenues.length === 0 ? (
+                        <p className="empty" style={{ padding: 16 }}>Không tìm thấy quán nào gần đây.</p>
+                      ) : (
+                        <div className="chat-venue-picker-list">
+                          {pickerVenues.map((v) => (
+                            <button key={v.id} type="button" className="chat-venue-pick-item"
+                              disabled={sharingId === v.id} onClick={() => shareVenue(v)}>
+                              <div className="chat-venue-pick-img"
+                                style={v.imageUrl ? { backgroundImage: `url(${resolveImageUrl(v.imageUrl)})` } : undefined} />
+                              <div className="chat-venue-pick-info">
+                                <div className="chat-venue-pick-name">{v.name}</div>
+                                <div className="chat-venue-pick-meta">
+                                  {v.category}{v.distanceKm != null ? ` · ${formatDistance(v.distanceKm)}` : ''}
+                                </div>
+                              </div>
+                              {sharingId === v.id ? <span className="spinner" /> : <span className="chat-venue-pick-share">Chia sẻ</span>}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPickerOpen(false)}>Đóng</button>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Popup: tin nhắn bị chặn + trừ uy tín */}
+              <AnimatePresence>
+                {flagged && (
+                  <motion.div className="chat-propose-backdrop"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    onClick={() => setFlagged(false)}>
+                    <motion.div className="chat-flag-modal"
+                      initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, y: 20 }} onClick={(e) => e.stopPropagation()}>
+                      <div className="chat-flag-icon">⚠️</div>
+                      <div className="chat-flag-title">Tin nhắn đã bị chặn</div>
+                      <p className="chat-flag-text">
+                        Tin nhắn của bạn vi phạm tiêu chuẩn cộng đồng nên đã bị chặn và
+                        {' '}<strong>trừ 8 điểm uy tín</strong>.
+                      </p>
+                      <div className="chat-flag-warn">
+                        <strong>Uy tín thấp ảnh hưởng gì?</strong>
+                        <ul>
+                          <li>Hồ sơ ít được hiển thị trong Khám phá → khó match hơn</li>
+                          <li>Mất nhãn tin cậy, người khác dè dặt hơn</li>
+                          <li>Vi phạm nặng/nhiều lần có thể bị hạn chế tài khoản</li>
+                        </ul>
+                      </div>
+                      <div className="chat-flag-actions">
+                        <button type="button" className="btn btn-ghost btn-sm" onClick={() => setFlagged(false)}>Đã hiểu</button>
+                        <button type="button" className="btn btn-primary btn-sm" onClick={() => { setFlagged(false); navigate('/reputation') }}>Xem điểm uy tín</button>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <form className="chat-input-bar" onSubmit={send}>
+                <button type="button" className="chat-venue-btn" onClick={openVenuePicker}
+                  title="Chia sẻ địa điểm" aria-label="Chia sẻ địa điểm">📍</button>
                 <textarea
                   className="chat-input"
                   value={text}

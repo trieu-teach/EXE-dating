@@ -5,65 +5,55 @@
   background: var(--color-bg);
 }
 
-/* ── Cinematic Hero ─────────────────────────────────────────── */
-.profile-hero {
-  position: relative;
-  width: 100%;
-  height: 240px;
-  overflow: hidden;
-  background: linear-gradient(160deg, #1a0d18 0%, #2d1135 50%, #1c0e28 100%);
+/* ── Info Card ─────────────────────────────────────────────── */
+.profile-info-card {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.profile-cover {
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-color: var(--color-surface-2);
-  transition: transform 0.6s ease;
-}
-.profile-root:hover .profile-cover {
-  transform: scale(1.03);
-}
-
-.profile-cover-gradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    transparent 20%,
-    rgba(0, 0, 0, 0.2) 50%,
-    rgba(0, 0, 0, 0.55) 100%
-  );
-}
-
-/* Avatar overlapping cover */
-.profile-avatar-wrap {
-  position: absolute;
-  bottom: -48px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
+/* ── Header: avatar + name + action ─────────────────────────── */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .profile-avatar {
-  width: 96px;
-  height: 96px;
+  position: relative;
+  width: 84px;
+  height: 84px;
+  flex-shrink: 0;
   border-radius: 50%;
   background-color: var(--color-surface-2);
   background-size: cover;
   background-position: center;
-  border: 4px solid var(--color-surface);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 0 0 2px var(--color-primary-soft), 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.profile-avatar-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
 }
 
 .profile-avatar-edit-btn {
   position: absolute;
-  bottom: 0;
-  right: -4px;
-  width: 30px;
-  height: 30px;
+  bottom: -2px;
+  right: -2px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   color: #ffffff;
@@ -72,8 +62,7 @@
   justify-content: center;
   border: 2.5px solid var(--color-surface);
   cursor: pointer;
-  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.18s ease;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
   z-index: 3;
   box-shadow: 0 4px 12px rgba(255, 79, 139, 0.4);
 }
@@ -84,12 +73,12 @@
 
 .profile-verified {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 26px;
-  height: 26px;
+  top: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -98,25 +87,22 @@
   z-index: 3;
 }
 
-/* ── Info Card ─────────────────────────────────────────────── */
-.profile-info-card {
-  margin-top: 56px;
-  padding: 0 20px 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.profile-header-info {
+  flex: 1;
+  min-width: 0;
 }
 
-/* Name + edit row */
-.profile-name-row {
+.profile-header-actions {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+@media (max-width: 420px) {
+  .profile-header-actions { flex-direction: column; }
 }
 
 .profile-name {
-  font-size: 1.55rem;
+  font-size: 1.5rem;
   font-weight: 900;
   color: var(--color-text);
   letter-spacing: -0.025em;
@@ -317,15 +303,107 @@
   color: var(--color-text-muted);
 }
 
-/* ── Edit section ───────────────────────────────────────────── */
+/* ── Edit section (Bumble style) ────────────────────────────── */
 .profile-edit-section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   overflow: hidden;
 }
 
-/* ── Dark mode ──────────────────────────────────────────────── */
-[data-theme='dark'] .profile-hero {
-  background: linear-gradient(160deg, #0a0610 0%, #180d20 50%, #120820 100%);
+.profile-section-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin: 10px 4px 0;
+}
+
+/* Clickable row (Xem trước / Xác minh / Sở thích) */
+.profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 15px 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.profile-row:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+.profile-row-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.profile-row-label svg { color: var(--color-primary); flex-shrink: 0; }
+.profile-row-chevron { color: var(--color-text-muted); flex-shrink: 0; }
+
+.profile-verify-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 11px;
+  border-radius: var(--radius-pill);
+  background: rgba(22, 163, 74, 0.12);
+  color: #16a34a;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+/* ── Accordion form ─────────────────────────────────────────── */
+.pinfo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pinfo-acc {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.pinfo-acc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px 18px;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.pinfo-acc-chevron {
+  color: var(--color-text-muted);
+  transition: transform 0.2s;
+}
+.pinfo-acc.is-open .pinfo-acc-chevron {
+  transform: rotate(90deg);
+}
+.pinfo-acc-body {
+  padding: 0 18px 18px;
+}
+.pinfo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── Edit form submit (full-width gradient) ─────────────────── */
+.profile-edit-section .btn-block {
+  margin-top: 4px;
 }

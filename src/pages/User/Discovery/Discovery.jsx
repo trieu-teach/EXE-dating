@@ -1,30 +1,26 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { swipesService, discoveryService } from '../../../api'
+import { swipesService, discoveryService, profileService, chatService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { useAuth } from '../../../context/AuthContext.jsx'
 import { resolveImageUrl, formatDistance } from '../../../utils/format.js'
 import {
   HeartIcon, XIcon, StarIcon, MatchHeartIcon, SparkleIcon,
-  RefreshIcon, PinIcon
+  RefreshIcon, PinIcon, ShieldCheckIcon,
 } from '../../../components/ui/CustomIcons.jsx'
-import ProfileDetailModal from '../../../components/User/ProfileDetailModal/ProfileDetailModal.jsx'
 import './Discovery.css'
 
-const cardVariants = {
-  initial: { opacity: 0, y: 40, scale: 0.95 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.9,
-    transition: { duration: 0.22, ease: 'easeIn' }
-  }
+const GOAL_LABEL = {
+  LongTerm: 'Mối quan hệ lâu dài', ShortTerm: 'Mối quan hệ ngắn hạn',
+  Friendship: 'Kết bạn', Casual: 'Hẹn hò thoải mái',
+}
+const GENDER_LABEL = { Male: 'Nam', Female: 'Nữ', Other: 'Khác' }
+
+const orderedPhotos = (p) => {
+  const list = Array.isArray(p?.photos) ? [...p.photos] : []
+  list.sort((a, b) => (b.isPrimary === true) - (a.isPrimary === true))
+  return list.map((x) => resolveImageUrl(x.url)).filter(Boolean)
 }
 
 export default function Discovery() {
@@ -36,7 +32,9 @@ export default function Discovery() {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
   const [matchModal, setMatchModal] = useState(null)
-  const [detailModal, setDetailModal] = useState(null)
+  const [myPhoto, setMyPhoto] = useState(null)
+  const [opening, setOpening] = useState(false)
+  const scrollRef = useRef(null)
 
   const load = async ({ append = false } = {}) => {
     setLoading(true)
@@ -44,7 +42,7 @@ export default function Discovery() {
       const data = await discoveryService.feed({ limit: 10 })
       const list = Array.isArray(data) ? data : (data?.items ?? [])
       setFeed((prev) => append ? [...prev, ...list] : list)
-      setCursor(0)
+      if (!append) setCursor(0)
     } catch (err) {
       toast.error(err?.message || 'Không tải được danh sách.')
     } finally {
@@ -53,242 +51,226 @@ export default function Discovery() {
   }
 
   useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    profileService.me()
+      .then((p) => setMyPhoto(p?.avatarUrl || p?.photos?.find((x) => x.isPrimary)?.url || p?.photos?.[0]?.url || null))
+      .catch(() => {})
+  }, [])
 
   const current = feed[cursor]
 
-  const handleSwipe = async (action) => {
+  const decide = async (action) => {
     if (!current || actionLoading) return
     setActionLoading(true)
+    const target = current
     try {
-      const res = await swipesService.swipe({ targetUserId: current.userId, action })
-      if (res?.isMatch) {
-        setMatchModal({ other: current, matchId: res.matchId })
-      } else {
-        setCursor((c) => c + 1)
-      }
+      const res = await swipesService.swipe({ targetUserId: target.userId, action })
+      if (res?.isMatch) setMatchModal({ other: target, matchId: res.matchId })
     } catch (err) {
-      if (err?.status === 403) {
-        toast.error('Tính năng bị giới hạn theo gói. Hãy nâng cấp Premium.')
-      } else {
-        toast.error(err?.message || 'Thao tác thất bại.')
-      }
+      if (err?.status === 403) toast.error('Tính năng bị giới hạn theo gói. Hãy nâng cấp Premium.')
+      else toast.error(err?.message || 'Thao tác thất bại.')
+    } finally {
       setCursor((c) => c + 1)
+      if (scrollRef.current) scrollRef.current.scrollTop = 0
+      setActionLoading(false)
+    }
+  }
+
+  const undo = async () => {
+    if (actionLoading) return
+    if (cursor === 0) { toast.info('Không có lượt nào để hoàn tác.'); return }
+    setActionLoading(true)
+    try {
+      await swipesService.undo()
+      setCursor((c) => Math.max(0, c - 1))
+      if (scrollRef.current) scrollRef.current.scrollTop = 0
+      toast.success('Đã hoàn tác lượt vừa rồi.')
+    } catch (err) {
+      if (err?.status === 403) toast.error('Hoàn tác là tính năng Plus/Gold. Nâng cấp để dùng.')
+      else toast.error(err?.message || 'Không hoàn tác được (chỉ hoàn tác được lượt Bỏ qua).')
     } finally {
       setActionLoading(false)
     }
   }
 
-  const handleNextBatch = () => load({ append: true })
-
-  const handleDetailSwipe = (action, res) => {
-    setDetailModal(null)
-    if (res?.isMatch) {
-      setMatchModal({ other: detailModal, matchId: res.matchId })
-    } else {
-      setCursor((c) => c + 1)
+  const openChat = async (matchId) => {
+    if (!matchId || opening) return
+    setOpening(true)
+    try {
+      const conv = await chatService.byMatch(matchId)
+      setMatchModal(null)
+      navigate(`/chat/${conv.id || conv.conversationId}`)
+    } catch (err) {
+      toast.error(err?.message || 'Không mở được cuộc trò chuyện.')
+    } finally {
+      setOpening(false)
     }
   }
 
   if (loading && feed.length === 0) {
-    return (
-      <div className="loading-block">
-        <span className="spinner" />
-        Đang tải…
-      </div>
-    )
+    return <div className="loading-block"><span className="spinner" /> Đang tải…</div>
   }
 
   if (!current) {
     return (
-      <div className="discovery-empty">
-        <div className="discovery-empty-icon"><SparkleIcon size={56} /></div>
-        <h2>Hết người mới rồi!</h2>
-        <p>Bạn đã xem hết gợi ý hôm nay. Hãy quay lại sau hoặc thử lại ngay.</p>
-        <div className="discovery-empty-actions">
-          <button className="btn btn-primary btn-block" onClick={handleNextBatch}>
-            <RefreshIcon size={15} />
-            Tải lại gợi ý
-          </button>
-          <div className="discovery-empty-tip">
-            <SparkleIcon size={14} />
-            <span>Hoàn thiện profile để có gợi ý chính xác hơn</span>
+      <div className="disc-root">
+        <div className="discovery-empty">
+          <div className="discovery-empty-icon"><SparkleIcon size={56} /></div>
+          <h2>Hết người mới rồi!</h2>
+          <p>Bạn đã xem hết gợi ý hôm nay. Quay lại sau hoặc tải lại nhé.</p>
+          <div className="discovery-empty-actions">
+            <button className="btn btn-primary btn-block" onClick={() => load({ append: true })}>
+              <RefreshIcon size={15} /> Tải lại gợi ý
+            </button>
           </div>
         </div>
       </div>
     )
   }
 
+  const photos = orderedPhotos(current)
+  const chips = [
+    current.height && `${current.height} cm`,
+    GENDER_LABEL[current.gender] || current.gender,
+    current.datingGoal && (GOAL_LABEL[current.datingGoal] || current.datingGoal),
+    current.distanceKm != null && `Cách ${formatDistance(current.distanceKm)}`,
+  ].filter(Boolean)
+
   return (
-    <div className="discovery-root">
-      <div className="discovery-topbar">
-        <div className="discovery-title">Same<span>Mess</span></div>
-      </div>
-
-      <div className="discovery-card-wrap">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={current.userId}
-            className="swipe-card"
-            variants={cardVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            onClick={() => setDetailModal(current)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setDetailModal(current) }}
-            aria-label={`Xem chi tiết ${current.displayName}`}
-          >
-            <div
-              className="swipe-card-photo"
-              style={{ backgroundImage: `url(${resolveImageUrl(current.photos?.find(p => p.isPrimary)?.url || current.photos?.[0]?.url)})` }}
-            />
-            <div className="swipe-card-gradient" />
-            <div className="swipe-card-overlay">
-              <div className="swipe-card-badges">
-                {current.isOnline && (
-                  <span className="swipe-card-badge online">
-                    <span className="swipe-card-badge-dot" />
-                    Đang online
-                  </span>
-                )}
-                {current.isPremium && (
-                  <span className="swipe-card-badge premium">
-                    <StarIcon size={9} />
-                    Premium
-                  </span>
+    <div className="disc-root">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={current.userId}
+          ref={scrollRef}
+          className="disc-scroll"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -16 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+        >
+          {/* Ảnh chính + tên */}
+          <div className="disc-photo disc-photo-hero" style={photos[0] ? { backgroundImage: `url(${photos[0]})` } : undefined}>
+            <div className="disc-photo-gradient" />
+            <div className="disc-hero-info">
+              <div className="disc-hero-name">
+                {current.displayName}{current.age ? `, ${current.age}` : ''}
+                {current.isPhotoVerified && <span className="disc-verified" title="Đã xác minh"><ShieldCheckIcon size={16} /></span>}
+              </div>
+              <div className="disc-hero-meta">
+                {current.location && <span><PinIcon size={12} /> {current.location}</span>}
+                {current.reputationTier && current.reputationTier !== 'Standard' && (
+                  <span className="disc-tier"><StarIcon size={11} /> {current.reputationTier}</span>
                 )}
               </div>
-              <div className="swipe-card-name">
-                {current.displayName}, {current.age ?? ''}
-              </div>
-              <div className="swipe-card-meta">
-                {current.location && (
-                  <span>
-                    <PinIcon size={11} />
-                    {current.location}
-                  </span>
-                )}
-                {current.distanceKm != null && (
-                  <span>{formatDistance(current.distanceKm)}</span>
-                )}
-              </div>
-              {current.bio && <p className="swipe-card-bio">{current.bio}</p>}
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
 
-        <div className="swipe-actions">
-          <motion.button
-            className="swipe-action swipe-action-pass"
-            onClick={() => handleSwipe('Pass')}
-            aria-label="Bỏ qua"
-            whileHover={{ scale: 1.14, y: -3 }}
-            whileTap={{ scale: 0.88 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          >
-            <XIcon size={22} />
-          </motion.button>
+          {/* Giới thiệu */}
+          {current.bio && (
+            <div className="disc-panel">
+              <div className="disc-panel-label">Giới thiệu về {current.displayName}</div>
+              <p className="disc-panel-bio">{current.bio}</p>
+            </div>
+          )}
 
-          <motion.button
-            className="swipe-action swipe-action-super"
-            onClick={() => handleSwipe('SuperLike')}
-            aria-label="Thích siêu cấp"
-            whileHover={{ scale: 1.16, y: -3 }}
-            whileTap={{ scale: 0.88 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          >
-            <StarIcon size={20} />
-          </motion.button>
+          {/* Ảnh 2 */}
+          {photos[1] && <div className="disc-photo" style={{ backgroundImage: `url(${photos[1]})` }} />}
 
-          <motion.button
-            className="swipe-action swipe-action-like"
-            onClick={() => handleSwipe('Like')}
-            aria-label="Thích"
-            whileHover={{ scale: 1.14, y: -3 }}
-            whileTap={{ scale: 0.88 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          >
-            <HeartIcon size={26} />
-          </motion.button>
-        </div>
+          {/* Thông tin cơ bản */}
+          {chips.length > 0 && (
+            <div className="disc-panel">
+              <div className="disc-panel-label">Thông tin cơ bản</div>
+              <div className="disc-chips">
+                {chips.map((c, i) => <span key={i} className="disc-chip">{c}</span>)}
+              </div>
+            </div>
+          )}
+
+          {/* Ảnh 3 */}
+          {photos[2] && <div className="disc-photo" style={{ backgroundImage: `url(${photos[2]})` }} />}
+
+          {/* Vị trí */}
+          {current.location && (
+            <div className="disc-panel">
+              <div className="disc-panel-label">Vị trí của {current.displayName}</div>
+              <div className="disc-panel-big">{current.location}</div>
+              {current.distanceKm != null && (
+                <span className="disc-chip" style={{ marginTop: 10 }}><PinIcon size={11} /> Cách bạn {formatDistance(current.distanceKm)}</span>
+              )}
+            </div>
+          )}
+
+          {/* Các ảnh còn lại */}
+          {photos.slice(3).map((url, i) => (
+            <div key={i} className="disc-photo" style={{ backgroundImage: `url(${url})` }} />
+          ))}
+
+          <div className="disc-scroll-end">Hết hồ sơ · Bạn nghĩ sao?</div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Nút hành động nổi */}
+      <div className="disc-actions">
+        <motion.button className="disc-action disc-action-undo" aria-label="Hoàn tác"
+          onClick={undo} disabled={actionLoading}
+          whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.9 }}>
+          <RefreshIcon size={20} />
+        </motion.button>
+        <motion.button className="disc-action disc-action-pass" aria-label="Bỏ qua"
+          onClick={() => decide('Pass')} disabled={actionLoading}
+          whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.9 }}>
+          <XIcon size={24} />
+        </motion.button>
+        <motion.button className="disc-action disc-action-super" aria-label="Siêu thích"
+          onClick={() => decide('SuperLike')} disabled={actionLoading}
+          whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.9 }}>
+          <StarIcon size={24} />
+        </motion.button>
+        <motion.button className="disc-action disc-action-like" aria-label="Thích"
+          onClick={() => decide('Like')} disabled={actionLoading}
+          whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.9 }}>
+          <HeartIcon size={24} />
+        </motion.button>
       </div>
 
+      {/* Match modal */}
       <AnimatePresence>
         {matchModal && (
-          <motion.div
-            className="modal-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            onClick={() => { setMatchModal(null); setCursor((c) => c + 1) }}
-          >
-            <motion.div
-              className="modal"
-              initial={{ opacity: 0, scale: 0.75, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.85, y: 20 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-              onClick={(e) => e.stopPropagation()}
-            >
+          <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setMatchModal(null)}>
+            <motion.div className="modal" initial={{ opacity: 0, scale: 0.75, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.85, y: 20 }} transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+              onClick={(e) => e.stopPropagation()}>
               <div className="match-success">
-                <motion.div
-                  className="match-success-heart"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 15, delay: 0.1 }}
-                >
+                <motion.div className="match-success-heart" initial={{ scale: 0 }} animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 15, delay: 0.1 }}>
                   <MatchHeartIcon size={64} />
                 </motion.div>
-                <motion.h1
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.25, duration: 0.35 }}
-                >
+                <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
                   It's a Match!
                 </motion.h1>
-                <motion.div
-                  className="match-success-photos"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.35, duration: 0.4, type: 'spring', stiffness: 200, damping: 18 }}
-                >
-                  <div
-                    className="match-success-photo"
-                    style={{ backgroundImage: `url(${resolveImageUrl(user?.photos?.[0]?.url || user?.photos?.find(p => p.isPrimary)?.url)})` }}
-                  />
-                  <div
-                    className="match-success-photo"
-                    style={{ backgroundImage: `url(${resolveImageUrl(matchModal.other.photos?.[0]?.url || matchModal.other.photos?.find(p => p.isPrimary)?.url)})` }}
-                  />
+                <motion.div className="match-success-photos" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 18 }}>
+                  <div className="match-success-photo" style={myPhoto ? { backgroundImage: `url(${resolveImageUrl(myPhoto)})` } : undefined}>
+                    {!myPhoto && <span className="match-success-initial">{(user?.displayName || 'B').charAt(0).toUpperCase()}</span>}
+                  </div>
+                  {(() => {
+                    const otherUrl = orderedPhotos(matchModal.other)[0]
+                    return (
+                      <div className="match-success-photo" style={otherUrl ? { backgroundImage: `url(${otherUrl})` } : undefined}>
+                        {!otherUrl && <span className="match-success-initial">{(matchModal.other.displayName || '?').charAt(0).toUpperCase()}</span>}
+                      </div>
+                    )
+                  })()}
                 </motion.div>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.48 }}
-                  style={{ color: 'var(--color-text-soft)', fontSize: '0.92rem' }}
-                >
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.48 }} style={{ color: 'var(--color-text-soft)', fontSize: '0.92rem' }}>
                   Bạn và <strong>{matchModal.other.displayName}</strong> đã thích nhau.
                 </motion.p>
-                <motion.div
-                  style={{ display: 'flex', gap: 10, justifyContent: 'center', width: '100%', flexWrap: 'wrap' }}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.58 }}
-                >
-                  <button
-                    className="btn btn-ghost"
-                    onClick={() => { setMatchModal(null); setCursor((c) => c + 1) }}
-                  >
-                    Tiếp tục lướt
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => navigate(`/chat?matchId=${matchModal.matchId}`)}
-                  >
-                    <HeartIcon size={14} />
-                    Nhắn tin ngay
+                <motion.div style={{ display: 'flex', gap: 10, justifyContent: 'center', width: '100%', flexWrap: 'wrap' }}
+                  initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.58 }}>
+                  <button className="btn btn-ghost" onClick={() => setMatchModal(null)}>Tiếp tục lướt</button>
+                  <button className="btn btn-primary" onClick={() => openChat(matchModal.matchId)} disabled={opening}>
+                    {opening ? <span className="spinner" /> : <><HeartIcon size={14} /> Nhắn tin ngay</>}
                   </button>
                 </motion.div>
               </div>
@@ -296,13 +278,6 @@ export default function Discovery() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <ProfileDetailModal
-        profile={detailModal}
-        open={!!detailModal}
-        onClose={() => setDetailModal(null)}
-        onSwipe={handleDetailSwipe}
-      />
     </div>
   )
 }

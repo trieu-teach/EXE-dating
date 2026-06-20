@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { HeartIcon, MessageIcon, TreeIcon, SparkleIcon, CalendarIcon, SearchIcon, CrownIcon, ShieldIcon, UserIcon, SettingsIcon } from '../../ui/CustomIcons.jsx'
+import { HeartIcon, MessageIcon, TreeIcon, SparkleIcon, CalendarIcon, CrownIcon, UserIcon, SettingsIcon } from '../../ui/CustomIcons.jsx'
 
 const SIDE_LINKS = [
   { to: '/discovery', label: 'Khám phá', Icon: HeartIcon },
@@ -8,9 +8,7 @@ const SIDE_LINKS = [
   { to: '/love-tree', label: 'Cây tình yêu', Icon: TreeIcon },
   { to: '/daily-connection', label: 'Hằng ngày', Icon: SparkleIcon },
   { to: '/events', label: 'Sự kiện', Icon: CalendarIcon },
-  { to: '/search', label: 'Tìm kiếm', Icon: SearchIcon },
   { to: '/premium', label: 'Premium', Icon: CrownIcon },
-  { to: '/safety', label: 'An toàn', Icon: ShieldIcon },
   { to: '/profile', label: 'Hồ sơ', Icon: UserIcon },
   { to: '/settings', label: 'Cài đặt', Icon: SettingsIcon },
 ]

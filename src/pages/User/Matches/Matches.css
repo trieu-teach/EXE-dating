@@ -79,6 +79,25 @@
   margin-top: 20px;
 }
 
+.matches-likedme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 16px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 4px 14px rgba(255, 79, 139, 0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.matches-likedme-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 79, 139, 0.4); }
+
 .matches-hero-stat {
   display: flex;
   flex-direction: column;
@@ -101,6 +120,61 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-text-muted);
+}
+
+/* ── Tabs ──────────────────────────────────────────────────── */
+.mt-tabs {
+  display: flex;
+  gap: 8px;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 16px 16px 0;
+}
+.mt-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-soft);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.mt-tab:hover { border-color: var(--color-primary); }
+.mt-tab.is-active {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 6px 18px rgba(255, 79, 139, 0.3);
+}
+.mt-tab-count {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.74rem;
+  font-weight: 800;
+  background: var(--color-surface-2);
+  color: var(--color-primary);
+}
+.mt-tab.is-active .mt-tab-count { background: rgba(255,255,255,0.25); color: #fff; }
+
+.mt-body { max-width: 880px; margin: 0 auto; padding: 18px 16px 56px; }
+.mt-body .matches-list {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 /* ── Body ──────────────────────────────────────────────────── */
@@ -190,6 +264,20 @@
 
 .match-card:hover .match-avatar {
   box-shadow: 0 0 0 2px var(--color-primary), 0 4px 16px rgba(255, 79, 139, 0.25);
+}
+
+/* Chữ cái thay ảnh khi đối phương chưa có avatar */
+.match-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #ff4f8b, #c9184a);
+  border-radius: 50%;
 }
 
 .match-online {

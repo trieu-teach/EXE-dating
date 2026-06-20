@@ -1,18 +1,18 @@
 /**
- * MeetupSection — integrated into LoveTree when tree level >= 4.
+ * MeetupSection — tab "Hẹn hò" trong LoveTree (mở khi cây Level >= 4).
  *
- * §0  Lock state: shown when level < 4.
- * §1  Venue discovery: GET /api/meetup/nearby/{matchId} — multi-select, category filter.
- * §2  Share venue to chat: POST /api/conversations/{conversationId}/venue.
- * §3  Propose meetup: POST /api/connection/meetup/{conversationId}/propose.
- * §4  Meetup status: GET /api/connection/meetups/{conversationId} — accept/decline/counter.
+ * Flow tạo cuộc hẹn:
+ *   1. Danh sách lịch hẹn + nút "Tạo cuộc hẹn"
+ *   2. Bấm nút → chọn quán (lọc theo loại / bán kính)
+ *   3. Chọn quán → nhập ngày giờ + lời nhắn → Gửi đề xuất
+ *   4. Đối phương: Đồng ý / Từ chối / Đổi giờ (gửi đề xuất ngược)
  *
- * Props:
- *   matchId        — the match UUID
- *   conversationId — the conversation UUID (for sharing + proposing)
- *   plant          — PlantDto from usePlant (to check level)
- *   onProposeVenue — fn(venue) called when user clicks "Đề xuất hẹn ở đây"
- *                   from the venue detail modal (sits inside Chat context)
+ * Backend:
+ *   GET  /api/meetup/nearby/{matchId}                 — danh sách quán
+ *   POST /api/connection/meetup/{conversationId}/propose
+ *   GET  /api/connection/meetups/{conversationId}
+ *   POST /api/connection/meetup/{meetupId}/respond    — { action: accept|decline }
+ *   (Gửi đề xuất mới sẽ TỰ thay thế đề xuất đang chờ — "đổi giờ" = đề xuất lại.)
  */
 import { useCallback, useEffect, useState } from 'react'
 import { venuesService, meetupService } from '../../../api'
@@ -29,27 +29,46 @@ const CATEGORY_OPTIONS = [
   { value: 'bar', label: '🍸 Bar' },
   { value: 'dessert', label: '🍰 Tráng miệng' },
 ]
-
 const PRICE_LABELS = { 1: 'Rẻ', 2: 'Bình thường', 3: 'Hơi mắc', 4: 'Sang trọng' }
-const CATEGORY_ICONS = {
-  cafe: '☕', restaurant: '🍽️', cinema: '🎬', park: '🌳', bar: '🍸', dessert: '🍰',
+const CATEGORY_ICONS = { cafe: '☕', restaurant: '🍽️', cinema: '🎬', park: '🌳', bar: '🍸', dessert: '🍰' }
+
+// Mặc định: 3 ngày sau, làm tròn giờ
+function defaultDateTime() {
+  const d = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+  d.setMinutes(0, 0, 0)
+  return toLocalInput(d)
 }
+function toLocalInput(d) {
+  const off = d.getTimezoneOffset()
+  return new Date(d.getTime() - off * 60000).toISOString().slice(0, 16)
+}
+const MIN_DATETIME = toLocalInput(new Date(Date.now() + 60 * 60 * 1000)) // tối thiểu +1h
 
-export default function MeetupSection({ matchId, conversationId, plant, onProposeVenue }) {
+export default function MeetupSection({ matchId, conversationId, plant }) {
   const toast = useToast()
-
-  // ── §0: Lock guard ────────────────────────────────────────────────────────
   const isUnlocked = Number(plant?.level ?? 0) >= 4
 
-  // ── §1: Venues ──────────────────────────────────────────────────────────
+  // step: 'list' | 'pickVenue' | 'form'
+  const [step, setStep] = useState('list')
+
+  // ── Venues ──
   const [venues, setVenues] = useState([])
   const [loadingVenues, setLoadingVenues] = useState(false)
   const [category, setCategory] = useState('')
   const [radiusKm, setRadiusKm] = useState(10)
-  const [selected, setSelected] = useState(new Set())
-  const [sharing, setSharing] = useState(false)
   const [detailVenue, setDetailVenue] = useState(null)
   const [detailOpen, setDetailOpen] = useState(false)
+
+  // ── Propose form ──
+  const [chosenVenue, setChosenVenue] = useState(null)
+  const [proposedAt, setProposedAt] = useState(defaultDateTime)
+  const [note, setNote] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  // ── Meetups ──
+  const [meetups, setMeetups] = useState([])
+  const [loadingMeetups, setLoadingMeetups] = useState(false)
+  const [responding, setResponding] = useState(null)
 
   const loadVenues = useCallback(() => {
     if (!matchId) return
@@ -58,100 +77,60 @@ export default function MeetupSection({ matchId, conversationId, plant, onPropos
     setVenues([])
     venuesService.nearby(matchId, { category, radiusKm })
       .then((list) => { if (!cancelled) setVenues(Array.isArray(list) ? list : (list?.items ?? [])) })
-      .catch(() => { /* 403 — handled by §0 guard */ })
+      .catch(() => { /* 403 — guard ở §lock */ })
       .finally(() => { if (!cancelled) setLoadingVenues(false) })
     return () => { cancelled = true }
-     
   }, [matchId, category, radiusKm])
-
-  useEffect(() => {
-    if (!isUnlocked) return
-    return loadVenues()
-  }, [isUnlocked, loadVenues])
-
-  const toggleVenue = (id) => {
-    setSelected((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
-  }
-
-  const handleShareSelected = async () => {
-    if (!conversationId || selected.size === 0) return
-    setSharing(true)
-    let shared = 0
-    try {
-      for (const venueId of selected) {
-        await meetupService.shareVenue(conversationId, venueId)
-        shared++
-      }
-      toast.success(`Đã chia sẻ ${shared} quán vào trò chuyện! 💕`)
-      setSelected(new Set())
-    } catch {
-      toast.error('Chia sẻ thất bại. Thử lại.')
-    } finally {
-      setSharing(false)
-    }
-  }
-
-  const openVenueDetail = (venue) => {
-    setDetailVenue(venue)
-    setDetailOpen(true)
-  }
-
-  const handleProposeFromDetail = (venue) => {
-    // Delegate to parent (Chat) which has the propose form open
-    onProposeVenue?.(venue)
-  }
-
-  // ── §3+§4: Propose form + meetup status ─────────────────────────────────
-  const [meetups, setMeetups] = useState([])
-  const [loadingMeetups, setLoadingMeetups] = useState(false)
-  const [showProposeForm, setShowProposeForm] = useState(false)
-  const [proposeVenue, setProposeVenue] = useState(null)
-  const [proposedAt, setProposedAt] = useState(() => {
-    const d = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-    d.setMinutes(0, 0, 0)
-    return d.toISOString().slice(0, 16)
-  })
-  const [proposeNote, setProposeNote] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [responding, setResponding] = useState(null) // meetupId being responded to
 
   const loadMeetups = useCallback(() => {
     if (!conversationId) return
     let cancelled = false
     setLoadingMeetups(true)
     meetupService.list(conversationId)
-      .then((list) => {
-        if (!cancelled) setMeetups(Array.isArray(list) ? list : (list?.items ?? []))
-      })
-      .catch(() => { /* ignore — meetup not yet unlocked */ })
+      .then((list) => { if (!cancelled) setMeetups(Array.isArray(list) ? list : (list?.items ?? [])) })
+      .catch(() => { /* ignore */ })
       .finally(() => { if (!cancelled) setLoadingMeetups(false) })
     return () => { cancelled = true }
   }, [conversationId])
 
-  useEffect(() => {
-    if (!isUnlocked) return
-    return loadMeetups()
-  }, [isUnlocked, loadMeetups])
+  useEffect(() => { if (isUnlocked) return loadMeetups() }, [isUnlocked, loadMeetups])
+  // Tải quán khi bước vào màn chọn quán
+  useEffect(() => { if (step === 'pickVenue') return loadVenues() }, [step, loadVenues])
+
+  const goCreate = () => {
+    setChosenVenue(null)
+    setStep('pickVenue')
+  }
+
+  const pickVenue = (v) => {
+    setChosenVenue(v)
+    setProposedAt(defaultDateTime())
+    setNote('')
+    setStep('form')
+  }
+
+  const resetToList = () => {
+    setStep('list')
+    setChosenVenue(null)
+    setNote('')
+  }
 
   const handlePropose = async (e) => {
     e?.preventDefault()
-    if (!conversationId || !proposeVenue) return
+    if (!conversationId || !chosenVenue) return
+    if (new Date(proposedAt).getTime() <= Date.now()) {
+      toast.warn('Vui lòng chọn thời gian trong tương lai.')
+      return
+    }
     setSubmitting(true)
     try {
-      const proposedIso = new Date(proposedAt).toISOString()
       await meetupService.propose(conversationId, {
-        venueId: proposeVenue.id || proposeVenue.venueId,
-        proposedAt: proposedIso,
-        note: proposeNote || undefined,
+        venueId: chosenVenue.id || chosenVenue.venueId,
+        proposedAt: new Date(proposedAt).toISOString(),
+        note: note.trim() || undefined,
       })
-      toast.success('Đã gửi đề xuất hẹn! 💕')
-      setShowProposeForm(false)
-      setProposeVenue(null)
-      setProposeNote('')
+      toast.success('Đã gửi lời mời hẹn! 💕')
+      resetToList()
       loadMeetups()
     } catch (err) {
       toast.error(err?.message || 'Gửi đề xuất thất bại.')
@@ -173,111 +152,73 @@ export default function MeetupSection({ matchId, conversationId, plant, onPropos
     }
   }
 
-  // Active incoming proposal (mine=false, status=Proposed)
-  const incomingProposal = meetups.find(
-    (m) => m.status === 'Proposed' && !m.isMine,
-  )
-  // Any accepted meetup
-  const acceptedMeetup = meetups.find((m) => m.status === 'Accepted')
+  // "Đổi giờ/quán" → mở form với quán của đề xuất đến, người dùng đặt giờ mới rồi gửi (đề xuất ngược)
+  const startCounter = (incoming) => {
+    setChosenVenue({ id: incoming.venueId, name: incoming.venueName })
+    setProposedAt(defaultDateTime())
+    setNote('')
+    setStep('form')
+  }
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  const incomingProposal = meetups.find((m) => m.status === 'Proposed' && !m.isMine)
+  const myPending = meetups.find((m) => m.status === 'Proposed' && m.isMine)
+  const acceptedMeetups = meetups
+    .filter((m) => m.status === 'Accepted')
+    .sort((a, b) => new Date(a.proposedAt) - new Date(b.proposedAt))
+
+  // ── Lock ──
   if (!isUnlocked) {
     return (
       <div className="meetup-locked">
-        <div className="meetup-locked-icon">🌳</div>
-        <p>Chăm cây đạt <strong>Level 4</strong> để mở khóa hẹn hò</p>
-        <p className="meetup-locked-hint">Cây hiện đang ở Level {plant?.level ?? 1} — hãy tưới cây thường xuyên nhé!</p>
+        <div className="meetup-locked-icon" style={{ fontSize: 48 }}>🌳</div>
+        <h3>Mở khóa hẹn hò ở Level 4</h3>
+        <p>Chăm cây tình yêu đạt <strong>Level 4</strong> để cùng nhau lên kế hoạch gặp gỡ.</p>
+        <p className="meetup-locked-sub">Cây hiện ở Level {plant?.level ?? 1} — tưới cây mỗi ngày nhé!</p>
       </div>
     )
   }
 
-  return (
-    <div className="meetup-section">
-      {/* ── §2 Share selected venues ───────────────────────────────────── */}
-      {selected.size > 0 && (
-        <div className="meetup-share-bar">
-          <span>Đã chọn {selected.size} quán</span>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            disabled={sharing || !conversationId}
-            onClick={handleShareSelected}
-          >
-            {sharing ? <span className="spinner" /> : '💬 Chia sẻ vào trò chuyện'}
-          </button>
+  // ── Step 2: chọn quán ──
+  if (step === 'pickVenue') {
+    return (
+      <div className="meetup-section">
+        <div className="meetup-step-head">
+          <button type="button" className="meetup-back" onClick={resetToList}>← Quay lại</button>
+          <span className="meetup-step-title">Chọn quán hẹn</span>
         </div>
-      )}
 
-      {/* ── §1 Venue discovery ─────────────────────────────────────── */}
-      <div className="meetup-venues">
-        <div className="meetup-venues-toolbar">
-          <div className="meetup-filter-row">
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="meetup-select"
-            >
-              {CATEGORY_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-            <select
-              value={radiusKm}
-              onChange={(e) => setRadiusKm(Number(e.target.value))}
-              className="meetup-select"
-            >
-              <option value={5}>5 km</option>
-              <option value={10}>10 km</option>
-              <option value={20}>20 km</option>
-              <option value={30}>30 km</option>
-            </select>
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={loadVenues}
-              disabled={loadingVenues}
-            >
-              🔄
-            </button>
-          </div>
+        <div className="meetup-filter-row">
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="meetup-select">
+            {CATEGORY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+          <select value={radiusKm} onChange={(e) => setRadiusKm(Number(e.target.value))} className="meetup-select">
+            <option value={5}>5 km</option>
+            <option value={10}>10 km</option>
+            <option value={20}>20 km</option>
+            <option value={30}>30 km</option>
+          </select>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={loadVenues} disabled={loadingVenues}>🔄</button>
         </div>
 
         {loadingVenues ? (
-          <div className="loading-block" style={{ padding: 16 }}>
-            <span className="spinner" />
-          </div>
+          <div className="loading-block" style={{ padding: 16 }}><span className="spinner" /></div>
         ) : venues.length === 0 ? (
-          <p className="empty" style={{ padding: 16 }}>
-            Không tìm thấy quán nào gần đó.
-          </p>
+          <p className="empty" style={{ padding: 16 }}>Không tìm thấy quán nào gần đây. Thử mở rộng bán kính.</p>
         ) : (
           <div className="meetup-venues-grid">
             {venues.map((v) => {
               const img = resolveImageUrl(v.imageUrl)
-              const isSel = selected.has(v.id)
               return (
-                <div
-                  key={v.id}
-                  className={`meetup-venue-card${isSel ? ' is-selected' : ''}`}
-                  onClick={() => toggleVenue(v.id)}
-                  role="checkbox"
-                  aria-checked={isSel}
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === ' ' && toggleVenue(v.id)}
-                >
+                <div key={v.id} className="meetup-venue-card" onClick={() => pickVenue(v)}
+                  role="button" tabIndex={0}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && pickVenue(v)}>
                   {img ? (
-                    <div
-                      className="meetup-venue-img"
-                      style={{ backgroundImage: `url(${img})` }}
-                    />
+                    <div className="meetup-venue-img" style={{ backgroundImage: `url(${img})` }} />
                   ) : (
-                    <div className="meetup-venue-img meetup-venue-img-placeholder">
-                      {CATEGORY_ICONS[v.category] ?? '📍'}
-                    </div>
+                    <div className="meetup-venue-img meetup-venue-img-placeholder">{CATEGORY_ICONS[v.category] ?? '📍'}</div>
                   )}
-                  {isSel && (
-                    <div className="meetup-venue-check">✓</div>
-                  )}
+                  <button type="button" className="meetup-venue-detail-btn"
+                    onClick={(e) => { e.stopPropagation(); setDetailVenue(v); setDetailOpen(true) }} title="Xem chi tiết">ℹ️</button>
                   <div className="meetup-venue-info">
                     <div className="meetup-venue-name">{v.name}</div>
                     <div className="meetup-venue-meta">
@@ -285,29 +226,57 @@ export default function MeetupSection({ matchId, conversationId, plant, onPropos
                       {v.priceRange ? ` · ${PRICE_LABELS[v.priceRange] ?? ''}` : ''}
                       {v.distanceKm != null ? ` · ${formatDistance(v.distanceKm)}` : ''}
                     </div>
-                    {v.address && (
-                      <div className="meetup-venue-address">{v.address}</div>
-                    )}
+                    {v.address && <div className="meetup-venue-address">{v.address}</div>}
                   </div>
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm meetup-venue-detail-btn"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      openVenueDetail(v)
-                    }}
-                    title="Xem chi tiết"
-                  >
-                    ℹ️
-                  </button>
                 </div>
               )
             })}
           </div>
         )}
-      </div>
 
-      {/* ── §3+§4 Meetup proposals ─────────────────────────────────── */}
+        <VenueDetailModal venue={detailVenue} open={detailOpen}
+          onClose={() => setDetailOpen(false)}
+          onPropose={(v) => { setDetailOpen(false); pickVenue(v) }} />
+      </div>
+    )
+  }
+
+  // ── Step 3: nhập ngày giờ + gửi ──
+  if (step === 'form' && chosenVenue) {
+    return (
+      <div className="meetup-section">
+        <div className="meetup-step-head">
+          <button type="button" className="meetup-back" onClick={() => setStep('pickVenue')}>← Đổi quán</button>
+          <span className="meetup-step-title">Chi tiết cuộc hẹn</span>
+        </div>
+
+        <form className="meetup-propose-form" onSubmit={handlePropose}>
+          <div className="meetup-propose-venue">📍 <strong>{chosenVenue.name || `Quán #${chosenVenue.id}`}</strong></div>
+          <div className="field">
+            <label className="field-label">Thời gian</label>
+            <input type="datetime-local" className="meetup-datetime" value={proposedAt}
+              min={MIN_DATETIME} onChange={(e) => setProposedAt(e.target.value)} required />
+          </div>
+          <div className="field">
+            <label className="field-label">Lời nhắn (tuỳ chọn)</label>
+            <textarea rows={2} className="meetup-textarea" value={note}
+              onChange={(e) => setNote(e.target.value)} maxLength={300}
+              placeholder="Mình rủ bạn đi cà phê chiều cuối tuần nhé ☕" />
+          </div>
+          <div className="meetup-propose-actions">
+            <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>
+              {submitting ? <span className="spinner" /> : '💕 Gửi lời mời'}
+            </button>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={resetToList}>Hủy</button>
+          </div>
+        </form>
+      </div>
+    )
+  }
+
+  // ── Step 1: danh sách lịch hẹn + nút tạo ──
+  return (
+    <div className="meetup-section">
       <div className="meetup-proposals">
         <h3 className="meetup-section-title">📅 Lịch hẹn</h3>
 
@@ -315,185 +284,71 @@ export default function MeetupSection({ matchId, conversationId, plant, onPropos
           <div style={{ padding: 12 }}><span className="spinner" /></div>
         ) : (
           <>
-            {/* Accepted — always shown */}
-            {acceptedMeetup && (
-              <div className="meetup-card meetup-card-accepted">
+            {acceptedMeetups.map((mu) => (
+              <div key={mu.id} className="meetup-card meetup-card-accepted">
                 <div className="meetup-card-icon">✅</div>
                 <div className="meetup-card-body">
-                  <div className="meetup-card-title">
-                    Buổi hẹn đã chốt
-                  </div>
-                  <div className="meetup-card-venue">
-                    {acceptedMeetup.venueName || `Quán #${acceptedMeetup.venueId}`}
-                  </div>
-                  <div className="meetup-card-time">
-                    ⏰ {formatMeetupTime(acceptedMeetup.proposedAt)}
-                  </div>
-                  {acceptedMeetup.note && (
-                    <p className="meetup-card-note">{acceptedMeetup.note}</p>
-                  )}
+                  <div className="meetup-card-title">Buổi hẹn đã chốt</div>
+                  <div className="meetup-card-venue">{mu.venueName || `Quán #${mu.venueId}`}</div>
+                  <div className="meetup-card-time">⏰ {formatMeetupTime(mu.proposedAt)}</div>
+                  {mu.note && <p className="meetup-card-note">{mu.note}</p>}
                 </div>
               </div>
-            )}
+            ))}
 
-            {/* Incoming proposal — I am the RECEIVER */}
             {incomingProposal && (
               <div className="meetup-card meetup-card-incoming">
                 <div className="meetup-card-icon">💌</div>
                 <div className="meetup-card-body">
-                  <div className="meetup-card-title">
-                    {incomingProposal.venueName || `Quán #${incomingProposal.venueId}`}
-                  </div>
-                  <div className="meetup-card-time">
-                    ⏰ {formatMeetupTime(incomingProposal.proposedAt)}
-                  </div>
-                  {incomingProposal.note && (
-                    <p className="meetup-card-note">{incomingProposal.note}</p>
-                  )}
+                  <div className="meetup-card-title">{incomingProposal.venueName || `Quán #${incomingProposal.venueId}`}</div>
+                  <div className="meetup-card-time">⏰ {formatMeetupTime(incomingProposal.proposedAt)}</div>
+                  {incomingProposal.note && <p className="meetup-card-note">{incomingProposal.note}</p>}
                   <div className="meetup-card-actions">
-                    <button
-                      type="button"
-                      className="btn btn-primary btn-sm"
+                    <button type="button" className="btn btn-primary btn-sm"
                       disabled={responding === incomingProposal.id}
-                      onClick={() => handleRespond(incomingProposal.id, 'accept')}
-                    >
+                      onClick={() => handleRespond(incomingProposal.id, 'accept')}>
                       {responding === incomingProposal.id ? <span className="spinner" /> : '💕 Đồng ý'}
                     </button>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
+                    <button type="button" className="btn btn-ghost btn-sm"
                       disabled={responding === incomingProposal.id}
-                      onClick={() => handleRespond(incomingProposal.id, 'decline')}
-                    >
-                      Không
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => {
-                        setProposeVenue({ id: incomingProposal.venueId, name: incomingProposal.venueName })
-                        setShowProposeForm(true)
-                      }}
-                    >
-                      🔄 Đổi giờ/quán
-                    </button>
+                      onClick={() => handleRespond(incomingProposal.id, 'decline')}>Từ chối</button>
+                    <button type="button" className="btn btn-ghost btn-sm"
+                      onClick={() => startCounter(incomingProposal)}>🔄 Đổi giờ/quán</button>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* My outgoing proposal — waiting for partner */}
-            {meetups.some((m) => m.isMine && m.status === 'Proposed') && !incomingProposal && (
+            {myPending && !incomingProposal && (
               <div className="meetup-card meetup-card-pending">
                 <div className="meetup-card-icon">⏳</div>
                 <div className="meetup-card-body">
                   <div className="meetup-card-title">Đang chờ đối phương phản hồi…</div>
-                  {meetups
-                    .filter((m) => m.isMine && m.status === 'Proposed')
-                    .map((m) => (
-                      <div key={m.id} className="meetup-card-venue">
-                        {m.venueName || `Quán #${m.venueId}`} · {formatMeetupTime(m.proposedAt)}
-                      </div>
-                    ))}
+                  <div className="meetup-card-venue">
+                    {(myPending.venueName || `Quán #${myPending.venueId}`)} · {formatMeetupTime(myPending.proposedAt)}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* §3: Propose form */}
-            {showProposeForm && (
-              <form className="meetup-propose-form" onSubmit={handlePropose}>
-                <div className="meetup-propose-venue">
-                  📍 <strong>{proposeVenue?.name || `Quán #${proposeVenue?.id || proposeVenue?.venueId}`}</strong>
-                </div>
-                <div className="field">
-                  <label className="field-label">Thời gian</label>
-                  <input
-                    type="datetime-local"
-                    value={proposedAt}
-                    onChange={(e) => setProposedAt(e.target.value)}
-                    required
-                    className="meetup-datetime"
-                  />
-                </div>
-                <div className="field">
-                  <label className="field-label">Lời nhắn (tuỳ chọn)</label>
-                  <textarea
-                    rows={2}
-                    value={proposeNote}
-                    onChange={(e) => setProposeNote(e.target.value)}
-                    placeholder="Mình rủ bạn đi uống cà phê nhé ☕"
-                    maxLength={300}
-                    className="meetup-textarea"
-                  />
-                </div>
-                <div className="meetup-propose-actions">
-                  <button
-                    type="submit"
-                    className="btn btn-primary btn-sm"
-                    disabled={submitting}
-                  >
-                    {submitting ? <span className="spinner" /> : '💕 Gửi đề xuất'}
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => {
-                      setShowProposeForm(false)
-                      setProposeVenue(null)
-                    }}
-                  >
-                    Hủy
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* Default state — no proposals, offer to create one */}
-            {!showProposeForm && !acceptedMeetup && !incomingProposal && !meetups.some((m) => m.isMine && m.status === 'Proposed') && (
+            {acceptedMeetups.length === 0 && !incomingProposal && !myPending && (
               <div className="meetup-empty">
-                <p>Chưa có lời mời hẹn nào.</p>
-                <p style={{ fontSize: 13, color: 'var(--color-text-soft)' }}>
-                  Chọn một quán ở trên rồi nhấn nút bên dưới để đề xuất!
-                </p>
-                {!proposeVenue && venues.length > 0 && (
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    style={{ marginTop: 8 }}
-                    onClick={() => {
-                      // Auto-select the first venue for proposing
-                      if (venues[0]) {
-                        setProposeVenue(venues[0])
-                        setShowProposeForm(true)
-                      }
-                    }}
-                  >
-                    💕 Đề xuất hẹn
-                  </button>
-                )}
-                {proposeVenue && (
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    style={{ marginTop: 8 }}
-                    onClick={() => setShowProposeForm(true)}
-                  >
-                    💕 Đề xuất hẹn
-                  </button>
-                )}
+                <p>Chưa có cuộc hẹn nào.</p>
+                <p className="meetup-empty-hint">Tạo lời mời để rủ {plant?.partnerName || 'người ấy'} đi chơi nhé!</p>
               </div>
             )}
           </>
         )}
-      </div>
 
-      {/* Venue detail modal */}
-      <VenueDetailModal
-        venue={detailVenue}
-        open={detailOpen}
-        onClose={() => setDetailOpen(false)}
-        onPropose={(v) => handleProposeFromDetail(v)}
-      />
+        {/* Nút tạo cuộc hẹn — luôn hiển thị (gửi mới sẽ thay đề xuất đang chờ) */}
+        <button type="button" className="btn btn-primary meetup-cta"
+          onClick={goCreate} disabled={!conversationId}>
+          ➕ {acceptedMeetups.length > 0 ? 'Đặt lịch hẹn khác' : (myPending || incomingProposal ? 'Đề xuất khác' : 'Tạo cuộc hẹn')}
+        </button>
+        {!conversationId && (
+          <p className="meetup-empty-hint" style={{ textAlign: 'center' }}>Đang chuẩn bị hội thoại…</p>
+        )}
+      </div>
     </div>
   )
 }
@@ -502,14 +357,8 @@ function formatMeetupTime(iso) {
   if (!iso) return '—'
   try {
     return new Date(iso).toLocaleString('vi-VN', {
-      weekday: 'short',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
     })
-  } catch {
-    return iso
-  }
+  } catch { return iso }
 }

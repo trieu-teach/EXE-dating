@@ -556,6 +556,76 @@
   background-position: center;
   border: 2px solid var(--color-border);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.love-tree-match-initial {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Các cấp độ cây ─────────────────────────────────────────── */
+.love-tree-levels {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+.love-tree-levels-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 12px;
+}
+.love-tree-levels-list { display: flex; flex-direction: column; gap: 8px; }
+.love-tree-level-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  opacity: 0.55;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.love-tree-level-row.is-reached { opacity: 1; }
+.love-tree-level-row.is-current { border-color: var(--color-primary); box-shadow: 0 0 0 2px var(--color-primary-soft); }
+.love-tree-level-row.is-unlock { background: rgba(255, 79, 139, 0.05); }
+.love-tree-level-img {
+  width: 40px; height: 40px; object-fit: contain; flex-shrink: 0;
+}
+.love-tree-level-info { flex: 1; min-width: 0; }
+.love-tree-level-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.love-tree-level-lv {
+  font-size: 0.72rem; font-weight: 800; color: #fff;
+  background: var(--color-text-soft); padding: 2px 8px; border-radius: 999px;
+}
+.love-tree-level-row.is-reached .love-tree-level-lv { background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); }
+.love-tree-level-name { font-size: 0.9rem; font-weight: 800; color: var(--color-text); }
+.love-tree-level-tag {
+  font-size: 0.68rem; font-weight: 800; color: #c9184a;
+  background: rgba(255,79,139,0.14); padding: 2px 8px; border-radius: 999px;
+}
+.love-tree-level-now {
+  font-size: 0.68rem; font-weight: 800; color: #fff;
+  background: var(--color-primary); padding: 2px 8px; border-radius: 999px;
+}
+.love-tree-level-desc { font-size: 0.78rem; color: var(--color-text-soft); margin-top: 2px; line-height: 1.4; }
+.love-tree-level-check { color: #16a34a; font-weight: 900; font-size: 1.1rem; flex-shrink: 0; }
+.love-tree-levels-note {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: var(--color-text-soft);
+  line-height: 1.6;
+  background: var(--color-surface-2);
+  padding: 12px 14px;
+  border-radius: 12px;
 }
 .love-tree-match-item.is-active .avatar {
   border-color: var(--color-primary);

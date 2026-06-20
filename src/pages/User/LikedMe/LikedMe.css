@@ -1,0 +1,105 @@
+/* ── Ai đã thích tôi ─────────────────────────────────────────── */
+.liked-root { max-width: 880px; margin: 0 auto; padding: 0 16px 56px; }
+
+.liked-hero { padding: 28px 4px 20px; text-align: left; }
+.liked-hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--color-primary);
+}
+.liked-hero h1 { font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 900; letter-spacing: -0.03em; margin: 6px 0 6px; color: var(--color-text); }
+.liked-hero-sub { font-size: 0.9rem; color: var(--color-text-soft); margin: 0; }
+
+/* Gold banner */
+.liked-gold-banner {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+  padding: 14px 18px; margin-bottom: 18px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(245,166,35,0.16), rgba(255,79,139,0.12));
+  border: 1.5px solid rgba(245,166,35,0.4);
+  color: var(--color-text); cursor: pointer; font-family: inherit;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.liked-gold-banner:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(245,166,35,0.2); }
+.liked-gold-banner > svg { color: #f5a623; flex-shrink: 0; }
+.liked-gold-banner strong { display: block; font-size: 0.92rem; }
+.liked-gold-banner span { font-size: 0.8rem; color: var(--color-text-soft); }
+
+/* Grid */
+.liked-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.liked-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.liked-card-photo {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  background-color: var(--color-surface-2);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.liked-card-photo.is-clickable { cursor: pointer; }
+.liked-card-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  transition: transform 0.25s;
+}
+.liked-card-photo.is-clickable:hover .liked-card-bg { transform: scale(1.05); }
+.liked-card-bg.is-locked { filter: blur(16px); transform: scale(1.12); }
+.liked-card-initial { position: relative; z-index: 1; font-size: 2.4rem; font-weight: 800; color: #fff; }
+.liked-card-grad {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent 50%);
+}
+.liked-card-name {
+  position: absolute; left: 12px; right: 12px; bottom: 10px; z-index: 2;
+  font-size: 1rem; font-weight: 800; color: #fff;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.liked-card-super {
+  position: absolute; top: 8px; left: 8px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 9px; border-radius: 999px;
+  background: linear-gradient(135deg, #4aa3ff, #2563eb); color: #fff;
+  font-size: 0.66rem; font-weight: 800;
+}
+.liked-card-lock {
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  border: none; cursor: pointer; font-family: inherit;
+  background: rgba(0,0,0,0.28);
+  color: #fff; font-size: 0.82rem; font-weight: 800;
+}
+.liked-card-lock svg { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); color: #ffd76f; }
+
+.liked-card-actions { display: flex; }
+.liked-act {
+  flex: 1; padding: 12px; border: none; cursor: pointer;
+  display: grid; place-items: center; font-size: 1.1rem; font-weight: 800;
+  background: var(--color-surface); transition: background 0.15s;
+}
+.liked-act:disabled { opacity: 0.5; cursor: default; }
+.liked-act-pass { color: var(--color-text-muted); border-right: 1px solid var(--color-border); }
+.liked-act-pass:hover { background: var(--color-surface-2); }
+.liked-act-like { color: #fff; background: linear-gradient(135deg, var(--color-primary), #ff2d6b); }
+.liked-act-like:hover { filter: brightness(1.05); }
+
+/* Empty */
+.liked-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  text-align: center; padding: 60px 24px; color: var(--color-text-muted);
+}
+.liked-empty-icon { color: var(--color-primary); opacity: 0.5; }
+.liked-empty p { max-width: 300px; line-height: 1.6; margin: 0; }
+
+[data-theme='dark'] .liked-act { background: var(--color-surface, #1c1c1e); }

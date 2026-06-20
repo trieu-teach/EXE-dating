@@ -1,30 +1,26 @@
-import { useCallback, useEffect, useState } from 'react'
-import { dailyService, gamificationService, connectionRemindersService } from '../../../api'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { gamificationService, connectionRemindersService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
+import { MATERIALS, MATERIAL_META, TASK_TYPE_META, TASK_TYPE_ORDER } from '../../../constants/gamification.js'
+import { SparkleIcon, HeartIcon } from '../../../components/ui/CustomIcons.jsx'
+import { motion } from 'framer-motion'
+import './DailyConnection.css'
 
 export default function DailyConnection() {
   const toast = useToast()
-  const [quests, setQuests] = useState([])
-  const [totalXp, setTotalXp] = useState(0)
-  const [userXp, setUserXp] = useState(0)
   const [tasks, setTasks] = useState([])
   const [inventory, setInventory] = useState([])
   const [reminders, setReminders] = useState([])
   const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [d, t, inv, r] = await Promise.all([
-        dailyService.get(),
+      const [t, inv, r] = await Promise.all([
         gamificationService.tasks().catch(() => null),
         gamificationService.inventory().catch(() => null),
         connectionRemindersService.reminders().catch(() => null),
       ])
-      setQuests(Array.isArray(d?.quests) ? d.quests : [])
-      setTotalXp(d?.totalXp ?? 0)
-      setUserXp(d?.userXp ?? 0)
       setTasks(Array.isArray(t?.tasks) ? t.tasks : (Array.isArray(t) ? t : []))
       setInventory(Array.isArray(inv?.items) ? inv.items : (Array.isArray(inv) ? inv : []))
       setReminders(Array.isArray(r?.items) ? r.items : (Array.isArray(r) ? r : []))
@@ -37,123 +33,131 @@ export default function DailyConnection() {
 
   useEffect(() => { load() }, [load])
 
-  const handleComplete = async (questIds) => {
-    setSubmitting(true)
-    try {
-      await dailyService.complete(questIds)
-      toast.success('Đã nhận XP!')
-      await load()
-    } catch (err) {
-      toast.error(err?.message || 'Không nhận được XP.')
-    } finally {
-      setSubmitting(false)
+  // Kho nguyên liệu (luôn hiện đủ 3 loại)
+  const invByMaterial = useMemo(() => {
+    const map = {}
+    for (const it of inventory) map[it.material ?? it.name] = it.quantity ?? 0
+    return map
+  }, [inventory])
+
+  // Nhóm nhiệm vụ theo loại Daily/Weekly/Achievement
+  const tasksByType = useMemo(() => {
+    const groups = {}
+    for (const t of tasks) {
+      const type = t.type || 'Daily'
+      ;(groups[type] ??= []).push(t)
     }
-  }
+    return groups
+  }, [tasks])
 
   if (loading) return <div className="loading-block"><span className="spinner" /></div>
 
-  const pct = totalXp > 0 ? Math.round((userXp / totalXp) * 100) : 0
+  const doneCount = tasks.filter((t) => t.completed).length
+  const dailyPct = tasks.length ? Math.round((doneCount / tasks.length) * 100) : 0
 
   return (
-    <div className="connection-page">
-      <h1>Hằng ngày</h1>
-
-      <section className="card">
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-          <strong>Tiến trình hôm nay</strong>
-          <span style={{ color: 'var(--color-text-soft)' }}>{userXp} / {totalXp} XP</span>
+    <div className="daily-page">
+      {/* ── Hero ── */}
+      <motion.div
+        className="daily-hero"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="daily-hero-top">
+          <div>
+            <div className="daily-hero-eyebrow"><SparkleIcon size={12} /> Hằng ngày</div>
+            <h1 className="daily-hero-title">Nhiệm vụ & Phần thưởng</h1>
+            <p className="daily-hero-sub">Hoàn thành nhiệm vụ để nhận nguyên liệu chăm sóc Cây tình yêu 🌳</p>
+          </div>
         </div>
-        <div className="daily-progress" style={{ marginTop: 8 }}>
-          <div className="daily-progress-fill" style={{ width: `${pct}%` }} />
-        </div>
-      </section>
 
-      <section>
-        <h2 style={{ fontSize: '1rem', marginBottom: 8 }}>Nhiệm vụ</h2>
-        {quests.length === 0 ? (
-          <div className="empty">Không có nhiệm vụ nào hôm nay.</div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {quests.map((q) => (
-              <div key={q.code || q.id} className={`quest-item${q.completed ? ' is-done' : ''}`}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600 }}>{q.title || q.name}</div>
-                  {q.description && (
-                    <div style={{ fontSize: 13, color: 'var(--color-text-soft)' }}>{q.description}</div>
-                  )}
-                </div>
-                <span className="tag tag-primary">+{q.xp ?? 0} XP</span>
-                {q.completed ? (
-                  <span className="tag">✓ Hoàn thành</span>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={() => handleComplete([q.code || q.id])}
-                    disabled={submitting}
-                  >
-                    Nhận
-                  </button>
-                )}
-              </div>
-            ))}
-            {quests.some((q) => !q.completed) && (
-              <button
-                type="button"
-                className="btn btn-ghost"
-                onClick={() => handleComplete(quests.filter((q) => !q.completed).map((q) => q.code || q.id))}
-                disabled={submitting}
-              >
-                Nhận tất cả
-              </button>
-            )}
+        {tasks.length > 0 && (
+          <div className="daily-hero-progress">
+            <div className="daily-hero-progress-head">
+              <span>Nhiệm vụ đã hoàn thành</span>
+              <span>{doneCount}/{tasks.length}</span>
+            </div>
+            <div className="daily-bar"><div className="daily-bar-fill" style={{ width: `${dailyPct}%` }} /></div>
           </div>
         )}
+      </motion.div>
+
+      {/* ── Kho nguyên liệu ── */}
+      <section className="daily-section">
+        <h2 className="daily-section-title">Kho nguyên liệu</h2>
+        <div className="material-row">
+          {MATERIALS.map((m) => {
+            const meta = MATERIAL_META[m]
+            return (
+              <div key={m} className="material-chip" style={{ background: meta.bg }}>
+                <span className="material-emoji">{meta.emoji}</span>
+                <div className="material-info">
+                  <span className="material-qty" style={{ color: meta.color }}>{invByMaterial[m] ?? 0}</span>
+                  <span className="material-name">{meta.label}</span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </section>
 
+      {/* ── Nhiệm vụ thưởng nguyên liệu ── */}
       {tasks.length > 0 && (
-        <section>
-          <h2 style={{ fontSize: '1rem', marginBottom: 8 }}>Nhiệm vụ dài hạn</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {tasks.map((t) => (
-              <div key={t.id || t.code} className="quest-item">
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600 }}>{t.title || t.name}</div>
-                  {t.description && (
-                    <div style={{ fontSize: 13, color: 'var(--color-text-soft)' }}>{t.description}</div>
-                  )}
+        <section className="daily-section">
+          <h2 className="daily-section-title">Nhiệm vụ thưởng nguyên liệu</h2>
+          {TASK_TYPE_ORDER.filter((type) => tasksByType[type]?.length).map((type) => {
+            const meta = TASK_TYPE_META[type]
+            return (
+              <div key={type} className="task-group">
+                <div className="task-group-label" style={{ background: meta.accent }}>
+                  <span>{meta.emoji}</span> {meta.label}
                 </div>
-                <span className="tag tag-primary">+{t.xp ?? 0} XP</span>
+                <div className="task-list">
+                  {tasksByType[type].map((t) => {
+                    const mat = MATERIAL_META[t.rewardMaterial]
+                    const target = t.target || 1
+                    const prog = Math.min(t.progress ?? 0, target)
+                    const pct = Math.round((prog / target) * 100)
+                    return (
+                      <div key={t.code || t.id} className={`task-row${t.completed ? ' is-done' : ''}`}>
+                        <div className="task-row-main">
+                          <div className="task-row-title">
+                            {t.description || t.title}
+                            {t.completed && <span className="task-check">✓</span>}
+                          </div>
+                          <div className="task-progress">
+                            <div className="task-progress-bar">
+                              <div className="task-progress-fill" style={{ width: `${pct}%` }} />
+                            </div>
+                            <span className="task-progress-text">{prog}/{target}</span>
+                          </div>
+                        </div>
+                        {mat && (
+                          <div className="task-reward" style={{ background: mat.bg, color: mat.color }} title={`${mat.label} x${t.rewardQty}`}>
+                            <span>{mat.emoji}</span>
+                            <span className="task-reward-qty">×{t.rewardQty ?? 1}</span>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-            ))}
-          </div>
+            )
+          })}
         </section>
       )}
 
-      {inventory.length > 0 && (
-        <section>
-          <h2 style={{ fontSize: '1rem', marginBottom: 8 }}>Kho đồ</h2>
-          <div className="events-grid">
-            {inventory.map((it, i) => (
-              <div key={it.id || i} className="event-card">
-                <div className="event-card-cover" style={{ background: 'var(--color-primary-soft)' }} />
-                <div className="event-card-body">
-                  <div className="event-card-title">{it.name || it.title}</div>
-                  <div className="event-card-meta">SL: {it.quantity ?? 1}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
+      {/* ── Lời nhắc kết nối ── */}
       {reminders.length > 0 && (
-        <section>
-          <h2 style={{ fontSize: '1rem', marginBottom: 8 }}>Lời nhắc kết nối</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <section className="daily-section">
+          <h2 className="daily-section-title">Lời nhắc kết nối</h2>
+          <div className="reminder-list">
             {reminders.map((r, i) => (
-              <div key={r.id || i} className="quest-item">
-                <span>💡 {r.title || r.body || r.code}</span>
+              <div key={r.matchId || r.id || i} className="reminder-item">
+                <HeartIcon size={14} />
+                <span>{r.message || r.title || r.body}</span>
               </div>
             ))}
           </div>

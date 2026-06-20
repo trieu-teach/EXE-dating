@@ -44,6 +44,22 @@ function treeStageName(level) {
   return 'Mầm xanh'
 }
 
+// Đọc field match thống nhất (DTO mới: matchId/displayName/avatarUrl/matchedAt)
+const mId = (m) => m?.matchId ?? m?.id
+const mName = (m) => m?.displayName ?? m?.otherDisplayName ?? 'Người dùng'
+const mAvatar = (m) => m?.avatarUrl ?? m?.otherAvatarUrl
+const mWhen = (m) => m?.matchedAt ?? m?.createdAt
+
+// Bậc cấp độ cây + phần thưởng khi đạt
+const TREE_LEVELS = [
+  { lv: 1, img: 'seedling', name: 'Mầm xanh', desc: 'Cây vừa nảy mầm — bắt đầu hành trình cùng nhau.' },
+  { lv: 3, img: 'budding', name: 'Cây non', desc: 'Đâm chồi nảy lộc khi hai bạn trò chuyện đều đặn.' },
+  { lv: 4, img: 'sparse', name: 'Mở khóa Hẹn hò', desc: 'Đề xuất gặp mặt & gợi ý địa điểm hẹn hò gần nhau.', unlock: true },
+  { lv: 6, img: 'young', name: 'Cây trưởng thành', desc: 'Tình cảm vững vàng, cây xanh tốt.' },
+  { lv: 11, img: 'blooming', name: 'Cây đơm hoa', desc: 'Cây bắt đầu nở hoa rực rỡ.' },
+  { lv: 21, img: 'premium', name: 'Cây tình yêu vĩnh cửu', desc: 'Cấp cao nhất — biểu tượng tình yêu bền chặt.' },
+]
+
 // ── Debug helper ─────────────────────────────────────────────────────────────
 function DebugPanel({ plant, lastResult, inventory, loading, watering, error }) {
   const [open, setOpen] = useState(false)
@@ -83,7 +99,7 @@ export default function LoveTree() {
         if (cancelled) return
         const arr = Array.isArray(list) ? list : (list?.items ?? [])
         setMatches(arr)
-        setActiveMatchId((cur) => cur || arr[0]?.id || null)
+        setActiveMatchId((cur) => cur || mId(arr[0]) || null)
       })
       .catch((err) => { if (!cancelled) toast.error(err?.message || 'Không tải được danh sách match.') })
       .finally(() => { if (!cancelled) setLoadingMatches(false) })
@@ -101,7 +117,7 @@ export default function LoveTree() {
     return () => { cancelled = true }
   }, [activeMatchId])
 
-  const active = useMemo(() => matches.find((m) => m.id === activeMatchId) || null, [matches, activeMatchId])
+  const active = useMemo(() => matches.find((m) => mId(m) === activeMatchId) || null, [matches, activeMatchId])
 
   const handleWater = async (material) => {
     if (!activeMatchId || watering) return
@@ -177,9 +193,9 @@ export default function LoveTree() {
                 <span>✨</span><span>💫</span><span>⭐</span><span>🌟</span><span>💫</span>
               </div>
               <div className="love-tree-hero-content">
-                <div className="love-tree-hero-label">Cây tình yêu</div>
-                <div className="love-tree-hero-name">{active.otherDisplayName}</div>
-                <div className="love-tree-hero-sub">Match {timeAgo(active.createdAt)}</div>
+                <div className="love-tree-hero-label">Cây tình yêu với</div>
+                <div className="love-tree-hero-name">{mName(active)}</div>
+                <div className="love-tree-hero-sub">Match {timeAgo(mWhen(active))}</div>
                 <div className="love-tree-hero-badges">
                   {streak > 0 && (
                     <span className="love-tree-hero-badge is-fire"><FireIcon size={14} /> {streak} ngày streak</span>
@@ -200,7 +216,7 @@ export default function LoveTree() {
                 <button type="button" role="tab" aria-selected={tab === 'tree'}
                   className={`love-tree-tab-btn${tab === 'tree' ? ' is-active' : ''}`}
                   onClick={() => setTab('tree')}>
-                  <TreeIcon size={15} /> Cây
+                  <Tree2Icon size={15} /> Cây
                 </button>
                 <button type="button" role="tab" aria-selected={tab === 'meetup'}
                   className={`love-tree-tab-btn${tab === 'meetup' ? ' is-active' : ''}`}
@@ -250,8 +266,8 @@ export default function LoveTree() {
                       style={{ width: `${Math.min(100, (growthPct / perLevel) * 100)}%` }} />
                   </div>
                   <div className="love-tree-growth-detail">
-                    <span>{growthPct} / {perLevel} XP</span>
-                    <span>Cấp {level + 1} khi đạt {perLevel}%</span>
+                    <span>{growthPct} / {perLevel} điểm tăng trưởng</span>
+                    <span>Lên Cấp {level + 1} khi đầy</span>
                   </div>
                 </div>
 
@@ -291,12 +307,41 @@ export default function LoveTree() {
 
                 {/* Action buttons */}
                 <div className="love-tree-actions">
-                  <button type="button" className="btn btn-ghost" onClick={() => navigate(`/chat/${active.id}`)}>
+                  <button type="button" className="btn btn-ghost" onClick={() => navigate(`/chat/${mId(active)}`)}>
                     <MessageIcon size={14} /> Nhắn tin
                   </button>
                   <button type="button" className="btn btn-soft" onClick={() => navigate('/tasks')}>
                     <SparkleIcon size={14} /> Nhiệm vụ
                   </button>
+                </div>
+
+                {/* Các cấp độ cây + phần thưởng */}
+                <div className="love-tree-levels">
+                  <div className="love-tree-levels-title">Các cấp độ & phần thưởng</div>
+                  <div className="love-tree-levels-list">
+                    {TREE_LEVELS.map((t) => {
+                      const reached = level >= t.lv
+                      const current = level >= t.lv && level < (TREE_LEVELS.find((x) => x.lv > t.lv)?.lv ?? 999)
+                      return (
+                        <div key={t.lv} className={`love-tree-level-row${reached ? ' is-reached' : ''}${current ? ' is-current' : ''}${t.unlock ? ' is-unlock' : ''}`}>
+                          <img src={TREE_IMAGES[t.img]} alt="" className="love-tree-level-img" />
+                          <div className="love-tree-level-info">
+                            <div className="love-tree-level-head">
+                              <span className="love-tree-level-lv">Cấp {t.lv}</span>
+                              <span className="love-tree-level-name">{t.name}</span>
+                              {t.unlock && <span className="love-tree-level-tag">🔓 Mở khóa</span>}
+                              {current && <span className="love-tree-level-now">Hiện tại</span>}
+                            </div>
+                            <div className="love-tree-level-desc">{t.desc}</div>
+                          </div>
+                          {reached && <span className="love-tree-level-check">✓</span>}
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div className="love-tree-levels-note">
+                    🎁 Đạt các mốc <strong>{LEVEL_MILESTONES.join(', ')}</strong> sẽ nhận thưởng nguyên liệu cho cả hai. Lên Cấp tối đa để có <strong>Cây tình yêu vĩnh cửu</strong>!
+                  </div>
                 </div>
               </>
             )}
@@ -317,20 +362,26 @@ export default function LoveTree() {
           <span className="love-tree-match-count">{matches.length}</span>
         </div>
         <div className="love-tree-match-items">
-          {matches.map((m, idx) => (
-            <div key={m?.id ? `${m.id}-${idx}` : `match-${idx}`}
-              className={`love-tree-match-item${m.id === activeMatchId ? ' is-active' : ''}`}
-              onClick={() => { setActiveMatchId(m.id); setTab('tree') }}
-              role="button" tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setActiveMatchId(m.id); setTab('tree') } }}>
-              <div className="avatar"
-                style={{ backgroundImage: m.otherAvatarUrl ? `url(${resolveImageUrl(m.otherAvatarUrl)})` : undefined }} />
-              <div className="love-tree-match-meta">
-                <div className="love-tree-match-name">{m.otherDisplayName}</div>
-                <div className="love-tree-match-sub">{timeAgo(m.createdAt)}</div>
+          {matches.map((m, idx) => {
+            const id = mId(m)
+            const av = resolveImageUrl(mAvatar(m))
+            const name = mName(m)
+            return (
+              <div key={id ? `${id}-${idx}` : `match-${idx}`}
+                className={`love-tree-match-item${id === activeMatchId ? ' is-active' : ''}`}
+                onClick={() => { setActiveMatchId(id); setTab('tree') }}
+                role="button" tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setActiveMatchId(id); setTab('tree') } }}>
+                <div className="avatar" style={av ? { backgroundImage: `url(${av})` } : undefined}>
+                  {!av && <span className="love-tree-match-initial">{name.charAt(0).toUpperCase()}</span>}
+                </div>
+                <div className="love-tree-match-meta">
+                  <div className="love-tree-match-name">{name}</div>
+                  <div className="love-tree-match-sub">Match {timeAgo(mWhen(m))}</div>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </aside>
 
@@ -355,7 +406,7 @@ export default function LoveTree() {
             <p>
               {milestone.message || (
                 LEVEL_MILESTONES.includes(milestone.level)
-                  ? `Bạn và ${active?.otherDisplayName || 'người ấy'} đã đạt mốc ${milestone.level} — nhận thưởng cặp đôi nhé!`
+                  ? `Bạn và ${mName(active)} đã đạt mốc ${milestone.level} — nhận thưởng cặp đôi nhé!`
                   : `Cây đã lên cấp ${milestone.level}.`
               )}
             </p>
