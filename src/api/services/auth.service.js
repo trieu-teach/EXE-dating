@@ -13,7 +13,7 @@
  */
 
 import { API_ENDPOINTS } from '../config.js'
-import { get, post } from '../http.js'
+import { get, post, del } from '../http.js'
 import { setAccessToken } from '../tokenStore.js'
 
 export const authService = {
@@ -57,5 +57,14 @@ export const authService = {
 
   resetPassword({ email, otpCode, newPassword }) {
     return post(API_ENDPOINTS.auth.resetPassword, { email, otpCode, newPassword })
+  },
+
+  // Xoá vĩnh viễn tài khoản hiện tại (dùng khi user bị ban bấm "Thoát")
+  async deleteAccount() {
+    try {
+      await del(API_ENDPOINTS.auth.deleteAccount)
+    } finally {
+      setAccessToken(null)
+    }
   },
 }

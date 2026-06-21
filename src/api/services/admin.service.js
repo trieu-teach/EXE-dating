@@ -23,4 +23,14 @@ export const adminService = {
   combos() { return get(API_ENDPOINTS.admin.combos) },
   createCombo(payload) { return post(API_ENDPOINTS.admin.combos, payload) },
   deleteCombo(id) { return del(API_ENDPOINTS.admin.combo(id)) },
+
+  // Quản lý user
+  users({ search = '', status = '', page = 1, pageSize = 50 } = {}) {
+    const qs = new URLSearchParams({ page, pageSize })
+    if (search) qs.set('search', search)
+    if (status) qs.set('status', status)
+    return get(`${API_ENDPOINTS.admin.users}?${qs.toString()}`)
+  },
+  banUser(userId) { return post(API_ENDPOINTS.admin.usersBulk, { action: 'ban', userIds: [userId] }) },
+  unbanUser(userId) { return post(API_ENDPOINTS.admin.usersBulk, { action: 'unban', userIds: [userId] }) },
 }

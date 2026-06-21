@@ -29,6 +29,7 @@ export const API_ENDPOINTS = {
     me: '/api/auth/me',
     forgotPassword: '/api/auth/forgot-password',
     resetPassword: '/api/auth/reset-password',
+    deleteAccount: '/api/auth/account',
   },
   profile: {
     me: '/api/profile/me',
@@ -75,6 +76,8 @@ export const API_ENDPOINTS = {
     venue: (id) => `/api/admin/venues/${id}`,
     combos: '/api/admin/combos',
     combo: (id) => `/api/admin/combos/${id}`,
+    users: '/api/admin/users',
+    usersBulk: '/api/admin/users/bulk-action',
   },
   matches: {
     list: '/api/matches',

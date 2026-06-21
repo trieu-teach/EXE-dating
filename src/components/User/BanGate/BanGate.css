@@ -1,0 +1,61 @@
+.bangate-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(20, 8, 16, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.bangate-modal {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 28px;
+  padding: 40px 30px 32px;
+  text-align: center;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+  animation: bangate-in 0.25s ease-out;
+}
+@keyframes bangate-in {
+  from { opacity: 0; transform: scale(0.9) translateY(16px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.bangate-icon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 18px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  font-size: 2.4rem;
+  background: linear-gradient(135deg, #ff4f6b, #b14bff);
+  box-shadow: 0 12px 30px rgba(255, 79, 107, 0.4);
+}
+.bangate-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #1c1320;
+  margin: 0 0 12px;
+}
+.bangate-text { font-size: 0.98rem; line-height: 1.6; color: #4a3a44; margin: 0 0 10px; }
+.bangate-sub { font-size: 0.88rem; line-height: 1.55; color: #8a7681; margin: 0 0 24px; }
+.bangate-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 800;
+  font-family: inherit;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  box-shadow: 0 10px 26px rgba(255, 79, 139, 0.4);
+  transition: transform 0.15s, filter 0.15s;
+}
+.bangate-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+.bangate-btn:disabled { opacity: 0.7; cursor: default; }

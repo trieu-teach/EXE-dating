@@ -40,6 +40,7 @@ import DiscoverySettings from './pages/User/Settings/DiscoverySettings/Discovery
 import SecuritySettings from './pages/User/Settings/SecuritySettings/SecuritySettings.jsx'
 import Logout from './pages/User/Logout/Logout.jsx'
 import Landing from './pages/User/Landing/Landing.jsx'
+import BanGate from './components/User/BanGate/BanGate.jsx'
 
 function PublicOrShell({ children, variant }) {
   const { user } = useAuth()
@@ -81,6 +82,7 @@ export default function App() {
           <InventoryProvider>
             <BrowserRouter>
               <SessionGuard />
+              <BanGate />
               <Routes>
             {/* Auth (no shell) */}
             <Route path="/login" element={<Login />} />

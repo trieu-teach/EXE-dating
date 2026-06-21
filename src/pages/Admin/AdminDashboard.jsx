@@ -11,6 +11,7 @@ const CATEGORIES = ['cafe', 'restaurant', 'cinema', 'park', 'bar', 'dessert']
 
 const NAV = [
   { key: 'overview', label: '📊 Tổng quan' },
+  { key: 'users', label: '👥 Người dùng' },
   { key: 'verify', label: '🛡️ Xác minh ảnh' },
   { key: 'venues', label: '📍 Quán gợi ý' },
   { key: 'combos', label: '🎟️ Combo / Voucher' },
@@ -28,6 +29,8 @@ export default function AdminDashboard() {
   const [verifs, setVerifs] = useState([])
   const [venues, setVenues] = useState([])
   const [combos, setCombos] = useState([])
+  const [users, setUsers] = useState([])
+  const [userSearch, setUserSearch] = useState('')
   const [loading, setLoading] = useState(false)
   const [busy, setBusy] = useState(null)
 
@@ -57,10 +60,38 @@ export default function AdminDashboard() {
     setLoading(true)
     adminService.combos().then((d) => setCombos(Array.isArray(d) ? d : (d?.items ?? []))).catch(() => {}).finally(() => setLoading(false))
   }, [])
+  const loadUsers = useCallback((search = '') => {
+    setLoading(true)
+    adminService.users({ search })
+      .then((d) => setUsers(Array.isArray(d) ? d : (d?.items ?? [])))
+      .catch((e) => toast.error(e?.message || 'Lỗi tải người dùng'))
+      .finally(() => setLoading(false))
+  }, [toast])
+
+  const banUser = async (u) => {
+    if (!window.confirm(`Cấm ${u.displayName || u.email}? Lần đăng nhập tới họ sẽ thấy thông báo bị cấm và bị xoá vĩnh viễn khi thoát.`)) return
+    setBusy(u.id)
+    try {
+      await adminService.banUser(u.id)
+      setUsers((cur) => cur.map((x) => (x.id === u.id ? { ...x, status: 'Banned' } : x)))
+      toast.success('Đã cấm người dùng.')
+    } catch (e) { toast.error(e?.message || 'Cấm thất bại.') }
+    finally { setBusy(null) }
+  }
+  const unbanUser = async (u) => {
+    setBusy(u.id)
+    try {
+      await adminService.unbanUser(u.id)
+      setUsers((cur) => cur.map((x) => (x.id === u.id ? { ...x, status: 'Active' } : x)))
+      toast.success('Đã bỏ cấm.')
+    } catch (e) { toast.error(e?.message || 'Thao tác thất bại.') }
+    finally { setBusy(null) }
+  }
 
   useEffect(() => {
     if (!isAdmin) return
     if (section === 'overview') loadOverview()
+    if (section === 'users') loadUsers()
     if (section === 'verify') loadVerifs()
     if (section === 'venues') loadVenues()
     if (section === 'combos') { loadCombos(); if (venues.length === 0) adminService.venues().then((d) => setVenues(Array.isArray(d) ? d : (d?.items ?? []))).catch(() => {}) }
@@ -162,6 +193,48 @@ export default function AdminDashboard() {
         )}
 
         {/* ── XÁC MINH ── */}
+        {section === 'users' && (
+          <>
+            <h1 className="admin-h1">Quản lý người dùng</h1>
+            <p className="admin-note">Cấm người vi phạm. Lần đăng nhập tới họ sẽ thấy thông báo bị cấm và bị xoá vĩnh viễn khi bấm Thoát.</p>
+            <form className="admin-user-search" onSubmit={(e) => { e.preventDefault(); loadUsers(userSearch) }}>
+              <input placeholder="Tìm theo tên / email…" value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
+              <button type="submit" className="btn btn-ghost btn-sm">Tìm</button>
+            </form>
+            {users.length === 0 ? (
+              <div className="admin-empty">Không có người dùng.</div>
+            ) : (
+              <div className="admin-user-table">
+                {users.map((u) => (
+                  <div key={u.id} className={`admin-user-row${u.status === 'Banned' ? ' is-banned' : ''}`}>
+                    <div className="admin-user-info">
+                      <div className="admin-user-name">
+                        {u.displayName || '(chưa đặt tên)'}
+                        {u.role === 'Admin' && <span className="admin-user-tag admin-tag-role">Admin</span>}
+                        <span className={`admin-user-tag ${u.status === 'Banned' ? 'admin-tag-banned' : 'admin-tag-active'}`}>
+                          {u.status === 'Banned' ? 'Đã cấm' : u.status === 'Active' ? 'Hoạt động' : u.status}
+                        </span>
+                      </div>
+                      <div className="admin-user-email">{u.email}</div>
+                    </div>
+                    <div className="admin-user-actions">
+                      {u.role !== 'Admin' && (
+                        u.status === 'Banned' ? (
+                          <button className="btn btn-ghost btn-sm" disabled={busy === u.id} onClick={() => unbanUser(u)}>Bỏ cấm</button>
+                        ) : (
+                          <button className="btn btn-danger btn-sm" disabled={busy === u.id} onClick={() => banUser(u)}>
+                            {busy === u.id ? <span className="spinner" /> : 'Cấm'}
+                          </button>
+                        )
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
         {section === 'verify' && (
           <>
             <h1 className="admin-h1">Duyệt xác minh khuôn mặt</h1>
