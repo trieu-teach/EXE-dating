@@ -3,6 +3,7 @@ import { gamificationService, connectionRemindersService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { MATERIALS, MATERIAL_META, TASK_TYPE_META, TASK_TYPE_ORDER } from '../../../constants/gamification.js'
 import { SparkleIcon, HeartIcon, TrophyIcon } from '../../../components/ui/CustomIcons.jsx'
+import HeroFX from '../../../components/User/HeroFX/HeroFX.jsx'
 import { motion } from 'framer-motion'
 import './DailyConnection.css'
 
@@ -122,7 +123,7 @@ export default function DailyConnection() {
           <div>
             <div className="daily-hero-eyebrow"><TrophyIcon size={12} /> Hằng ngày</div>
             <h1 className="daily-hero-title">Nhiệm vụ & Phần thưởng</h1>
-            <p className="daily-hero-sub">Hoàn thành nhiệm vụ để nhận nguyên liệu chăm sóc Cây tình yêu 🌳</p>
+            <p className="daily-hero-sub">Hoàn thành nhiệm vụ để nhận nguyên liệu chăm sóc Cây tình yêu</p>
           </div>
         </div>
 
@@ -135,6 +136,7 @@ export default function DailyConnection() {
             <div className="daily-bar"><div className="daily-bar-fill" style={{ width: `${dailyPct}%` }} /></div>
           </div>
         )}
+        <HeroFX emojis={['🎁', '🏆', '⭐', '✨', '🌟', '💧', '🎉', '🥇']} />
         <span className="hero-deco" aria-hidden>🎁</span>
       </motion.div>
 
@@ -178,7 +180,7 @@ export default function DailyConnection() {
                     const prog = Math.min(t.progress ?? 0, target)
                     const pct = Math.round((prog / target) * 100)
                     return (
-                      <div key={t.code || t.id} className={`task-row${t.completed ? ' is-done' : ''}`}>
+                      <div key={t.code || t.id} className={`task-row${t.completed ? ' is-done' : ''}${t.claimed ? ' is-claimed' : ''}`}>
                         <div className="task-row-main">
                           <div className="task-row-title">
                             {t.description || t.title}

@@ -31,6 +31,7 @@ export default function AdminDashboard() {
   const [combos, setCombos] = useState([])
   const [users, setUsers] = useState([])
   const [userSearch, setUserSearch] = useState('')
+  const [banTarget, setBanTarget] = useState(null)
   const [loading, setLoading] = useState(false)
   const [busy, setBusy] = useState(null)
 
@@ -68,13 +69,15 @@ export default function AdminDashboard() {
       .finally(() => setLoading(false))
   }, [toast])
 
-  const banUser = async (u) => {
-    if (!window.confirm(`Cấm ${u.displayName || u.email}? Lần đăng nhập tới họ sẽ thấy thông báo bị cấm và bị xoá vĩnh viễn khi thoát.`)) return
+  const confirmBan = async () => {
+    const u = banTarget
+    if (!u) return
     setBusy(u.id)
     try {
       await adminService.banUser(u.id)
       setUsers((cur) => cur.map((x) => (x.id === u.id ? { ...x, status: 'Banned' } : x)))
       toast.success('Đã cấm người dùng.')
+      setBanTarget(null)
     } catch (e) { toast.error(e?.message || 'Cấm thất bại.') }
     finally { setBusy(null) }
   }
@@ -222,7 +225,7 @@ export default function AdminDashboard() {
                         u.status === 'Banned' ? (
                           <button className="btn btn-ghost btn-sm" disabled={busy === u.id} onClick={() => unbanUser(u)}>Bỏ cấm</button>
                         ) : (
-                          <button className="btn btn-danger btn-sm" disabled={busy === u.id} onClick={() => banUser(u)}>
+                          <button className="btn btn-danger btn-sm" disabled={busy === u.id} onClick={() => setBanTarget(u)}>
                             {busy === u.id ? <span className="spinner" /> : 'Cấm'}
                           </button>
                         )
@@ -277,6 +280,26 @@ export default function AdminDashboard() {
           <CombosSection combos={combos} venues={venues} onReload={loadCombos} toast={toast} busy={busy} setBusy={setBusy} />
         )}
       </main>
+
+      {/* Popup xác nhận cấm */}
+      {banTarget && (
+        <div className="admin-modal-backdrop" onClick={() => busy !== banTarget.id && setBanTarget(null)}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal-icon">🚫</div>
+            <div className="admin-modal-title">Cấm {banTarget.displayName || banTarget.email}?</div>
+            <p className="admin-modal-text">
+              Lần đăng nhập tới, người này sẽ thấy thông báo bị cấm và bị
+              {' '}<strong>xoá vĩnh viễn toàn bộ dữ liệu</strong> khi bấm Thoát. Không thể hoàn tác.
+            </p>
+            <div className="admin-modal-actions">
+              <button className="btn btn-ghost btn-sm" disabled={busy === banTarget.id} onClick={() => setBanTarget(null)}>Huỷ</button>
+              <button className="btn btn-danger btn-sm" disabled={busy === banTarget.id} onClick={confirmBan}>
+                {busy === banTarget.id ? <span className="spinner" /> : 'Cấm người dùng'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

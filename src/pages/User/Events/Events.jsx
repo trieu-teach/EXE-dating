@@ -4,6 +4,7 @@ import { useToast } from '../../../context/ToastContext.jsx'
 import { formatDate } from '../../../utils/format.js'
 import { useNavigate } from 'react-router-dom'
 import { CalendarIcon, PinIcon, UsersIcon, ClockIcon } from '../../../components/ui/CustomIcons.jsx'
+import HeroFX from '../../../components/User/HeroFX/HeroFX.jsx'
 import { motion } from 'framer-motion'
 import { Button } from '../../../components/ui/Button.jsx'
 import './Events.css'
@@ -63,6 +64,7 @@ export default function Events() {
         </div>
         <h1 className="events-hero-title">Khám phá sự kiện</h1>
         <p className="events-hero-subtitle">Gặp gỡ những người cùng sở thích tại các sự kiện độc đáo</p>
+        <HeroFX emojis={['🎉', '🎈', '🎊', '✨', '⭐', '🥳', '🎶', '🌟']} />
         <span className="hero-deco" aria-hidden>🎉</span>
       </div>
 

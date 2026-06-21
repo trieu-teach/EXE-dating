@@ -16,32 +16,25 @@ import { HeartBrokenIcon, LeafSeedlingIcon, SparkleIcon, Tree2Icon, HeartIcon, M
 import './LoveTree.css'
 
 // ── Tree image mapping ───────────────────────────────────────────────────────
-const TREE_IMAGES = {
-  seedling: '/assets/love-tree/tree-stage-seedling.png',
-  sprout:  '/assets/love-tree/tree-stage-sprout.png',
-  budding: '/assets/love-tree/tree-stage-budding.png',
-  sparse:  '/assets/love-tree/tree-stage-sparse.png',
-  young:   '/assets/love-tree/tree-stage-young.png',
-  blooming:'/assets/love-tree/tree-stage-blooming.png',
-  premium: '/assets/love-tree/cherry-tree-premium.png',
-}
+// Ảnh đặt tên theo SỐ: 1.png … 7.png. Level = số ảnh (1→7), tối đa là 7.
+const TREE_MAX_LEVEL = 7
+const treeImgByNumber = (n) => `/assets/love-tree/${Math.min(TREE_MAX_LEVEL, Math.max(1, n))}.png`
 
 function getTreeImage(level) {
-  if (level >= 21) return TREE_IMAGES.premium
-  if (level >= 11) return TREE_IMAGES.blooming
-  if (level >= 6)  return TREE_IMAGES.young
-  if (level >= 4)  return TREE_IMAGES.sparse
-  if (level >= 3)  return TREE_IMAGES.budding
-  if (level >= 2)  return TREE_IMAGES.sprout
-  return TREE_IMAGES.seedling
+  return treeImgByNumber(level)
 }
 
+const TREE_STAGE_NAMES = {
+  1: 'Mầm xanh',
+  2: 'Cây non',
+  3: 'Cây nhỏ',
+  4: 'Cây trưởng thành',
+  5: 'Cây sai lá',
+  6: 'Cây đơm hoa',
+  7: 'Cây tình yêu vĩnh cửu',
+}
 function treeStageName(level) {
-  if (level >= 21) return 'Cây tình yêu vĩnh cửu'
-  if (level >= 11) return 'Cây đơm hoa'
-  if (level >= 6)  return 'Cây trưởng thành'
-  if (level >= 3)  return 'Cây non'
-  return 'Mầm xanh'
+  return TREE_STAGE_NAMES[Math.min(TREE_MAX_LEVEL, Math.max(1, level))]
 }
 
 // Đọc field match thống nhất (DTO mới: matchId/displayName/avatarUrl/matchedAt)
@@ -52,12 +45,13 @@ const mWhen = (m) => m?.matchedAt ?? m?.createdAt
 
 // Bậc cấp độ cây + phần thưởng khi đạt
 const TREE_LEVELS = [
-  { lv: 1, img: 'seedling', name: 'Mầm xanh', desc: 'Cây vừa nảy mầm — bắt đầu hành trình cùng nhau.' },
-  { lv: 3, img: 'budding', name: 'Cây non', desc: 'Đâm chồi nảy lộc khi hai bạn trò chuyện đều đặn.' },
-  { lv: 4, img: 'sparse', name: 'Mở khóa Hẹn hò', desc: 'Đề xuất gặp mặt & gợi ý địa điểm hẹn hò gần nhau.', unlock: true },
-  { lv: 6, img: 'young', name: 'Cây trưởng thành', desc: 'Tình cảm vững vàng, cây xanh tốt.' },
-  { lv: 11, img: 'blooming', name: 'Cây đơm hoa', desc: 'Cây bắt đầu nở hoa rực rỡ.' },
-  { lv: 21, img: 'premium', name: 'Cây tình yêu vĩnh cửu', desc: 'Cấp cao nhất — biểu tượng tình yêu bền chặt.' },
+  { lv: 1, img: 1, name: 'Mầm xanh', desc: 'Cây vừa nảy mầm — bắt đầu hành trình cùng nhau.' },
+  { lv: 2, img: 2, name: 'Cây non', desc: 'Đâm chồi nảy lộc khi hai bạn trò chuyện đều đặn.' },
+  { lv: 3, img: 3, name: 'Cây nhỏ', desc: 'Cây lớn dần theo từng lần tưới.' },
+  { lv: 4, img: 4, name: 'Mở khóa Hẹn hò', desc: 'Đề xuất gặp mặt & gợi ý địa điểm hẹn hò gần nhau.', unlock: true },
+  { lv: 5, img: 5, name: 'Cây trưởng thành', desc: 'Tình cảm vững vàng, cây xanh tốt.' },
+  { lv: 6, img: 6, name: 'Cây đơm hoa', desc: 'Cây bắt đầu nở hoa rực rỡ.' },
+  { lv: 7, img: 7, name: 'Cây tình yêu vĩnh cửu', desc: 'Cấp tối đa — biểu tượng tình yêu bền chặt.' },
 ]
 
 // ── Debug helper ─────────────────────────────────────────────────────────────
@@ -310,7 +304,7 @@ export default function LoveTree() {
                   <button type="button" className="btn btn-ghost" onClick={() => navigate(`/chat/${mId(active)}`)}>
                     <MessageIcon size={14} /> Nhắn tin
                   </button>
-                  <button type="button" className="btn btn-soft" onClick={() => navigate('/tasks')}>
+                  <button type="button" className="btn btn-soft" onClick={() => navigate('/daily-connection')}>
                     <SparkleIcon size={14} /> Nhiệm vụ
                   </button>
                 </div>
@@ -324,7 +318,7 @@ export default function LoveTree() {
                       const current = level >= t.lv && level < (TREE_LEVELS.find((x) => x.lv > t.lv)?.lv ?? 999)
                       return (
                         <div key={t.lv} className={`love-tree-level-row${reached ? ' is-reached' : ''}${current ? ' is-current' : ''}${t.unlock ? ' is-unlock' : ''}`}>
-                          <img src={TREE_IMAGES[t.img]} alt="" className="love-tree-level-img" />
+                          <img src={treeImgByNumber(t.img)} alt="" className="love-tree-level-img" />
                           <div className="love-tree-level-info">
                             <div className="love-tree-level-head">
                               <span className="love-tree-level-lv">Cấp {t.lv}</span>

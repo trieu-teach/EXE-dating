@@ -7,6 +7,7 @@ import { HeartIcon, MessageIcon, SparkleIcon, StarIcon, CrownIcon } from '../../
 import { motion, AnimatePresence } from 'framer-motion'
 import ProfileDetailModal from '../../../components/User/ProfileDetailModal/ProfileDetailModal.jsx'
 import ProfilePreviewModal from '../../../components/User/ProfilePreviewModal/ProfilePreviewModal.jsx'
+import HeroFX from '../../../components/User/HeroFX/HeroFX.jsx'
 import './Matches.css'
 import '../LikedMe/LikedMe.css'
 
@@ -96,6 +97,7 @@ export default function Matches() {
           <h1>Lượt thích & Match</h1>
           <p className="matches-hero-subtitle">Ai đã thích bạn và những người đã match — tất cả ở đây.</p>
         </div>
+        <HeroFX emojis={['💕', '💖', '💞', '❤️', '💗', '💘', '😍', '💓']} />
         <span className="hero-deco" aria-hidden>💞</span>
       </div>
 

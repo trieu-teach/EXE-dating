@@ -1,23 +1,9 @@
 import { Link } from 'react-router-dom'
 
-const TREE_IMAGES_MINI = {
-  seedling: '/assets/love-tree/tree-stage-seedling.png',
-  sprout:  '/assets/love-tree/tree-stage-sprout.png',
-  budding: '/assets/love-tree/tree-stage-budding.png',
-  sparse:  '/assets/love-tree/tree-stage-sparse.png',
-  young:   '/assets/love-tree/tree-stage-young.png',
-  blooming:'/assets/love-tree/tree-stage-blooming.png',
-  premium: '/assets/love-tree/cherry-tree-premium.png',
-}
-
+// Ảnh cây đặt tên theo số 1.png … 7.png; level = số ảnh, tối đa 7.
 function getTreeMini(level) {
-  if (level >= 21) return TREE_IMAGES_MINI.premium
-  if (level >= 11) return TREE_IMAGES_MINI.blooming
-  if (level >= 6)  return TREE_IMAGES_MINI.young
-  if (level >= 4)  return TREE_IMAGES_MINI.sparse
-  if (level >= 3)  return TREE_IMAGES_MINI.budding
-  if (level >= 2)  return TREE_IMAGES_MINI.sprout
-  return TREE_IMAGES_MINI.seedling
+  const n = Math.min(7, Math.max(1, Number(level) || 1))
+  return `/assets/love-tree/${n}.png`
 }
 
 export default function LoveTreeBondBar({ plant, matchId, onWater, loading }) {

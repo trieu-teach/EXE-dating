@@ -178,7 +178,7 @@
   background: var(--color-surface, #fff);
   border: 1px solid var(--color-border, #f0e6ec);
 }
-.task-row.is-done { opacity: 0.6; }
+.task-row.is-claimed { opacity: 0.6; }
 .task-row-main { flex: 1; min-width: 0; }
 .task-row-title {
   font-weight: 600; font-size: 13.5px; color: var(--color-text, #1a1a2e);

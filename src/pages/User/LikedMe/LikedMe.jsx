@@ -4,6 +4,7 @@ import { swipesService, subscriptionService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
 import { HeartIcon, StarIcon, CrownIcon, SparkleIcon } from '../../../components/ui/CustomIcons.jsx'
+import HeroFX from '../../../components/User/HeroFX/HeroFX.jsx'
 import { motion } from 'framer-motion'
 import ProfileDetailModal from '../../../components/User/ProfileDetailModal/ProfileDetailModal.jsx'
 import './LikedMe.css'
@@ -77,6 +78,7 @@ export default function LikedMe() {
           {people.length} người đã thích bạn.{' '}
           {isGold ? 'Thích lại để tạo match ngay!' : 'Nâng cấp Gold để xem rõ và thích lại.'}
         </p>
+        <HeroFX emojis={['💖', '💕', '😍', '✨', '💗', '👍', '💝', '🥰']} />
         <span className="hero-deco" aria-hidden>💖</span>
       </div>
 

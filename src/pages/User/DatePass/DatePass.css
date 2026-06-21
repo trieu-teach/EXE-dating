@@ -95,7 +95,7 @@
 .dp-combo-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
 .dp-combo-img {
   height: 120px; background-size: cover; background-position: center;
-  background-color: var(--color-surface-2); position: relative;
+  background-color: #fff; position: relative;
 }
 .dp-combo-badge {
   position: absolute; top: 10px; left: 10px;
@@ -120,7 +120,7 @@
 }
 .dp-detail-img {
   height: 220px; background-size: cover; background-position: center;
-  background-color: var(--color-surface-2); position: relative;
+  background-color: #fff; position: relative;
 }
 .dp-detail-badge {
   position: absolute; top: 14px; left: 14px;

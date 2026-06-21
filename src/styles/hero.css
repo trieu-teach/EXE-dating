@@ -11,13 +11,17 @@
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
-  width: 100%;
-  max-width: 1080px;          /* cùng bề rộng với banner Ưu đãi */
-  margin-left: auto !important;
-  margin-right: auto !important;
-  border-radius: 24px !important;
-  padding: 30px 28px !important;
-  margin-bottom: 18px !important;
+  width: 100vw;                                  /* full-bleed: rộng hết màn */
+  max-width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw !important;
+  margin-right: -50vw !important;
+  margin-top: -18px !important;                  /* ăn phần padding trên của trang */
+  border-radius: 0 !important;
+  padding: 40px clamp(24px, 6vw, 96px) !important;
+  margin-bottom: 24px !important;
+  text-align: center;                            /* căn giữa nội dung */
   background: linear-gradient(120deg, #ff2d6b 0%, #ff4f8b 48%, #ff85b8 100%) !important;
   color: #fff !important;
   box-shadow: 0 14px 36px rgba(255, 79, 139, 0.3) !important;
@@ -129,10 +133,11 @@
   font-size: 120px !important;
   line-height: 1 !important;
   opacity: 0.2 !important;
-  transform: rotate(-15deg) !important;
+  transform: rotate(-15deg);
   z-index: 0 !important;
   pointer-events: none !important;
   user-select: none;
+  animation: hero-deco-float 5s ease-in-out infinite;
 }
 
 /* ── Mobile ── */
@@ -153,3 +158,180 @@
     font-size: 1.45rem !important;
   }
 }
+
+/* ============================================================
+   HIỆU ỨNG ĐỘNG + TƯƠNG TÁC cho banner
+   ============================================================ */
+.matches-hero,
+.liked-hero,
+.dp-hero,
+.daily-hero,
+.events-hero {
+  background-size: 220% 220% !important;
+  animation: hero-shift 14s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+@keyframes hero-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Hover: nhấc lên + sáng/đổ bóng mạnh hơn */
+.matches-hero:hover,
+.liked-hero:hover,
+.dp-hero:hover,
+.daily-hero:hover,
+.events-hero:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 54px rgba(255, 79, 139, 0.5) !important;
+}
+
+/* 2 vầng glow trôi + đập nhẹ */
+.matches-hero::before,
+.liked-hero::before,
+.dp-hero::before,
+.daily-hero::before,
+.events-hero::before {
+  animation: hero-glow-a 9s ease-in-out infinite;
+}
+.matches-hero::after,
+.liked-hero::after,
+.dp-hero::after,
+.daily-hero::after,
+.events-hero::after {
+  animation: hero-glow-b 11s ease-in-out infinite;
+}
+@keyframes hero-glow-a {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
+  50%      { transform: translate(-26px, 20px) scale(1.18); opacity: 1; }
+}
+@keyframes hero-glow-b {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.8; }
+  50%      { transform: translate(24px, -18px) scale(1.22); opacity: 1; }
+}
+
+/* Emoji trang trí bồng bềnh */
+@keyframes hero-deco-float {
+  0%, 100% { transform: rotate(-15deg) translateY(0); }
+  50%      { transform: rotate(-8deg) translateY(-12px); }
+}
+
+/* Tôn trọng người tắt chuyển động */
+@media (prefers-reduced-motion: reduce) {
+  .matches-hero, .liked-hero, .dp-hero, .daily-hero, .events-hero,
+  .matches-hero::before, .liked-hero::before, .dp-hero::before, .daily-hero::before, .events-hero::before,
+  .matches-hero::after, .liked-hero::after, .dp-hero::after, .daily-hero::after, .events-hero::after,
+  .hero-deco, .dp-hero-deco {
+    animation: none !important;
+  }
+}
+
+/* ── Tương tác nâng cao: nghiêng 3D + đèn spotlight bám chuột ── */
+.matches-hero,
+.liked-hero,
+.dp-hero,
+.daily-hero,
+.events-hero {
+  --mx: 50%; --my: 50%; --tilt-x: 0deg; --tilt-y: 0deg;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.matches-hero.is-hovering,
+.liked-hero.is-hovering,
+.dp-hero.is-hovering,
+.daily-hero.is-hovering,
+.events-hero.is-hovering {
+  transform: perspective(820px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(-5px) scale(1.015);
+  box-shadow: 0 34px 70px rgba(255, 45, 107, 0.55) !important;
+}
+
+/* Parallax: nội dung trồi lên trước theo con trỏ (chiều sâu) */
+.matches-hero > *:not(.hero-deco):not(.hero-shine),
+.liked-hero > *:not(.hero-deco):not(.hero-shine),
+.dp-hero > *:not(.hero-deco):not(.hero-shine),
+.daily-hero > *:not(.hero-deco):not(.hero-shine),
+.events-hero > *:not(.hero-deco):not(.hero-shine) {
+  transition: transform 0.12s ease-out;
+}
+.matches-hero.is-hovering > *:not(.hero-deco):not(.hero-shine),
+.liked-hero.is-hovering > *:not(.hero-deco):not(.hero-shine),
+.dp-hero.is-hovering > *:not(.hero-deco):not(.hero-shine),
+.daily-hero.is-hovering > *:not(.hero-deco):not(.hero-shine),
+.events-hero.is-hovering > *:not(.hero-deco):not(.hero-shine) {
+  transform: translate3d(var(--px, 0), var(--py, 0), 40px);
+}
+
+/* Tia sáng quét chéo (element .hero-shine do BannerFX chèn) */
+.hero-shine {
+  position: absolute !important;
+  inset: 0;
+  z-index: 0 !important;
+  pointer-events: none;
+  background: linear-gradient(110deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.18) 45%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.18) 55%,
+    transparent 68%);
+  background-size: 250% 100%;
+  background-position: 160% 0;
+  mix-blend-mode: overlay;
+  animation: hero-shine-sweep 7s ease-in-out infinite;
+}
+@keyframes hero-shine-sweep {
+  0%        { background-position: 160% 0; }
+  35%, 100% { background-position: -160% 0; }
+}
+.is-hovering .hero-shine { animation-duration: 2.2s; }
+/* Spotlight: tái dùng vầng ::before, cho bám theo con trỏ khi hover */
+.matches-hero.is-hovering::before,
+.liked-hero.is-hovering::before,
+.dp-hero.is-hovering::before,
+.daily-hero.is-hovering::before,
+.events-hero.is-hovering::before {
+  animation: none;
+  top: var(--my);
+  left: var(--mx);
+  right: auto;
+  bottom: auto;
+  width: 320px;
+  height: 320px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55), transparent 60%);
+}
+
+/* ── Căn giữa nội dung banner ── */
+.dp-hero-inner {
+  max-width: 760px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center;
+}
+.daily-hero-top { justify-content: center !important; text-align: center; }
+.matches-hero-content, .premium-hero-content { margin-left: auto; margin-right: auto; }
+.matches-hero-subtitle,
+.liked-hero-sub,
+.dp-hero p,
+.daily-hero-sub,
+.events-hero-subtitle {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* ── Nhiều emoji bay quanh banner (BannerFX chèn .hero-emoji) ── */
+.hero-emoji {
+  position: absolute;
+  z-index: 0 !important;
+  pointer-events: none;
+  opacity: 0.6;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.18));
+  animation: hero-emoji-float var(--dur, 6s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: transform;
+}
+@keyframes hero-emoji-float {
+  0%, 100% { transform: translateY(0) rotate(-8deg) scale(1); }
+  50%      { transform: translateY(-18px) rotate(10deg) scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) { .hero-emoji { animation: none !important; } }

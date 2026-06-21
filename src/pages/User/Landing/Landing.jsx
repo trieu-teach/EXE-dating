@@ -30,10 +30,10 @@ const STEPS = [
 
 /* Ảnh cây thật trong app + mốc cấp độ */
 const TREE_STAGES = [
-  { lv: 1, img: '/assets/love-tree/tree-stage-seedling.png', name: 'Mầm xanh' },
-  { lv: 4, img: '/assets/love-tree/tree-stage-sparse.png', name: 'Mở khóa Hẹn hò', unlock: true },
-  { lv: 11, img: '/assets/love-tree/tree-stage-blooming.png', name: 'Đơm hoa' },
-  { lv: 21, img: '/assets/love-tree/cherry-tree-premium.png', name: 'Vĩnh cửu' },
+  { lv: 1, img: '/assets/love-tree/1.png', name: 'Mầm xanh' },
+  { lv: 4, img: '/assets/love-tree/4.png', name: 'Mở khóa Hẹn hò', unlock: true },
+  { lv: 6, img: '/assets/love-tree/6.png', name: 'Đơm hoa' },
+  { lv: 7, img: '/assets/love-tree/7.png', name: 'Vĩnh cửu (tối đa)' },
 ]
 
 /* Logo thương hiệu thật từ Clearbit Logo API (free, không cần key) */

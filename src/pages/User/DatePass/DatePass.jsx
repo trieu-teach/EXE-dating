@@ -4,6 +4,7 @@ import { datePassService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
 import { HeartIcon, SparkleIcon, CheckIcon } from '../../../components/ui/CustomIcons.jsx'
+import HeroFX from '../../../components/User/HeroFX/HeroFX.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import './DatePass.css'
 
@@ -105,6 +106,7 @@ export default function DatePass() {
           <h1>Combo cho buổi hẹn của bạn 💕</h1>
           <p>Đặt combo ưu đãi tại quán đối tác — nhận voucher qua email, ra quán chỉ cần đưa mã QR.</p>
         </div>
+        <HeroFX emojis={['🎟️', '☕', '🍕', '🍷', '💕', '🍰', '🎬', '✨']} />
         <div className="dp-hero-deco" aria-hidden>🎟️</div>
       </div>
 
