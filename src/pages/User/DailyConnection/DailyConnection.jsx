@@ -68,6 +68,25 @@ export default function DailyConnection() {
 
   useEffect(() => { load() }, [load])
 
+  const [claiming, setClaiming] = useState(null) // code nhiệm vụ đang nhận
+
+  const handleClaim = async (task) => {
+    if (!task?.code || claiming) return
+    setClaiming(task.code)
+    try {
+      await gamificationService.claim(task.code)
+      setTasks((cur) => cur.map((t) => (t.code === task.code ? { ...t, claimed: true } : t)))
+      const inv = await gamificationService.inventory().catch(() => null)
+      if (inv) setInventory(Array.isArray(inv?.items) ? inv.items : (Array.isArray(inv) ? inv : []))
+      const meta = MATERIAL_META[task.rewardMaterial]
+      toast.success(`Đã nhận ${meta?.emoji ?? '🎁'} ×${task.rewardQty ?? 1}!`)
+    } catch (err) {
+      toast.error(err?.message || 'Nhận thưởng thất bại.')
+    } finally {
+      setClaiming(null)
+    }
+  }
+
   // Kho nguyên liệu (luôn hiện đủ 3 loại)
   const invByMaterial = useMemo(() => {
     const map = {}
@@ -173,10 +192,29 @@ export default function DailyConnection() {
                           </div>
                         </div>
                         {mat && (
-                          <div className="task-reward" style={{ background: mat.bg, color: mat.color }} title={`${mat.label} x${t.rewardQty}`}>
-                            <span>{mat.emoji}</span>
-                            <span className="task-reward-qty">×{t.rewardQty ?? 1}</span>
-                          </div>
+                          t.claimed ? (
+                            <div className="task-reward task-reward-claimed" title="Đã nhận thưởng">
+                              <span>{mat.emoji}</span>
+                              <span className="task-reward-qty">Đã nhận ✓</span>
+                            </div>
+                          ) : t.completed ? (
+                            <button
+                              type="button"
+                              className="task-claim-btn"
+                              disabled={claiming === t.code}
+                              onClick={() => handleClaim(t)}
+                              title={`Nhận ${mat.label} ×${t.rewardQty}`}
+                            >
+                              {claiming === t.code
+                                ? <span className="spinner" />
+                                : <>Nhận <span>{mat.emoji}</span> ×{t.rewardQty ?? 1}</>}
+                            </button>
+                          ) : (
+                            <div className="task-reward task-reward-locked" style={{ background: mat.bg, color: mat.color }} title={`Phần thưởng: ${mat.label} ×${t.rewardQty}`}>
+                              <span>{mat.emoji}</span>
+                              <span className="task-reward-qty">×{t.rewardQty ?? 1}</span>
+                            </div>
+                          )
                         )}
                       </div>
                     )

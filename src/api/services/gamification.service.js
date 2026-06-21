@@ -6,7 +6,7 @@
  */
 
 import { API_ENDPOINTS } from '../config.js'
-import { get } from '../http.js'
+import { get, post } from '../http.js'
 
 export const gamificationService = {
   tasks() {
@@ -15,5 +15,9 @@ export const gamificationService = {
 
   inventory() {
     return get(API_ENDPOINTS.gamification.inventory)
+  },
+
+  claim(code) {
+    return post(API_ENDPOINTS.gamification.claim(code))
   },
 }

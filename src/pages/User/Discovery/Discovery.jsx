@@ -157,6 +157,55 @@ export default function Discovery() {
     }
   }
 
+  // Match modal — tách ra để render được ở MỌI nhánh (kể cả khi đã hết người),
+  // nếu không, match vào người cuối feed sẽ không hiện popup.
+  const matchModalEl = (
+    <AnimatePresence>
+      {matchModal && (
+        <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          onClick={() => setMatchModal(null)}>
+          <motion.div className="modal" initial={{ opacity: 0, scale: 0.75, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.85, y: 20 }} transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+            onClick={(e) => e.stopPropagation()}>
+            <div className="match-success">
+              <motion.div className="match-success-heart" initial={{ scale: 0 }} animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 15, delay: 0.1 }}>
+                <MatchHeartIcon size={64} />
+              </motion.div>
+              <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+                It's a Match!
+              </motion.h1>
+              <motion.div className="match-success-photos" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 18 }}>
+                <div className="match-success-photo" style={myPhoto ? { backgroundImage: `url(${resolveImageUrl(myPhoto)})` } : undefined}>
+                  {!myPhoto && <span className="match-success-initial">{(user?.displayName || 'B').charAt(0).toUpperCase()}</span>}
+                </div>
+                {matchModal && (() => {
+                  const otherUrl = orderedPhotos(matchModal.other)[0]
+                  return (
+                    <div className="match-success-photo" style={otherUrl ? { backgroundImage: `url(${otherUrl})` } : undefined}>
+                      {!otherUrl && <span className="match-success-initial">{(matchModal.other.displayName || '?').charAt(0).toUpperCase()}</span>}
+                    </div>
+                  )
+                })()}
+              </motion.div>
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.48 }} style={{ color: 'var(--color-text-soft)', fontSize: '0.92rem' }}>
+                Bạn và <strong>{matchModal?.other?.displayName}</strong> đã thích nhau.
+              </motion.p>
+              <motion.div style={{ display: 'flex', gap: 10, justifyContent: 'center', width: '100%', flexWrap: 'wrap' }}
+                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.58 }}>
+                <button className="btn btn-ghost" onClick={() => setMatchModal(null)}>Tiếp tục lướt</button>
+                <button className="btn btn-primary" onClick={() => openChat(matchModal.matchId)} disabled={opening}>
+                  {opening ? <span className="spinner" /> : <><HeartIcon size={14} /> Nhắn tin ngay</>}
+                </button>
+              </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+
   if (loading && feed.length === 0) {
     return <div className="loading-block"><span className="spinner" /> Đang tải…</div>
   }
@@ -170,6 +219,7 @@ export default function Discovery() {
           <div className="disc-main">
             <FallingPetals count={20} />
             <div className="loading-block"><span className="spinner" /> Đang tìm thêm người…</div>
+            {matchModalEl}
           </div>
         </div>
       )
@@ -190,6 +240,7 @@ export default function Discovery() {
               </button>
             </div>
           </div>
+          {matchModalEl}
         </div>
       </div>
     )
@@ -304,51 +355,7 @@ export default function Discovery() {
         </motion.button>
       </div>
 
-      {/* Match modal */}
-      <AnimatePresence>
-        {matchModal && (
-          <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => setMatchModal(null)}>
-            <motion.div className="modal" initial={{ opacity: 0, scale: 0.75, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.85, y: 20 }} transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-              onClick={(e) => e.stopPropagation()}>
-              <div className="match-success">
-                <motion.div className="match-success-heart" initial={{ scale: 0 }} animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 15, delay: 0.1 }}>
-                  <MatchHeartIcon size={64} />
-                </motion.div>
-                <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-                  It's a Match!
-                </motion.h1>
-                <motion.div className="match-success-photos" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 18 }}>
-                  <div className="match-success-photo" style={myPhoto ? { backgroundImage: `url(${resolveImageUrl(myPhoto)})` } : undefined}>
-                    {!myPhoto && <span className="match-success-initial">{(user?.displayName || 'B').charAt(0).toUpperCase()}</span>}
-                  </div>
-                  {(() => {
-                    const otherUrl = orderedPhotos(matchModal.other)[0]
-                    return (
-                      <div className="match-success-photo" style={otherUrl ? { backgroundImage: `url(${otherUrl})` } : undefined}>
-                        {!otherUrl && <span className="match-success-initial">{(matchModal.other.displayName || '?').charAt(0).toUpperCase()}</span>}
-                      </div>
-                    )
-                  })()}
-                </motion.div>
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.48 }} style={{ color: 'var(--color-text-soft)', fontSize: '0.92rem' }}>
-                  Bạn và <strong>{matchModal.other.displayName}</strong> đã thích nhau.
-                </motion.p>
-                <motion.div style={{ display: 'flex', gap: 10, justifyContent: 'center', width: '100%', flexWrap: 'wrap' }}
-                  initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.58 }}>
-                  <button className="btn btn-ghost" onClick={() => setMatchModal(null)}>Tiếp tục lướt</button>
-                  <button className="btn btn-primary" onClick={() => openChat(matchModal.matchId)} disabled={opening}>
-                    {opening ? <span className="spinner" /> : <><HeartIcon size={14} /> Nhắn tin ngay</>}
-                  </button>
-                </motion.div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {matchModalEl}
       </div>
     </div>
   )

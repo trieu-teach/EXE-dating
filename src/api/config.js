@@ -105,6 +105,7 @@ export const API_ENDPOINTS = {
   gamification: {
     tasks: '/api/tasks',
     inventory: '/api/inventory',
+    claim: (code) => `/api/tasks/${code}/claim`,
   },
   plants: {
     get: (matchId) => `/api/plants/${matchId}`,

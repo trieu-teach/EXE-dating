@@ -200,6 +200,37 @@
 .task-reward-qty { font-size: 13px; }
 .task-reward > span:first-child { display: inline-block; animation: material-bob 2.7s ease-in-out infinite; }
 
+/* Phần thưởng chưa hoàn thành — mờ đi (xem trước) */
+.task-reward-locked { opacity: 0.55; }
+
+/* Đã nhận */
+.task-reward-claimed {
+  flex-shrink: 0; display: flex; align-items: center; gap: 5px;
+  font-size: 0.82rem; font-weight: 800;
+  padding: 7px 12px; border-radius: 12px;
+  background: rgba(22, 163, 74, 0.12); color: #16a34a;
+}
+
+/* Nút Nhận — nổi bật, có nhịp đập nhẹ để mời bấm */
+.task-claim-btn {
+  flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.85rem; font-weight: 800; font-family: inherit;
+  color: #fff; cursor: pointer; border: none;
+  padding: 9px 16px; border-radius: 999px;
+  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  box-shadow: 0 6px 16px rgba(255, 79, 139, 0.4);
+  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  animation: claim-pulse 1.8s ease-in-out infinite;
+}
+.task-claim-btn:hover { transform: translateY(-2px); filter: brightness(1.05); box-shadow: 0 10px 24px rgba(255, 79, 139, 0.5); }
+.task-claim-btn:disabled { opacity: 0.7; cursor: default; animation: none; }
+.task-claim-btn > span { display: inline-block; }
+@keyframes claim-pulse {
+  0%, 100% { box-shadow: 0 6px 16px rgba(255, 79, 139, 0.4); }
+  50% { box-shadow: 0 6px 22px rgba(255, 79, 139, 0.65); }
+}
+
 /* ── Reminders ── */
 .reminder-list { display: flex; flex-direction: column; gap: 8px; }
 .reminder-item {
