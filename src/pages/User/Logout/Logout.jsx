@@ -8,14 +8,14 @@ export default function Logout() {
   const navigate = useNavigate()
   useEffect(() => {
     let cancelled = false
-    logout().finally(() => { if (!cancelled) navigate('/login', { replace: true }) })
+    logout().finally(() => { if (!cancelled) navigate('/', { replace: true }) })
     return () => { cancelled = true }
   }, [logout, navigate])
   return (
     <main className="auth-page">
       <div className="auth-card" style={{ textAlign: 'center' }}>
         <h1>Đang đăng xuất…</h1>
-        <Link to="/login" className="btn btn-primary" style={{ marginTop: 16 }}>Về đăng nhập</Link>
+        <Link to="/" className="btn btn-primary" style={{ marginTop: 16 }}>Về trang chủ</Link>
       </div>
     </main>
   )

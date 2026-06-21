@@ -51,7 +51,7 @@ function PublicOrShell({ children, variant }) {
 function AuthOnly({ children }) {
   const { isAuthenticated, bootstrapping } = useAuth()
   if (bootstrapping) return <div className="loading-block"><span className="spinner" /></div>
-  if (!isAuthenticated) return <Navigate to="/login" replace />
+  if (!isAuthenticated) return <Navigate to="/" replace />
   return children
 }
 

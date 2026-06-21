@@ -16,7 +16,7 @@ export default function SessionGuard() {
   useEffect(() => {
     if (bootstrapping) return
     if (!isAuthenticated && !PUBLIC_ROUTES.has(pathname)) {
-      navigate('/login', { replace: true, state: { from: pathname } })
+      navigate('/', { replace: true, state: { from: pathname } })
     }
   }, [bootstrapping, isAuthenticated, pathname, navigate])
 
