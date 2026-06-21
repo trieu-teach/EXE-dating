@@ -32,10 +32,6 @@ import Tasks from './pages/User/Tasks/Tasks.jsx'
 import MeetUpPlan from './pages/User/MeetUpPlan/MeetUpPlan.jsx'
 import DailyConnection from './pages/User/DailyConnection/DailyConnection.jsx'
 import Premium from './pages/User/Premium/Premium.jsx'
-import Events from './pages/User/Events/Events.jsx'
-import EventDetail from './pages/User/EventDetail/EventDetail.jsx'
-import EventHistory from './pages/User/EventHistory/EventHistory.jsx'
-import EventReward from './pages/User/EventReward/EventReward.jsx'
 import MatchSuccess from './pages/User/MatchSuccess/MatchSuccess.jsx'
 import SettingsHub from './pages/User/Settings/SettingsHub.jsx'
 import ChangePassword from './pages/User/Settings/ChangePassword/ChangePassword.jsx'
@@ -43,6 +39,7 @@ import Devices from './pages/User/Settings/Devices/Devices.jsx'
 import DiscoverySettings from './pages/User/Settings/DiscoverySettings/DiscoverySettings.jsx'
 import SecuritySettings from './pages/User/Settings/SecuritySettings/SecuritySettings.jsx'
 import Logout from './pages/User/Logout/Logout.jsx'
+import Landing from './pages/User/Landing/Landing.jsx'
 
 function PublicOrShell({ children, variant }) {
   const { user } = useAuth()
@@ -56,6 +53,15 @@ function AuthOnly({ children }) {
   if (bootstrapping) return <div className="loading-block"><span className="spinner" /></div>
   if (!isAuthenticated) return <Navigate to="/login" replace />
   return children
+}
+
+/** Trang gốc "/": khách xem Landing; đã đăng nhập thì vào app. */
+function Root() {
+  const { isAuthenticated, bootstrapping, user } = useAuth()
+  if (bootstrapping) return <div className="loading-block"><span className="spinner" /></div>
+  if (!isAuthenticated) return <Landing />
+  if (user?.role === 'Admin') return <Navigate to="/admin" replace />
+  return <Navigate to="/discovery" replace />
 }
 
 /** Require auth + have passed face verification / onboarding. */
@@ -92,7 +98,7 @@ export default function App() {
             <Route path="/match-success" element={<AuthOnly><MatchSuccess /></AuthOnly>} />
 
             {/* Main app — bắt buộc đã hoàn tất onboarding */}
-            <Route path="/" element={<Navigate to="/discovery" replace />} />
+            <Route path="/" element={<Root />} />
             <Route path="/discovery" element={<Onboarded><PublicOrShell variant="full"><Discovery /></PublicOrShell></Onboarded>} />
             <Route path="/matches" element={<Onboarded><PublicOrShell><Matches /></PublicOrShell></Onboarded>} />
             <Route path="/chat" element={<Onboarded><PublicOrShell variant="full"><Chat /></PublicOrShell></Onboarded>} />
@@ -109,10 +115,6 @@ export default function App() {
             <Route path="/meet-up/:partnerId" element={<Onboarded><PublicOrShell><MeetUpPlan /></PublicOrShell></Onboarded>} />
             <Route path="/daily-connection" element={<Onboarded><PublicOrShell><DailyConnection /></PublicOrShell></Onboarded>} />
             <Route path="/premium" element={<Onboarded><PublicOrShell variant="full"><Premium /></PublicOrShell></Onboarded>} />
-            <Route path="/events" element={<Onboarded><PublicOrShell variant="full"><Events /></PublicOrShell></Onboarded>} />
-            <Route path="/events/history" element={<Onboarded><PublicOrShell><EventHistory /></PublicOrShell></Onboarded>} />
-            <Route path="/events/reward" element={<Onboarded><PublicOrShell><EventReward /></PublicOrShell></Onboarded>} />
-            <Route path="/events/:eventId" element={<Onboarded><PublicOrShell><EventDetail /></PublicOrShell></Onboarded>} />
             <Route path="/account-verification" element={<Onboarded><PublicOrShell><AccountVerification /></PublicOrShell></Onboarded>} />
 
 

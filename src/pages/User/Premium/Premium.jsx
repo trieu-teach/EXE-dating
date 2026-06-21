@@ -35,9 +35,9 @@ const PLAN_META = {
     gradient: 'linear-gradient(135deg, #ff7eb3, #ff4f8b)',
     features: [
       'Thích KHÔNG giới hạn',
+      '5 Super Swipe mỗi ngày ⭐',
       'Hoàn tác lượt vuốt (Undo)',
       'Bao gồm toàn bộ gói Free',
-      'Trải nghiệm không quảng cáo',
     ],
   },
   Gold: {
@@ -49,8 +49,8 @@ const PLAN_META = {
     gradient: 'linear-gradient(135deg, #ffd76f, #f5a623)',
     features: [
       'Xem AI đã thích bạn (kèm ảnh)',
+      '10 Super Swipe mỗi ngày ⭐',
       'Boost hồ sơ — nổi bật hơn',
-      'Ưu tiên hiển thị trong Discovery',
       'Bao gồm toàn bộ gói Plus',
     ],
   },

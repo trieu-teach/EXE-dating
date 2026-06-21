@@ -25,8 +25,8 @@ export default function DatePass() {
   const [matches, setMatches] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // xem chi tiết + mua
-  const [detailCombo, setDetailCombo] = useState(null)
+  // chọn quán → chọn combo → mua
+  const [venueModal, setVenueModal] = useState(null) // { venueName, category, venueAddress, venueImageUrl, items[] }
   const [buyCombo, setBuyCombo] = useState(null)
   const [matchId, setMatchId] = useState('')
   const [paying, setPaying] = useState(false)
@@ -83,21 +83,29 @@ export default function DatePass() {
     }
   }
 
-  const groupedByVenue = useMemo(() => {
+  // Gom combo theo quán
+  const venues = (() => {
     const g = {}
-    for (const c of combos) (g[c.venueId] ??= { venue: c, items: [] }).items.push(c)
+    for (const c of combos) {
+      const k = c.venueId
+      if (!g[k]) g[k] = { venueId: k, venueName: c.venueName, category: c.category, venueAddress: c.venueAddress, venueImageUrl: c.venueImageUrl, items: [] }
+      g[k].items.push(c)
+    }
     return Object.values(g)
-  }, [combos])
+  })()
 
   if (loading) return <div className="loading-block"><span className="spinner" /></div>
 
   return (
     <div className="dp-root">
-      {/* Hero */}
+      {/* Hero banner */}
       <div className="dp-hero">
-        <div className="dp-hero-eyebrow"><SparkleIcon size={12} /> Ưu đãi hẹn hò</div>
-        <h1>Combo cho buổi hẹn của bạn</h1>
-        <p>Đặt combo ưu đãi tại quán đối tác — nhận voucher gửi về email, ra quán chỉ cần đưa mã QR.</p>
+        <div className="dp-hero-inner">
+          <div className="dp-hero-eyebrow"><SparkleIcon size={12} /> Ưu đãi hẹn hò</div>
+          <h1>Combo cho buổi hẹn của bạn 💕</h1>
+          <p>Đặt combo ưu đãi tại quán đối tác — nhận voucher qua email, ra quán chỉ cần đưa mã QR.</p>
+        </div>
+        <div className="dp-hero-deco" aria-hidden>🎟️</div>
       </div>
 
       {/* Tabs */}
@@ -109,43 +117,36 @@ export default function DatePass() {
       </div>
 
       <div className="dp-body">
-        {/* ── TAB: Combos ── */}
+        {/* ── TAB: Quán (bấm để xem voucher) ── */}
         {tab === 'combos' && (
-          groupedByVenue.length === 0 ? (
-            <div className="dp-empty">Chưa có combo nào. Quay lại sau nhé!</div>
+          venues.length === 0 ? (
+            <div className="dp-empty">Chưa có quán nào. Quay lại sau nhé!</div>
           ) : (
-            groupedByVenue.map(({ venue, items }) => (
-              <div key={venue.venueId} className="dp-venue-block">
-                <div className="dp-venue-head">
-                  <span className="dp-venue-cat">{CAT_ICON[venue.category] || '📍'}</span>
-                  <div>
-                    <div className="dp-venue-name">{venue.venueName}</div>
-                    {venue.venueAddress && <div className="dp-venue-addr">{venue.venueAddress}</div>}
-                  </div>
-                </div>
-                <div className="dp-combo-grid">
-                  {items.map((c) => (
-                    <motion.div key={c.id} className="dp-combo-card"
-                      initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                      onClick={() => setDetailCombo(c)} role="button" tabIndex={0}
-                      onKeyDown={(e) => (e.key === 'Enter') && setDetailCombo(c)}>
-                      <div className="dp-combo-img" style={c.venueImageUrl ? { backgroundImage: `url(${resolveImageUrl(c.venueImageUrl)})` } : undefined}>
-                        {c.discountPercent > 0 && <span className="dp-combo-badge">-{c.discountPercent}%</span>}
+            <div className="dp-combo-grid">
+              {venues.map((v) => {
+                const min = Math.min(...v.items.map((i) => i.salePriceVnd))
+                return (
+                  <motion.div key={v.venueId} className="dp-combo-card"
+                    initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                    onClick={() => setVenueModal(v)} role="button" tabIndex={0}
+                    onKeyDown={(e) => (e.key === 'Enter') && setVenueModal(v)}>
+                    <div className="dp-combo-img" style={v.venueImageUrl ? { backgroundImage: `url(${resolveImageUrl(v.venueImageUrl)})` } : undefined}>
+                      <span className="dp-combo-badge dp-count-badge">{v.items.length} ưu đãi</span>
+                    </div>
+                    <div className="dp-combo-body">
+                      <div className="dp-combo-venue">{CAT_ICON[v.category] || '📍'} {v.category}</div>
+                      <div className="dp-combo-title">{v.venueName}</div>
+                      {v.venueAddress && <div className="dp-combo-desc">{v.venueAddress}</div>}
+                      <div className="dp-combo-price">
+                        <span className="dp-price-from">Từ</span>
+                        <span className="dp-price-sale">{vnd(min)}</span>
                       </div>
-                      <div className="dp-combo-body">
-                        <div className="dp-combo-title">{c.title}</div>
-                        {c.description && <div className="dp-combo-desc">{c.description}</div>}
-                        <div className="dp-combo-price">
-                          <span className="dp-price-sale">{vnd(c.salePriceVnd)}</span>
-                          {c.originalPriceVnd > c.salePriceVnd && <span className="dp-price-orig">{vnd(c.originalPriceVnd)}</span>}
-                        </div>
-                        <div className="dp-combo-cta">Xem chi tiết →</div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            ))
+                      <div className="dp-combo-cta">Xem ưu đãi →</div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
           )
         )}
 
@@ -199,32 +200,37 @@ export default function DatePass() {
 
       </div>
 
-      {/* ── Modal chi tiết combo ── */}
+      {/* ── Popup voucher của quán ── */}
       <AnimatePresence>
-        {detailCombo && (
+        {venueModal && (
           <motion.div className="dp-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => setDetailCombo(null)}>
+            onClick={() => setVenueModal(null)}>
             <motion.div className="dp-detail" initial={{ opacity: 0, scale: 0.92, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 20 }} onClick={(e) => e.stopPropagation()}>
-              <div className="dp-detail-img" style={detailCombo.venueImageUrl ? { backgroundImage: `url(${resolveImageUrl(detailCombo.venueImageUrl)})` } : undefined}>
-                {detailCombo.discountPercent > 0 && <span className="dp-detail-badge">Giảm {detailCombo.discountPercent}%</span>}
-                <button className="dp-detail-close" onClick={() => setDetailCombo(null)} aria-label="Đóng">✕</button>
-              </div>
-              <div className="dp-detail-body">
-                <div className="dp-detail-venue">{CAT_ICON[detailCombo.category] || '📍'} {detailCombo.venueName}</div>
-                <h2 className="dp-detail-title">{detailCombo.title}</h2>
-                {detailCombo.description && <p className="dp-detail-desc">{detailCombo.description}</p>}
-                {detailCombo.venueAddress && <div className="dp-detail-addr">📍 {detailCombo.venueAddress}</div>}
-                <div className="dp-detail-price">
-                  <span className="dp-price-sale">{vnd(detailCombo.salePriceVnd)}</span>
-                  {detailCombo.originalPriceVnd > detailCombo.salePriceVnd && (
-                    <span className="dp-price-orig">{vnd(detailCombo.originalPriceVnd)}</span>
-                  )}
-                  <span className="dp-detail-forwho">/ cho 2 người</span>
+              <div className="dp-detail-img" style={venueModal.venueImageUrl ? { backgroundImage: `url(${resolveImageUrl(venueModal.venueImageUrl)})` } : undefined}>
+                <button className="dp-detail-close" onClick={() => setVenueModal(null)} aria-label="Đóng">✕</button>
+                <div className="dp-detail-imgname">
+                  <div className="dp-detail-venue-row">{CAT_ICON[venueModal.category] || '📍'} {venueModal.category}</div>
+                  <h2>{venueModal.venueName}</h2>
+                  {venueModal.venueAddress && <div className="dp-detail-addr">📍 {venueModal.venueAddress}</div>}
                 </div>
-                <button className="dp-pay-btn" onClick={() => { const c = detailCombo; setDetailCombo(null); openBuy(c) }}>
-                  💕 Đặt combo này
-                </button>
+              </div>
+              <div className="dp-vlist">
+                <div className="dp-vlist-label">Chọn ưu đãi ({venueModal.items.length})</div>
+                {venueModal.items.map((c) => (
+                  <div key={c.id} className="dp-vrow">
+                    <div className="dp-vrow-main">
+                      <div className="dp-vrow-title">{c.title}</div>
+                      {c.description && <div className="dp-vrow-desc">{c.description}</div>}
+                      <div className="dp-vrow-price">
+                        <span className="dp-price-sale">{vnd(c.salePriceVnd)}</span>
+                        {c.originalPriceVnd > c.salePriceVnd && <span className="dp-price-orig">{vnd(c.originalPriceVnd)}</span>}
+                        {c.discountPercent > 0 && <span className="dp-vrow-off">-{c.discountPercent}%</span>}
+                      </div>
+                    </div>
+                    <button className="dp-vrow-btn" onClick={() => { setVenueModal(null); openBuy(c) }}>Đặt</button>
+                  </div>
+                ))}
               </div>
             </motion.div>
           </motion.div>

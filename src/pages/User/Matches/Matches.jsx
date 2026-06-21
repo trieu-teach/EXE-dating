@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { matchesService, chatService, swipesService, subscriptionService } from '../../../api'
+import { matchesService, chatService, swipesService, subscriptionService, profileService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl, timeAgo } from '../../../utils/format.js'
 import { HeartIcon, MessageIcon, SparkleIcon, StarIcon, CrownIcon } from '../../../components/ui/CustomIcons.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import ProfileDetailModal from '../../../components/User/ProfileDetailModal/ProfileDetailModal.jsx'
+import ProfilePreviewModal from '../../../components/User/ProfilePreviewModal/ProfilePreviewModal.jsx'
 import './Matches.css'
 import '../LikedMe/LikedMe.css'
 
@@ -19,6 +20,7 @@ export default function Matches() {
   const [loading, setLoading] = useState(true)
   const [acting, setActing] = useState(null)
   const [detail, setDetail] = useState(null)
+  const [profile, setProfile] = useState(null) // hồ sơ người match (bấm avatar)
 
   const loadMatches = () => matchesService.list()
     .then((m) => setMatches(Array.isArray(m) ? m : (m?.items ?? [])))
@@ -39,6 +41,16 @@ export default function Matches() {
       setIsGold(me?.entitlements?.canSeeLikedMePhotos === true || me?.planCode === 'Gold')
     }).finally(() => setLoading(false))
   }, [])
+
+  const openProfile = async (userId) => {
+    if (!userId) return
+    try {
+      const p = await profileService.byId(userId)
+      setProfile(p)
+    } catch (err) {
+      toast.error(err?.message || 'Không tải được hồ sơ.')
+    }
+  }
 
   const openChat = async (matchId) => {
     try {
@@ -80,10 +92,11 @@ export default function Matches() {
       {/* Hero */}
       <div className="matches-hero">
         <div className="matches-hero-content">
-          <div className="matches-hero-eyebrow"><SparkleIcon size={12} /> Kết nối</div>
+          <div className="matches-hero-eyebrow"><HeartIcon size={12} /> Kết nối</div>
           <h1>Lượt thích & Match</h1>
           <p className="matches-hero-subtitle">Ai đã thích bạn và những người đã match — tất cả ở đây.</p>
         </div>
+        <span className="hero-deco" aria-hidden>💞</span>
       </div>
 
       {/* Tabs */}
@@ -122,7 +135,9 @@ export default function Matches() {
                 <div className="liked-grid">
                   {likers.map((u, i) => {
                     const url = resolveImageUrl(u.photos?.[0]?.url)
-                    const locked = !isGold
+                    // Super Swipe luôn lộ rõ (kể cả Free/Plus); like thường mới cần Gold
+                    const locked = !isGold && !u.isSuperLike
+                    const canAct = isGold || u.isSuperLike
                     return (
                       <motion.div key={u.userId} className="liked-card"
                         initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
@@ -143,7 +158,7 @@ export default function Matches() {
                             {locked ? 'Ẩn danh' : u.displayName}{!locked && u.age ? `, ${u.age}` : ''}
                           </div>
                         </div>
-                        {isGold && (
+                        {canAct && (
                           <div className="liked-card-actions">
                             <button type="button" className="liked-act liked-act-pass" disabled={acting === u.userId}
                               onClick={() => act(u, 'Pass')} aria-label="Bỏ qua">✕</button>
@@ -174,14 +189,19 @@ export default function Matches() {
                       <motion.div key={matchId ?? i} className="match-card"
                         initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.06 }} onClick={() => openChat(matchId)}>
-                        <div className="match-avatar" style={avatar ? { backgroundImage: `url(${avatar})` } : undefined}>
+                        <button type="button" className="match-avatar" title="Xem hồ sơ"
+                          style={avatar ? { backgroundImage: `url(${avatar})` } : undefined}
+                          onClick={(e) => { e.stopPropagation(); openProfile(m.userId) }}>
                           {!avatar && <span className="match-avatar-fallback">{(m.displayName || '?').charAt(0).toUpperCase()}</span>}
-                        </div>
+                        </button>
                         <div className="match-info">
                           <div className="match-name">{m.displayName || 'Người dùng'}{m.age ? `, ${m.age}` : ''}</div>
                           <div className="match-meta"><HeartIcon size={10} /> Match {timeAgo(m.matchedAt)}</div>
                         </div>
-                        <div className="match-action"><MessageIcon size={18} /></div>
+                        <button type="button" className="match-action" title="Nhắn tin"
+                          onClick={(e) => { e.stopPropagation(); openChat(matchId) }}>
+                          <MessageIcon size={18} />
+                        </button>
                       </motion.div>
                     )
                   })}
@@ -193,6 +213,9 @@ export default function Matches() {
       </div>
 
       <ProfileDetailModal profile={detail} open={!!detail} onClose={() => setDetail(null)} onSwipe={onDetailSwipe} />
+
+      {/* Hồ sơ đầy đủ người match (bấm avatar) */}
+      <ProfilePreviewModal profile={profile} open={!!profile} onClose={() => setProfile(null)} ownerView={false} />
     </div>
   )
 }

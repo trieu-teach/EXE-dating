@@ -44,25 +44,6 @@ export default function SettingsHub() {
 
   return (
     <div className="settings-root">
-      {/* Avatar header */}
-      <div className="settings-avatar-header">
-        <div className="settings-avatar-inner">
-          <div className="settings-avatar-circle">
-            {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt={user.displayName || 'Avatar'} />
-            ) : (
-              initials
-            )}
-          </div>
-          <div className="settings-avatar-info">
-            <div className="settings-avatar-name">
-              {user?.displayName || 'Người dùng'}
-            </div>
-            <div className="settings-avatar-email">{user?.email}</div>
-          </div>
-        </div>
-      </div>
-
       {/* Sections */}
       <div className="settings-sections">
         {SECTIONS.map((section, si) => (

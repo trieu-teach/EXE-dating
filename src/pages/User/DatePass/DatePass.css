@@ -1,18 +1,29 @@
 /* ══════════ Date Pass — combo ưu đãi hẹn hò ══════════ */
-.dp-root { max-width: 920px; margin: 0 auto; padding: 0 16px 64px; }
+.dp-root { max-width: 1120px; margin: 0 auto; padding: 18px 20px 64px; }
 
-/* Hero */
+/* Hero banner */
 .dp-hero {
-  text-align: center;
-  padding: 34px 20px 26px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 30px 28px;
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, #ff7eb3 0%, #ff4f8b 45%, #b14bff 100%);
+  color: #fff;
+  box-shadow: 0 14px 36px rgba(255, 79, 139, 0.28);
 }
+.dp-hero-inner { position: relative; z-index: 1; max-width: 620px; }
 .dp-hero-eyebrow {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--color-primary);
+  font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+  opacity: 0.9;
 }
-.dp-hero h1 { font-size: clamp(1.6rem, 5vw, 2.3rem); font-weight: 900; letter-spacing: -0.03em; margin: 8px 0 8px; color: var(--color-text); }
-.dp-hero p { font-size: 0.92rem; color: var(--color-text-soft); max-width: 520px; margin: 0 auto; line-height: 1.6; }
+.dp-hero h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 900; letter-spacing: -0.03em; margin: 8px 0 8px; color: #fff; }
+.dp-hero p { font-size: 0.92rem; color: rgba(255,255,255,0.9); margin: 0; line-height: 1.6; }
+.dp-hero-deco {
+  position: absolute; right: -10px; bottom: -20px; font-size: 130px; opacity: 0.18;
+  transform: rotate(-15deg); z-index: 0; pointer-events: none;
+}
 
 /* Tabs */
 .dp-tabs { display: flex; gap: 8px; max-width: 520px; margin: 0 auto 8px; }
@@ -46,7 +57,36 @@
 .dp-venue-addr { font-size: 0.78rem; color: var(--color-text-muted); }
 
 /* Combo cards */
-.dp-combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.dp-combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px; }
+.dp-combo-venue { font-size: 0.74rem; font-weight: 700; color: var(--color-text-muted); text-transform: capitalize; }
+.dp-count-badge { background: rgba(0,0,0,0.55) !important; backdrop-filter: blur(4px); }
+.dp-price-from { font-size: 0.78rem; color: var(--color-text-muted); }
+
+/* Popup voucher của quán */
+.dp-detail-imgname { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 18px; color: #fff; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
+.dp-detail-imgname h2 { margin: 4px 0 2px; font-size: 1.3rem; font-weight: 900; }
+.dp-detail-venue-row { font-size: 0.78rem; font-weight: 700; opacity: 0.92; text-transform: capitalize; }
+.dp-detail-imgname .dp-detail-addr { color: rgba(255,255,255,0.85); }
+
+.dp-vlist { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.dp-vlist-label { font-size: 0.78rem; font-weight: 800; color: var(--color-text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+.dp-vrow {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border: 1px solid var(--color-border); border-radius: 14px;
+  background: var(--color-surface);
+}
+.dp-vrow-main { flex: 1; min-width: 0; }
+.dp-vrow-title { font-weight: 800; color: var(--color-text); font-size: 0.95rem; }
+.dp-vrow-desc { font-size: 0.8rem; color: var(--color-text-soft); margin-top: 2px; }
+.dp-vrow-price { display: flex; align-items: baseline; gap: 8px; margin-top: 6px; }
+.dp-vrow-off { font-size: 0.74rem; font-weight: 800; color: #fff; background: var(--color-primary); padding: 2px 7px; border-radius: 999px; }
+.dp-vrow-btn {
+  flex-shrink: 0; padding: 10px 18px; border: none; border-radius: 12px; cursor: pointer;
+  font-family: inherit; font-weight: 800; color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 4px 14px rgba(255,79,139,0.3);
+}
+.dp-vrow-btn:hover { filter: brightness(1.05); }
 .dp-combo-card {
   background: var(--color-surface); border: 1px solid var(--color-border);
   border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;

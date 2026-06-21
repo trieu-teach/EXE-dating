@@ -46,22 +46,20 @@ export default function LoveTreeBondBar({ plant, matchId, onWater, loading }) {
         </div>
         <div className="bond-bar-bottom">
           <span className="bond-bar-xp">{growthPct}% / {perLevel}%</span>
-          {matchId && (
-            <Link to={`/love-tree?matchId=${matchId}`} className="bond-bar-link">
-              Chi tiết →
-            </Link>
-          )}
         </div>
       </div>
-      <button
-        type="button"
-        className="bond-bar-water-btn"
-        onClick={onWater}
-        disabled={loading}
-        title="Tưới cây"
-      >
-        {loading ? <span className="spinner" /> : '💧'}
-      </button>
+      {matchId ? (
+        <Link
+          to={`/love-tree?matchId=${matchId}`}
+          className="bond-bar-water-btn"
+          title="Xem & chăm Cây tình yêu"
+          aria-label="Đi tới Cây tình yêu"
+        >
+          💧
+        </Link>
+      ) : (
+        <span className="bond-bar-water-btn">💧</span>
+      )}
     </section>
   )
 }

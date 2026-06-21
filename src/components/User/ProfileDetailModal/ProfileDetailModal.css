@@ -116,6 +116,14 @@
   text-transform: uppercase;
 }
 
+.pdm-badge-super {
+  background: linear-gradient(135deg, rgba(177, 75, 255, 0.92), rgba(147, 51, 234, 0.92));
+  color: #ffffff;
+  border: 1px solid rgba(177, 75, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 .pdm-badge-verified {
   background: rgba(52, 168, 85, 0.82);
   color: #ffffff;

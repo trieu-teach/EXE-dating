@@ -71,12 +71,13 @@ export default function LikedMe() {
   return (
     <div className="liked-root">
       <div className="liked-hero">
-        <div className="liked-hero-eyebrow"><SparkleIcon size={12} /> Lượt thích</div>
+        <div className="liked-hero-eyebrow"><HeartIcon size={12} /> Lượt thích</div>
         <h1>Ai đã thích bạn</h1>
         <p className="liked-hero-sub">
           {people.length} người đã thích bạn.{' '}
           {isGold ? 'Thích lại để tạo match ngay!' : 'Nâng cấp Gold để xem rõ và thích lại.'}
         </p>
+        <span className="hero-deco" aria-hidden>💖</span>
       </div>
 
       {!isGold && people.length > 0 && (

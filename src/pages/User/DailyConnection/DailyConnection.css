@@ -1,8 +1,8 @@
 /* ===== Daily / Hằng ngày — modern, friendly ===== */
 .daily-page {
-  max-width: 720px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 20px 16px 56px;
+  padding: 20px 20px 56px;
   display: flex;
   flex-direction: column;
   gap: 26px;
@@ -109,7 +109,19 @@
   padding: 14px 16px; border-radius: 18px;
   border: 1px solid rgba(0,0,0,0.04);
 }
-.material-emoji { font-size: 28px; line-height: 1; }
+.material-emoji {
+  font-size: 28px;
+  line-height: 1;
+  display: inline-block;
+  animation: material-bob 2.8s ease-in-out infinite;
+}
+@keyframes material-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(-6deg); }
+}
+.material-chip:nth-child(1) .material-emoji { animation-delay: 0s; animation-duration: 2.6s; }
+.material-chip:nth-child(2) .material-emoji { animation-delay: 0.4s; animation-duration: 3.1s; }
+.material-chip:nth-child(3) .material-emoji { animation-delay: 0.8s; animation-duration: 2.9s; }
 .material-info { display: flex; flex-direction: column; }
 .material-qty { font-size: 22px; font-weight: 800; line-height: 1.1; }
 .material-name { font-size: 12px; font-weight: 600; color: var(--color-text-soft, #6b7280); }
@@ -150,11 +162,15 @@
 
 /* ── Material tasks (grouped) ── */
 .task-group { display: flex; flex-direction: column; gap: 8px; }
+.task-group-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+}
 .task-group-label {
   display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
   font-size: 12px; font-weight: 700; color: var(--color-text, #1a1a2e);
   padding: 5px 12px; border-radius: 99px;
 }
+.task-group-reset { font-size: 11.5px; font-weight: 600; color: var(--color-text-muted, #9ca3af); }
 .task-list { display: flex; flex-direction: column; gap: 8px; }
 .task-row {
   display: flex; align-items: center; gap: 14px;
@@ -182,6 +198,7 @@
   padding: 7px 11px; border-radius: 12px;
 }
 .task-reward-qty { font-size: 13px; }
+.task-reward > span:first-child { display: inline-block; animation: material-bob 2.7s ease-in-out infinite; }
 
 /* ── Reminders ── */
 .reminder-list { display: flex; flex-direction: column; gap: 8px; }

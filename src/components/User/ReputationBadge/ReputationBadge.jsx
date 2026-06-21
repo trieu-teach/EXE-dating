@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useReputation } from '../../../hooks/useReputation.js'
 import './ReputationBadge.css'
 
@@ -22,7 +23,8 @@ export default function ReputationBadge({
 
   const tone = isPhotoVerified ? 'verified' : 'limited'
   return (
-    <span
+    <Link
+      to="/reputation"
       className={`rep-badge rep-${size} rep-${tone}`}
       title={
         isPhotoVerified
@@ -30,14 +32,11 @@ export default function ReputationBadge({
           : `Xác minh khuôn mặt để mở khóa uy tín đầy đủ (tối đa 65 khi chưa xác minh). Hiện tại: ${score}.`
       }
     >
-      <span className="rep-emoji" aria-hidden>
-        {isPhotoVerified ? '🛡️' : '🪪'}
-      </span>
       <span className="rep-value">{score}</span>
       {showLabel && <span className="rep-label">Uy tín</span>}
       {showCapNote && capped && (
-        <span className="rep-cap" aria-hidden>/65</span>
+        <span className="rep-cap" aria-hidden>/ 65</span>
       )}
-    </span>
+    </Link>
   )
 }

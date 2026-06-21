@@ -1,0 +1,155 @@
+/* ============================================================
+   APP HERO / BANNER — 1 CHUẨN DUY NHẤT (theo banner Ưu đãi/voucher)
+   Áp cho 6 banner. Cây tình yêu & Premium giữ nguyên màu/gốc.
+   ============================================================ */
+
+.matches-hero,
+.liked-hero,
+.dp-hero,
+.daily-hero,
+.events-hero {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1080px;          /* cùng bề rộng với banner Ưu đãi */
+  margin-left: auto !important;
+  margin-right: auto !important;
+  border-radius: 24px !important;
+  padding: 30px 28px !important;
+  margin-bottom: 18px !important;
+  background: linear-gradient(120deg, #ff2d6b 0%, #ff4f8b 48%, #ff85b8 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 14px 36px rgba(255, 79, 139, 0.3) !important;
+  border: none !important;
+  isolation: isolate;
+}
+
+/* Hào quang trang trí (góc trên phải) */
+.matches-hero::before,
+.liked-hero::before,
+.dp-hero::before,
+.daily-hero::before,
+.events-hero::before {
+  content: '';
+  position: absolute;
+  top: -45%;
+  right: -8%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.38), transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Hào quang hồng (góc dưới trái) */
+.matches-hero::after,
+.liked-hero::after,
+.dp-hero::after,
+.daily-hero::after,
+.events-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -55%;
+  left: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 45, 107, 0.55), transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Nội dung luôn nổi trên lớp glow */
+.matches-hero > *,
+.liked-hero > *,
+.dp-hero > *,
+.daily-hero > *,
+.events-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Eyebrow → pill kính mờ trắng ── */
+.matches-hero-eyebrow,
+.liked-hero-eyebrow,
+.dp-hero-eyebrow,
+.daily-hero-eyebrow,
+.events-hero-eyebrow {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px !important;
+  margin-bottom: 12px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  color: #fff !important;
+  font-size: 0.7rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* ── Tiêu đề ── */
+.matches-hero h1,
+.liked-hero h1,
+.dp-hero h1,
+.daily-hero-title,
+.events-hero-title {
+  color: #fff !important;
+  font-size: clamp(1.5rem, 4vw, 2.1rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.14 !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 0 8px !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Mô tả phụ ── */
+.matches-hero-subtitle,
+.liked-hero-sub,
+.dp-hero p,
+.daily-hero-sub,
+.events-hero-subtitle {
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-size: 0.92rem !important;
+  line-height: 1.55 !important;
+  margin: 0 !important;
+  max-width: 580px;
+}
+
+/* ── Emoji trang trí góc — dùng chung cho mọi banner ── */
+.hero-deco,
+.dp-hero-deco {
+  position: absolute !important;
+  right: -6px !important;
+  bottom: -16px !important;
+  font-size: 120px !important;
+  line-height: 1 !important;
+  opacity: 0.2 !important;
+  transform: rotate(-15deg) !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  user-select: none;
+}
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .matches-hero,
+  .liked-hero,
+  .dp-hero,
+  .daily-hero,
+  .events-hero {
+    padding: 24px 20px !important;
+    border-radius: 20px !important;
+  }
+  .matches-hero h1,
+  .liked-hero h1,
+  .dp-hero h1,
+  .daily-hero-title,
+  .events-hero-title {
+    font-size: 1.45rem !important;
+  }
+}

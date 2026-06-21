@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
   },
   profile: {
     me: '/api/profile/me',
+    byId: (id) => `/api/profile/${id}`,
     update: '/api/profile',
     location: '/api/profile/location',
     photos: '/api/profile/photos',

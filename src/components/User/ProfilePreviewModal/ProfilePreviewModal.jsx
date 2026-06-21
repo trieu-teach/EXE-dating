@@ -18,7 +18,7 @@ const orderedPhotos = (p) => {
 /**
  * Xem trước hồ sơ của chính mình đúng như người khác thấy trong Discovery.
  */
-export default function ProfilePreviewModal({ profile, open, onClose }) {
+export default function ProfilePreviewModal({ profile, open, onClose, ownerView = true }) {
   if (!profile) return null
   const photos = orderedPhotos(profile)
   const name = profile.displayName || 'Bạn'
@@ -38,12 +38,12 @@ export default function ProfilePreviewModal({ profile, open, onClose }) {
             exit={{ opacity: 0, y: 30, scale: 0.97 }} transition={{ type: 'spring', stiffness: 260, damping: 26 }}
             onClick={(e) => e.stopPropagation()}>
             <div className="pv-topbar">
-              <span className="pv-topbar-title">Xem trước hồ sơ</span>
+              <span className="pv-topbar-title">{ownerView ? 'Xem trước hồ sơ' : `Hồ sơ của ${name}`}</span>
               <button type="button" className="pv-close" onClick={onClose} aria-label="Đóng"><XIcon size={20} /></button>
             </div>
 
             <div className="pv-scroll">
-              <div className="pv-hint">👀 Đây là hồ sơ của bạn khi người khác nhìn thấy</div>
+              {ownerView && <div className="pv-hint">👀 Đây là hồ sơ của bạn khi người khác nhìn thấy</div>}
 
               {photos[0] ? (
                 <div className="pv-photo pv-photo-hero" style={{ backgroundImage: `url(${photos[0]})` }}>

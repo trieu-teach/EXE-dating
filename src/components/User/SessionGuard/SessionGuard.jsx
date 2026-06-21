@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useAuth } from '../../../context/AuthContext.jsx'
 
-const PUBLIC_ROUTES = new Set(['/login', '/register', '/verify-otp', '/forgot-password', '/reset-password'])
+const PUBLIC_ROUTES = new Set(['/', '/login', '/register', '/verify-otp', '/forgot-password', '/reset-password'])
 
 /**
  * Redirects unauthenticated users to /login. Runs on every navigation so

@@ -1,9 +1,9 @@
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { resolveImageUrl } from '../../../utils/format.js'
-import { TreeIcon } from '../../ui/CustomIcons.jsx'
+import { MoreIcon } from '../../ui/CustomIcons.jsx'
 
-export default function ChatThreadToolbar({ conversation, onBack }) {
-  const navigate = useNavigate()
+export default function ChatThreadToolbar({ conversation, onBack, onAvatarClick, onBlock }) {
+  const [menuOpen, setMenuOpen] = useState(false)
   const other = conversation?.otherDisplayName || conversation?.displayName || 'Đoạn chat'
   const avatar = resolveImageUrl(conversation?.otherAvatarUrl || conversation?.avatarUrl)
 
@@ -15,28 +15,44 @@ export default function ChatThreadToolbar({ conversation, onBack }) {
       <div
         className="chat-toolbar-avatar"
         style={avatar ? { backgroundImage: `url(${avatar})` } : undefined}
-        onClick={() => conversation?.otherUserId && navigate(`/profile/${conversation.otherUserId}`)}
+        onClick={() => onAvatarClick?.()}
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter' && conversation?.otherUserId) navigate(`/profile/${conversation.otherUserId}`) }}
+        onKeyDown={(e) => { if (e.key === 'Enter') onAvatarClick?.() }}
         aria-label={`Mở hồ sơ của ${other}`}
       />
       <div className="chat-toolbar-info">
         <div className="chat-toolbar-name">{other}</div>
-        {conversation?.matchId && (
-          <div className="chat-toolbar-status"><TreeIcon size={12} /> Match · cây tình yêu chung</div>
-        )}
       </div>
       <div className="chat-toolbar-actions">
-        {conversation?.matchId && (
-          <button
-            type="button"
-            className="chat-toolbar-action"
-            onClick={() => navigate(`/love-tree?matchId=${conversation.matchId}`)}
-            title="Cây tình yêu"
-          >
-            <TreeIcon size={18} />
-          </button>
+        {conversation?.otherUserId && (
+          <div className="chat-toolbar-menu">
+            <button
+              type="button"
+              className="chat-toolbar-action"
+              onClick={() => setMenuOpen((o) => !o)}
+              title="Tùy chọn"
+              aria-label="Tùy chọn"
+              aria-expanded={menuOpen}
+            >
+              <MoreIcon size={18} />
+            </button>
+            {menuOpen && (
+              <>
+                <div className="chat-toolbar-menu-backdrop" onClick={() => setMenuOpen(false)} />
+                <div className="chat-toolbar-menu-pop" role="menu">
+                  <button
+                    type="button"
+                    className="chat-toolbar-menu-item is-danger"
+                    role="menuitem"
+                    onClick={() => { setMenuOpen(false); onBlock?.() }}
+                  >
+                    Chặn người này
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         )}
       </div>
     </header>

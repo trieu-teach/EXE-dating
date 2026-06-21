@@ -11,7 +11,6 @@ const NAV_LINKS = [
   { to: '/chat', label: 'Tin nhắn', Icon: null },
   { to: '/love-tree', label: 'Cây', Icon: Leaf },
   { to: '/daily-connection', label: 'Hằng ngày', Icon: Star },
-  { to: '/events', label: 'Sự kiện', Icon: Calendar },
   { to: '/date-pass', label: 'Ưu đãi', Icon: null },
   { to: '/premium', label: 'Premium', Icon: null },
   { to: '/profile', label: 'Hồ sơ', Icon: null },

@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SearchIcon, SendIcon, Sparkles2Icon, HeartChatIcon, Check2Icon, LightbulbIcon, XSmallIcon, ArrowUpIcon } from '../../../components/ui/CustomIcons.jsx'
-import { chatService, plantsService, connectionRemindersService, meetupService, venuesService } from '../../../api'
+import { chatService, plantsService, connectionRemindersService, meetupService, venuesService, profileService, blocksService, matchesService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { useAuth } from '../../../context/AuthContext.jsx'
 import { timeAgo, resolveImageUrl, formatDistance } from '../../../utils/format.js'
 import ChatThreadToolbar from '../../../components/User/ChatThreadToolbar/ChatThreadToolbar.jsx'
+import ProfilePreviewModal from '../../../components/User/ProfilePreviewModal/ProfilePreviewModal.jsx'
 import AISuggestionPanel from '../../../components/User/AISuggestionPanel/AISuggestionPanel.jsx'
 import LoveTreeBondBar from '../../../components/User/LoveTreeBondBar/LoveTreeBondBar.jsx'
 import VenueMessage from '../../../components/User/VenueMessage/VenueMessage.jsx'
@@ -80,6 +81,9 @@ export default function Chat() {
   const [proposeNote, setProposeNote] = useState('')
   const [proposing, setProposing] = useState(false)
   const [flagged, setFlagged] = useState(false)
+  const [blockOpen, setBlockOpen] = useState(false)
+  const [blocking, setBlocking] = useState(false)
+  const [profileUser, setProfileUser] = useState(null)
   // Chia sẻ quán vào chat
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pickerVenues, setPickerVenues] = useState([])
@@ -140,6 +144,27 @@ export default function Chat() {
   const openConv = (conv) => {
     setConversation(conv)
     navigate(`/chat/${conv.id}`, { replace: true })
+  }
+
+  const confirmBlock = async () => {
+    if (!conversation?.otherUserId) return
+    setBlocking(true)
+    try {
+      await blocksService.block(conversation.otherUserId)
+      // Chặn đồng thời gỡ match → xóa cây tình yêu chung
+      if (conversation.matchId) {
+        try { await matchesService.unmatch(conversation.matchId) } catch { /* cây có thể đã gỡ */ }
+      }
+      toast.success('Đã chặn và xóa cây tình yêu chung.')
+      setConversations((cur) => cur.filter((c) => c.id !== conversation.id))
+      setBlockOpen(false)
+      setConversation(null)
+      navigate('/chat')
+    } catch (err) {
+      toast.error(err?.message || 'Chặn thất bại.')
+    } finally {
+      setBlocking(false)
+    }
   }
 
   const send = async (e) => {
@@ -333,7 +358,13 @@ export default function Chat() {
               exit="exit"
               className="chat-thread-wrapper"
             >
-              <ChatThreadToolbar conversation={conversation} onBack={() => { setConversation(null); navigate('/chat') }} />
+              <ChatThreadToolbar conversation={conversation} onBack={() => { setConversation(null); navigate('/chat') }}
+                onBlock={() => setBlockOpen(true)}
+                onAvatarClick={async () => {
+                  if (!conversation?.otherUserId) return
+                  try { setProfileUser(await profileService.byId(conversation.otherUserId)) }
+                  catch (err) { toast.error(err?.message || 'Không tải được hồ sơ.') }
+                }} />
 
               {plant && (
                 <div className="chat-bond-bar-wrapper">
@@ -399,7 +430,7 @@ export default function Chat() {
                 </div>
               )}
 
-              {conversation?.matchId && (
+              {conversation?.matchId && !threadLoading && messages.length === 0 && (
                 <div className="chat-ai-panel-wrapper">
                   <AISuggestionPanel matchId={conversation.matchId} onPick={(t) => setText(t)} />
                 </div>
@@ -509,6 +540,35 @@ export default function Chat() {
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* Popup xác nhận chặn */}
+              <AnimatePresence>
+                {blockOpen && (
+                  <motion.div className="chat-propose-backdrop"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    onClick={() => !blocking && setBlockOpen(false)}>
+                    <motion.div className="chat-flag-modal"
+                      initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, y: 20 }} onClick={(e) => e.stopPropagation()}>
+                      <div className="chat-flag-icon">🚫</div>
+                      <div className="chat-flag-title">Chặn {conversation?.otherDisplayName || 'người này'}?</div>
+                      <p className="chat-flag-text">
+                        Hai bạn sẽ không còn thấy nhau, không nhắn tin được nữa và
+                        {' '}<strong>cây tình yêu chung sẽ bị xóa</strong>. Hành động này không thể hoàn tác.
+                      </p>
+                      <div className="chat-flag-actions">
+                        <button type="button" className="btn btn-ghost btn-sm" disabled={blocking}
+                          onClick={() => setBlockOpen(false)}>Hủy</button>
+                        <button type="button" className="btn btn-primary btn-sm" disabled={blocking}
+                          onClick={confirmBlock}>{blocking ? <span className="spinner" /> : 'Chặn'}</button>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Hồ sơ đầy đủ đối phương (bấm avatar header) */}
+              <ProfilePreviewModal profile={profileUser} open={!!profileUser} onClose={() => setProfileUser(null)} ownerView={false} />
 
               <form className="chat-input-bar" onSubmit={send}>
                 <button type="button" className="chat-venue-btn" onClick={openVenuePicker}

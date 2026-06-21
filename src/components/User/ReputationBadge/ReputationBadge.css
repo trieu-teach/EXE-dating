@@ -1,8 +1,8 @@
 .rep-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
+  gap: 5px;
+  padding: 5px 12px;
   border-radius: var(--radius-pill);
   font-size: 0.78rem;
   font-weight: 700;
@@ -11,22 +11,30 @@
   border: 1px solid var(--color-border);
   line-height: 1;
   white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
 }
+.rep-badge:hover { transform: translateY(-1px); filter: brightness(1.04); }
 .rep-badge.rep-md { padding: 6px 14px; font-size: 0.9rem; gap: 6px; }
 .rep-badge.rep-sm .rep-emoji { font-size: 14px; }
 .rep-badge.rep-md .rep-emoji { font-size: 18px; }
 .rep-badge.is-loading { opacity: 0.6; }
 
 .rep-badge.rep-verified {
-  background: rgba(22, 163, 74, 0.10);
-  color: var(--color-success);
-  border-color: rgba(22, 163, 74, 0.35);
+  background: linear-gradient(135deg, #34d399, #16a34a);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.32);
 }
+.rep-badge.rep-verified:hover { box-shadow: 0 6px 18px rgba(22, 163, 74, 0.45); }
 .rep-badge.rep-limited {
-  background: rgba(245, 158, 11, 0.10);
-  color: #b45309;
-  border-color: rgba(245, 158, 11, 0.30);
+  background: linear-gradient(135deg, #ff7eb3, #b14bff);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(177, 75, 255, 0.32);
 }
-.rep-value { font-variant-numeric: tabular-nums; font-weight: 800; }
-.rep-cap { font-size: 0.78em; opacity: 0.7; font-weight: 600; }
-.rep-label { font-weight: 600; opacity: 0.85; }
+.rep-badge.rep-limited:hover { box-shadow: 0 6px 18px rgba(177, 75, 255, 0.45); }
+.rep-value { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 0.82rem; }
+.rep-cap { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 0.82rem; opacity: 0.9; }
+.rep-label { font-weight: 600; opacity: 0.9; }

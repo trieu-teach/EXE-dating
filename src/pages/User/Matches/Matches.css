@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  padding: 0 20px;
 }
 
 /* ── Hero Header ──────────────────────────────────────────── */
@@ -16,27 +17,6 @@
     color-mix(in srgb, var(--color-accent) 12%, transparent) 100%
   );
   overflow: hidden;
-}
-
-.matches-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 60% 80% at 20% 120%, color-mix(in srgb, var(--color-primary) 25%, transparent) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 60% at 80% 110%, color-mix(in srgb, var(--color-accent) 20%, transparent) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.matches-hero::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 24px;
-  background: var(--color-bg);
-  clip-path: ellipse(55% 100% at 50% 100%);
 }
 
 .matches-hero-content {
@@ -367,7 +347,46 @@
   color: var(--color-text-muted);
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-surface-2);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
+.match-action:hover { background: var(--color-primary-soft); color: var(--color-primary); }
+/* avatar giờ là button */
+.match-card button.match-avatar { border: none; padding: 0; cursor: pointer; }
+.match-card button.match-avatar:hover { box-shadow: 0 0 0 2px var(--color-primary), 0 4px 16px rgba(255,79,139,0.25); }
+
+/* ── Modal hồ sơ người match ── */
+.mt-profile-backdrop {
+  position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.mt-profile {
+  width: 100%; max-width: 360px; background: var(--color-surface); border-radius: 22px; overflow: hidden;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.4);
+}
+.mt-profile-photo {
+  position: relative; aspect-ratio: 1; background-size: cover; background-position: center;
+  background-color: var(--color-surface-2); display: grid; place-items: center;
+}
+.mt-profile-initial { font-size: 4rem; font-weight: 800; color: #fff; }
+.mt-profile-grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.65), transparent 50%); }
+.mt-profile-name {
+  position: absolute; left: 18px; bottom: 14px; z-index: 1;
+  font-size: 1.5rem; font-weight: 900; color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+.mt-profile-close {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+  background: rgba(0,0,0,0.45); color: #fff; font-size: 15px; backdrop-filter: blur(4px);
+}
+.mt-profile-body { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+.mt-profile-meta { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--color-text-soft); }
+.mt-profile-meta svg { color: var(--color-primary); }
 
 /* ── Empty state ───────────────────────────────────────────── */
 .matches-empty {

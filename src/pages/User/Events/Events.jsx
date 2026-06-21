@@ -63,6 +63,7 @@ export default function Events() {
         </div>
         <h1 className="events-hero-title">Khám phá sự kiện</h1>
         <p className="events-hero-subtitle">Gặp gỡ những người cùng sở thích tại các sự kiện độc đáo</p>
+        <span className="hero-deco" aria-hidden>🎉</span>
       </div>
 
       <div className="events-content">

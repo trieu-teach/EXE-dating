@@ -29,22 +29,34 @@ export default function Discovery() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const toast = useToast()
+  const PAGE_SIZE = 10 // số hồ sơ mỗi lần gọi feed
   const [feed, setFeed] = useState([])
   const [cursor, setCursor] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true)        // lần tải đầu
+  const [loadingMore, setLoadingMore] = useState(false) // đang tự lấy thêm
+  const [exhausted, setExhausted] = useState(false)   // backend đã hết người thật sự
   const [actionLoading, setActionLoading] = useState(false)
   const [matchModal, setMatchModal] = useState(null)
   const [myPhoto, setMyPhoto] = useState(null)
   const [opening, setOpening] = useState(false)
   const scrollRef = useRef(null)
+  const feedRef = useRef([])
+  useEffect(() => { feedRef.current = feed }, [feed])
 
-  const load = async ({ append = false } = {}) => {
+  const fetchBatch = async () => {
+    const data = await discoveryService.feed({ limit: PAGE_SIZE })
+    return Array.isArray(data) ? data : (data?.items ?? [])
+  }
+
+  // Tải lại từ đầu (lần đầu + nút "Tải lại gợi ý")
+  const load = async () => {
     setLoading(true)
+    setExhausted(false)
     try {
-      const data = await discoveryService.feed({ limit: 10 })
-      const list = Array.isArray(data) ? data : (data?.items ?? [])
-      setFeed((prev) => append ? [...prev, ...list] : list)
-      if (!append) setCursor(0)
+      const list = await fetchBatch()
+      setFeed(list)
+      setCursor(0)
+      setExhausted(list.length === 0)
     } catch (err) {
       toast.error(err?.message || 'Không tải được danh sách.')
     } finally {
@@ -52,7 +64,43 @@ export default function Discovery() {
     }
   }
 
+  // Tự động lấy thêm khi hết batch hiện tại (loại trùng theo userId)
+  const loadMore = async () => {
+    if (loadingMore || exhausted) return
+    setLoadingMore(true)
+    try {
+      const list = await fetchBatch()
+      const seen = new Set(feedRef.current.map((p) => p.userId))
+      const fresh = list.filter((p) => p.userId && !seen.has(p.userId))
+      if (fresh.length === 0) setExhausted(true) // không còn người mới → dừng
+      else setFeed((prev) => [...prev, ...fresh])
+    } catch (err) {
+      toast.error(err?.message || 'Không tải được danh sách.')
+      setExhausted(true) // tránh gọi lặp vô hạn khi lỗi
+    } finally {
+      setLoadingMore(false)
+    }
+  }
+
+  // Nút "Tải lại gợi ý": xem lại TỪ ĐẦU những người đã tải trong phiên (không gọi mạng,
+  // vì backend đã loại người đã vuốt nên gọi lại sẽ rỗng). Nếu chưa có ai thì tải mạng.
+  const resetFeed = () => {
+    if (feedRef.current.length > 0) {
+      setExhausted(false)
+      setCursor(0)
+      if (scrollRef.current) scrollRef.current.scrollTop = 0
+    } else {
+      load()
+    }
+  }
+
   useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Hết người trong batch hiện tại → tự gọi thêm cho tới khi có người hoặc hết hẳn
+  useEffect(() => {
+    if (loading || loadingMore || exhausted) return
+    if (cursor >= feed.length) loadMore()
+  }, [cursor, feed.length, loading, loadingMore, exhausted]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     profileService.me()
       .then((p) => setMyPhoto(p?.avatarUrl || p?.photos?.find((x) => x.isPrimary)?.url || p?.photos?.[0]?.url || null))
@@ -69,8 +117,8 @@ export default function Discovery() {
       const res = await swipesService.swipe({ targetUserId: target.userId, action })
       if (res?.isMatch) setMatchModal({ other: target, matchId: res.matchId })
     } catch (err) {
-      if (err?.status === 403) toast.error('Tính năng bị giới hạn theo gói. Hãy nâng cấp Premium.')
-      else toast.error(err?.message || 'Thao tác thất bại.')
+      // 409 = đã vuốt người này rồi (khi xem lại từ đầu) → bỏ qua, lướt tiếp
+      if (err?.status !== 409) toast.error(err?.message || 'Thao tác thất bại.')
     } finally {
       setCursor((c) => c + 1)
       if (scrollRef.current) scrollRef.current.scrollTop = 0
@@ -114,6 +162,19 @@ export default function Discovery() {
   }
 
   if (!current) {
+    // Hết batch nhưng chưa hết hẳn → đang tự lấy thêm
+    if (!exhausted) {
+      return (
+        <div className="disc-root">
+          <MatchesSidebar />
+          <div className="disc-main">
+            <FallingPetals count={20} />
+            <div className="loading-block"><span className="spinner" /> Đang tìm thêm người…</div>
+          </div>
+        </div>
+      )
+    }
+    // Hết người thật sự → user tự bấm tải lại từ đầu
     return (
       <div className="disc-root">
         <MatchesSidebar />
@@ -122,9 +183,9 @@ export default function Discovery() {
           <div className="discovery-empty">
             <div className="discovery-empty-icon"><SparkleIcon size={56} /></div>
             <h2>Hết người mới rồi!</h2>
-            <p>Bạn đã xem hết gợi ý hôm nay. Quay lại sau hoặc tải lại nhé.</p>
+            <p>Bạn đã xem hết gợi ý hôm nay. Bấm tải lại để xem từ đầu nhé.</p>
             <div className="discovery-empty-actions">
-              <button className="btn btn-primary btn-block" onClick={() => load({ append: true })}>
+              <button className="btn btn-primary btn-block" onClick={resetFeed}>
                 <RefreshIcon size={15} /> Tải lại gợi ý
               </button>
             </div>

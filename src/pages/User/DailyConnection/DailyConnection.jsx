@@ -2,9 +2,32 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { gamificationService, connectionRemindersService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { MATERIALS, MATERIAL_META, TASK_TYPE_META, TASK_TYPE_ORDER } from '../../../constants/gamification.js'
-import { SparkleIcon, HeartIcon } from '../../../components/ui/CustomIcons.jsx'
+import { SparkleIcon, HeartIcon, TrophyIcon } from '../../../components/ui/CustomIcons.jsx'
 import { motion } from 'framer-motion'
 import './DailyConnection.css'
+
+// Reset theo UTC: daily 00:00 UTC (07:00 VN), weekly Thứ 2 00:00 UTC, achievement không reset
+function nextDailyResetMs(now) {
+  const n = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0))
+  return n - now
+}
+function nextWeeklyResetMs(now) {
+  const dow = now.getUTCDay() // 0=CN..6=T7
+  let days = (1 - dow + 7) % 7 // tới Thứ 2 kế
+  if (days === 0) days = 7
+  const n = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + days, 0, 0, 0))
+  return n - now
+}
+function fmtDur(ms) {
+  if (ms <= 0) return 'sắp tới'
+  const totalMin = Math.floor(ms / 60000)
+  const d = Math.floor(totalMin / 1440)
+  const h = Math.floor((totalMin % 1440) / 60)
+  const m = totalMin % 60
+  if (d > 0) return `${d} ngày ${h} giờ`
+  if (h > 0) return `${h} giờ ${m} phút`
+  return `${m} phút`
+}
 
 export default function DailyConnection() {
   const toast = useToast()
@@ -12,6 +35,18 @@ export default function DailyConnection() {
   const [inventory, setInventory] = useState([])
   const [reminders, setReminders] = useState([])
   const [loading, setLoading] = useState(true)
+  const [now, setNow] = useState(() => new Date())
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30000)
+    return () => clearInterval(id)
+  }, [])
+
+  const resetInfo = {
+    Daily: `🔄 Làm mới sau ${fmtDur(nextDailyResetMs(now))} · mỗi ngày lúc 07:00`,
+    Weekly: `🔄 Làm mới sau ${fmtDur(nextWeeklyResetMs(now))} · đầu tuần (Thứ 2)`,
+    Achievement: '🏆 Mốc cố định — không làm mới',
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -66,7 +101,7 @@ export default function DailyConnection() {
       >
         <div className="daily-hero-top">
           <div>
-            <div className="daily-hero-eyebrow"><SparkleIcon size={12} /> Hằng ngày</div>
+            <div className="daily-hero-eyebrow"><TrophyIcon size={12} /> Hằng ngày</div>
             <h1 className="daily-hero-title">Nhiệm vụ & Phần thưởng</h1>
             <p className="daily-hero-sub">Hoàn thành nhiệm vụ để nhận nguyên liệu chăm sóc Cây tình yêu 🌳</p>
           </div>
@@ -81,6 +116,7 @@ export default function DailyConnection() {
             <div className="daily-bar"><div className="daily-bar-fill" style={{ width: `${dailyPct}%` }} /></div>
           </div>
         )}
+        <span className="hero-deco" aria-hidden>🎁</span>
       </motion.div>
 
       {/* ── Kho nguyên liệu ── */}
@@ -110,8 +146,11 @@ export default function DailyConnection() {
             const meta = TASK_TYPE_META[type]
             return (
               <div key={type} className="task-group">
-                <div className="task-group-label" style={{ background: meta.accent }}>
-                  <span>{meta.emoji}</span> {meta.label}
+                <div className="task-group-head">
+                  <div className="task-group-label" style={{ background: meta.accent }}>
+                    <span>{meta.emoji}</span> {meta.label}
+                  </div>
+                  {resetInfo[type] && <span className="task-group-reset">{resetInfo[type]}</span>}
                 </div>
                 <div className="task-list">
                   {tasksByType[type].map((t) => {

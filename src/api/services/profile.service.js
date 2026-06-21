@@ -21,6 +21,10 @@ export const profileService = {
     return get(API_ENDPOINTS.profile.me)
   },
 
+  byId(userId) {
+    return get(API_ENDPOINTS.profile.byId(userId))
+  },
+
   update(payload) {
     return put(API_ENDPOINTS.profile.update, payload)
   },

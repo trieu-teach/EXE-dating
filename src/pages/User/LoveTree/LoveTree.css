@@ -183,6 +183,12 @@
   object-fit: contain;
   filter: drop-shadow(0 8px 24px rgba(255, 79, 139, 0.25));
   transition: transform 0.3s;
+  transform-origin: bottom center;
+  animation: tree-sway 4.5s ease-in-out infinite;
+}
+@keyframes tree-sway {
+  0%, 100% { transform: rotate(-2.2deg); }
+  50% { transform: rotate(2.2deg); }
 }
 .love-tree-img.is-bounce {
   animation: tree-bounce 0.6s ease-out;
@@ -337,7 +343,18 @@
 .love-tree-water-btn:hover:not(:disabled)::before { opacity: 1; }
 .love-tree-water-btn:active:not(:disabled) { transform: translateY(0); }
 .love-tree-water-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.love-tree-water-emoji { font-size: 1.6rem; line-height: 1; position: relative; z-index: 1; }
+.love-tree-water-emoji {
+  font-size: 1.6rem; line-height: 1; position: relative; z-index: 1;
+  display: inline-block;
+  animation: water-bob 2.7s ease-in-out infinite;
+}
+@keyframes water-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-7deg); }
+}
+.love-tree-water-btn:nth-child(1) .love-tree-water-emoji { animation-delay: 0s; animation-duration: 2.6s; }
+.love-tree-water-btn:nth-child(2) .love-tree-water-emoji { animation-delay: 0.35s; animation-duration: 3.1s; }
+.love-tree-water-btn:nth-child(3) .love-tree-water-emoji { animation-delay: 0.7s; animation-duration: 2.9s; }
 .love-tree-water-label {
   font-size: 0.72rem;
   font-weight: 700;

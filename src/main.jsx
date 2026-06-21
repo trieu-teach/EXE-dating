@@ -15,6 +15,7 @@ import './styles/love-tree.css'
 import './styles/meetup.css'
 import './styles/chat.css'
 import './styles/bond-bar.css'
+import './styles/hero.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
