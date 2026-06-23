@@ -81,15 +81,6 @@ export default function AdminDashboard() {
     } catch (e) { toast.error(e?.message || 'Cấm thất bại.') }
     finally { setBusy(null) }
   }
-  const unbanUser = async (u) => {
-    setBusy(u.id)
-    try {
-      await adminService.unbanUser(u.id)
-      setUsers((cur) => cur.map((x) => (x.id === u.id ? { ...x, status: 'Active' } : x)))
-      toast.success('Đã bỏ cấm.')
-    } catch (e) { toast.error(e?.message || 'Thao tác thất bại.') }
-    finally { setBusy(null) }
-  }
 
   useEffect(() => {
     if (!isAdmin) return
@@ -221,15 +212,12 @@ export default function AdminDashboard() {
                       <div className="admin-user-email">{u.email}</div>
                     </div>
                     <div className="admin-user-actions">
-                      {u.role !== 'Admin' && (
-                        u.status === 'Banned' ? (
-                          <button className="btn btn-ghost btn-sm" disabled={busy === u.id} onClick={() => unbanUser(u)}>Bỏ cấm</button>
-                        ) : (
-                          <button className="btn btn-danger btn-sm" disabled={busy === u.id} onClick={() => setBanTarget(u)}>
-                            {busy === u.id ? <span className="spinner" /> : 'Cấm'}
-                          </button>
-                        )
+                      {u.role !== 'Admin' && u.status !== 'Banned' && (
+                        <button className="btn btn-danger btn-sm" disabled={busy === u.id} onClick={() => setBanTarget(u)}>
+                          {busy === u.id ? <span className="spinner" /> : 'Cấm'}
+                        </button>
                       )}
+                      {u.status === 'Banned' && <span className="admin-user-banned-note">Chờ xoá vĩnh viễn</span>}
                     </div>
                   </div>
                 ))}
