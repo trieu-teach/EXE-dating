@@ -39,21 +39,26 @@ export default function Discovery() {
   const [matchModal, setMatchModal] = useState(null)
   const [myPhoto, setMyPhoto] = useState(null)
   const [opening, setOpening] = useState(false)
+  const [recycled, setRecycled] = useState(false) // chế độ "tải lại" = hiện lại cả người đã vuốt
   const scrollRef = useRef(null)
   const feedRef = useRef([])
+  const recycledRef = useRef(false)
   useEffect(() => { feedRef.current = feed }, [feed])
+  useEffect(() => { recycledRef.current = recycled }, [recycled])
 
-  const fetchBatch = async () => {
-    const data = await discoveryService.feed({ limit: PAGE_SIZE })
+  const fetchBatch = async (includeSwiped) => {
+    const data = await discoveryService.feed({ limit: PAGE_SIZE, includeSwiped })
     return Array.isArray(data) ? data : (data?.items ?? [])
   }
 
-  // Tải lại từ đầu (lần đầu + nút "Tải lại gợi ý")
-  const load = async () => {
+  // Tải feed. includeSwiped=false: chỉ người mới. true (nút "Tải lại gợi ý"): hiện lại tất cả.
+  const load = async (includeSwiped = false) => {
     setLoading(true)
     setExhausted(false)
+    setRecycled(includeSwiped)
+    if (scrollRef.current) scrollRef.current.scrollTop = 0
     try {
-      const list = await fetchBatch()
+      const list = await fetchBatch(includeSwiped)
       setFeed(list)
       setCursor(0)
       setExhausted(list.length === 0)
@@ -64,12 +69,12 @@ export default function Discovery() {
     }
   }
 
-  // Tự động lấy thêm khi hết batch hiện tại (loại trùng theo userId)
+  // Tự động lấy thêm khi hết batch hiện tại (loại trùng theo userId), giữ đúng chế độ recycle
   const loadMore = async () => {
     if (loadingMore || exhausted) return
     setLoadingMore(true)
     try {
-      const list = await fetchBatch()
+      const list = await fetchBatch(recycledRef.current)
       const seen = new Set(feedRef.current.map((p) => p.userId))
       const fresh = list.filter((p) => p.userId && !seen.has(p.userId))
       if (fresh.length === 0) setExhausted(true) // không còn người mới → dừng
@@ -79,18 +84,6 @@ export default function Discovery() {
       setExhausted(true) // tránh gọi lặp vô hạn khi lỗi
     } finally {
       setLoadingMore(false)
-    }
-  }
-
-  // Nút "Tải lại gợi ý": xem lại TỪ ĐẦU những người đã tải trong phiên (không gọi mạng,
-  // vì backend đã loại người đã vuốt nên gọi lại sẽ rỗng). Nếu chưa có ai thì tải mạng.
-  const resetFeed = () => {
-    if (feedRef.current.length > 0) {
-      setExhausted(false)
-      setCursor(0)
-      if (scrollRef.current) scrollRef.current.scrollTop = 0
-    } else {
-      load()
     }
   }
 
@@ -235,7 +228,7 @@ export default function Discovery() {
             <h2>Hết người mới rồi!</h2>
             <p>Bạn đã xem hết gợi ý hôm nay. Bấm tải lại để xem từ đầu nhé.</p>
             <div className="discovery-empty-actions">
-              <button className="btn btn-primary btn-block" onClick={resetFeed}>
+              <button className="btn btn-primary btn-block" onClick={() => load(true)}>
                 <RefreshIcon size={15} /> Tải lại gợi ý
               </button>
             </div>
