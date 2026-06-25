@@ -878,3 +878,38 @@
     gap: 24px;
   }
 }
+
+/* ── Popup nâng cấp (Super Swipe cho gói Free) ── */
+.upgrade-modal {
+  text-align: center;
+  padding: 32px 26px 24px;
+  max-width: 380px;
+}
+.upgrade-icon {
+  width: 76px; height: 76px;
+  margin: 0 auto 18px;
+  border-radius: 22px;
+  display: grid; place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, #ffd76f, #f5a623);
+  box-shadow: 0 12px 30px rgba(245, 166, 35, 0.45);
+}
+.upgrade-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+  color: var(--color-text);
+}
+.upgrade-text {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--color-text-soft);
+  margin: 0 0 22px;
+}
+.upgrade-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}

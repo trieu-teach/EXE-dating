@@ -7,7 +7,7 @@ import { useAuth } from '../../../context/AuthContext.jsx'
 import { resolveImageUrl, formatDistance } from '../../../utils/format.js'
 import {
   HeartIcon, XIcon, StarIcon, MatchHeartIcon, SparkleIcon,
-  RefreshIcon, PinIcon, ShieldCheckIcon,
+  RefreshIcon, PinIcon, ShieldCheckIcon, CrownIcon,
 } from '../../../components/ui/CustomIcons.jsx'
 import FallingPetals from '../../../components/ui/FallingPetals.jsx'
 import MatchesSidebar from '../../../components/User/MatchesSidebar/MatchesSidebar.jsx'
@@ -37,6 +37,7 @@ export default function Discovery() {
   const [exhausted, setExhausted] = useState(false)   // backend đã hết người thật sự
   const [actionLoading, setActionLoading] = useState(false)
   const [matchModal, setMatchModal] = useState(null)
+  const [upgradeOpen, setUpgradeOpen] = useState(false) // popup nâng cấp khi Free dùng Super Swipe
   const [myPhoto, setMyPhoto] = useState(null)
   const [opening, setOpening] = useState(false)
   const [recycled, setRecycled] = useState(false) // chế độ "tải lại" = hiện lại cả người đã vuốt
@@ -102,6 +103,11 @@ export default function Discovery() {
 
   const current = feed[cursor]
 
+  const advance = () => {
+    setCursor((c) => c + 1)
+    if (scrollRef.current) scrollRef.current.scrollTop = 0
+  }
+
   const decide = async (action) => {
     if (!current || actionLoading) return
     setActionLoading(true)
@@ -109,12 +115,18 @@ export default function Discovery() {
     try {
       const res = await swipesService.swipe({ targetUserId: target.userId, action })
       if (res?.isMatch) setMatchModal({ other: target, matchId: res.matchId })
+      advance() // thành công → lướt tiếp
     } catch (err) {
-      // 409 = đã vuốt người này rồi (khi xem lại từ đầu) → bỏ qua, lướt tiếp
-      if (err?.status !== 409) toast.error(err?.message || 'Thao tác thất bại.')
+      if (err?.status === 403) {
+        // Tính năng trả phí (Super Swipe với gói Free…) → CHẶN, KHÔNG lướt qua người này
+        setUpgradeOpen(true)
+      } else if (err?.status === 409) {
+        advance() // đã vuốt người này rồi (khi xem lại từ đầu) → bỏ qua, lướt tiếp
+      } else {
+        // vd hết lượt thích hôm nay (400) → báo lỗi, giữ nguyên người hiện tại để thử lại
+        toast.error(err?.message || 'Thao tác thất bại.')
+      }
     } finally {
-      setCursor((c) => c + 1)
-      if (scrollRef.current) scrollRef.current.scrollTop = 0
       setActionLoading(false)
     }
   }
@@ -192,6 +204,33 @@ export default function Discovery() {
                   {opening ? <span className="spinner" /> : <><HeartIcon size={14} /> Nhắn tin ngay</>}
                 </button>
               </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+
+  // Popup nâng cấp khi tài khoản Free dùng Super Swipe
+  const upgradeModalEl = (
+    <AnimatePresence>
+      {upgradeOpen && (
+        <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          onClick={() => setUpgradeOpen(false)}>
+          <motion.div className="modal upgrade-modal" initial={{ opacity: 0, scale: 0.8, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.85, y: 20 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 24 }} onClick={(e) => e.stopPropagation()}>
+            <div className="upgrade-icon"><StarIcon size={40} /></div>
+            <h2 className="upgrade-title">Super Swipe là tính năng cao cấp</h2>
+            <p className="upgrade-text">
+              Nâng cấp lên <strong>Plus</strong> hoặc <strong>Gold</strong> để gây ấn tượng mạnh
+              bằng Super Swipe — cùng nhiều đặc quyền hẹn hò khác.
+            </p>
+            <div className="upgrade-actions">
+              <button className="btn btn-ghost" onClick={() => setUpgradeOpen(false)}>Để sau</button>
+              <button className="btn btn-primary" onClick={() => { setUpgradeOpen(false); navigate('/premium') }}>
+                <CrownIcon size={15} /> Mua ngay
+              </button>
             </div>
           </motion.div>
         </motion.div>
@@ -349,6 +388,7 @@ export default function Discovery() {
       </div>
 
       {matchModalEl}
+      {upgradeModalEl}
       </div>
     </div>
   )
