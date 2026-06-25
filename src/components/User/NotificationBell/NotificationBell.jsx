@@ -6,12 +6,15 @@ import { Bell, CheckCheck, Heart, MessageCircle, Calendar, Star } from 'lucide-r
 import { cn } from '../../../lib/utils'
 import './NotificationBell.css'
 
-const typeIcons = {
-  match: Heart,
-  message: MessageCircle,
-  event: Calendar,
-  reputation: Star,
+// Icon + màu theo loại thông báo (đúng giá trị backend: Match / Message / SuperLike)
+const TYPE_META = {
+  Match:     { Icon: Heart,         grad: 'linear-gradient(135deg, #ff7eb3, #ff2d6b)' },
+  Message:   { Icon: MessageCircle, grad: 'linear-gradient(135deg, #5eead4, #3b82f6)' },
+  SuperLike: { Icon: Star,          grad: 'linear-gradient(135deg, #c084fc, #9333ea)' },
+  Event:     { Icon: Calendar,      grad: 'linear-gradient(135deg, #fbbf24, #f59e0b)' },
+  Reputation:{ Icon: Star,          grad: 'linear-gradient(135deg, #34d399, #16a34a)' },
 }
+const TYPE_FALLBACK = { Icon: Bell, grad: 'linear-gradient(135deg, #ff9ec4, #b14bff)' }
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false)
@@ -29,8 +32,11 @@ export default function NotificationBell() {
   const handleItemClick = async (item) => {
     try { await markRead([item.id]) } catch {}
     setOpen(false)
-    if (item.data?.url) navigate(item.data.url)
-    else if (item.data?.conversationId) navigate(`/chat/${item.data.conversationId}`)
+    // item.data là 1 chuỗi id (conversationId / matchId / fromUserId) tuỳ loại thông báo
+    const ref = item.data
+    if (item.type === 'Message' && ref) navigate(`/chat/${ref}`)
+    else if (item.type === 'Match') navigate('/matches?tab=matches')
+    else if (item.type === 'SuperLike') navigate('/matches?tab=likes')
   }
 
   return (
@@ -69,7 +75,8 @@ export default function NotificationBell() {
               </div>
             )}
             {items.map((it) => {
-              const Icon = typeIcons[it.type] || Bell
+              const meta = TYPE_META[it.type] || TYPE_FALLBACK
+              const Icon = meta.Icon
               return (
                 <div
                   key={it.id}
@@ -79,8 +86,8 @@ export default function NotificationBell() {
                   tabIndex={0}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleItemClick(it) }}
                 >
-                  <div className="notif-item-icon">
-                    <Icon size={16} />
+                  <div className="notif-item-icon" style={{ background: meta.grad }}>
+                    <Icon size={17} />
                   </div>
                   <div className="notif-item-content">
                     <div className="notif-item-title">{it.title || it.type}</div>

@@ -137,6 +137,26 @@ export default function Chat() {
     return () => { cancelled = true }
   }, [conversation?.id, conversation?.matchId])
 
+  // Realtime (polling): tự lấy tin nhắn mới mỗi 3.5s → không cần reload
+  useEffect(() => {
+    if (!conversation?.id) return undefined
+    const convId = conversation.id
+    const id = setInterval(async () => {
+      try {
+        const list = await chatService.messages(convId, { limit: 50 })
+        const arr = Array.isArray(list) ? list : (list?.items ?? [])
+        setMessages((cur) => {
+          const changed = arr.length !== cur.length
+            || arr[arr.length - 1]?.id !== cur[cur.length - 1]?.id
+          if (!changed) return cur
+          chatService.markRead(convId).catch(() => {}) // có tin mới → đánh dấu đã đọc
+          return arr
+        })
+      } catch { /* bỏ qua lỗi tạm thời */ }
+    }, 3500)
+    return () => clearInterval(id)
+  }, [conversation?.id])
+
   useEffect(() => {
     messagesEnd.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])

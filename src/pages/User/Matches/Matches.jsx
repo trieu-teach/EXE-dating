@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { matchesService, chatService, swipesService, subscriptionService, profileService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl, timeAgo } from '../../../utils/format.js'
@@ -13,8 +13,9 @@ import '../LikedMe/LikedMe.css'
 
 export default function Matches() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const toast = useToast()
-  const [tab, setTab] = useState('likes') // 'likes' | 'matches'
+  const [tab, setTab] = useState(searchParams.get('tab') === 'matches' ? 'matches' : 'likes') // 'likes' | 'matches'
   const [matches, setMatches] = useState([])
   const [likers, setLikers] = useState([])
   const [isGold, setIsGold] = useState(false)

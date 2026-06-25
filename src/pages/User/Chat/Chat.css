@@ -354,13 +354,14 @@
   gap: 3px;
 }
 /* Tin của mình hiện bên TRÁI; tin nhận được hiện bên PHẢI (đối xứng 2 phía) */
+/* Tin của mình bên PHẢI; tin nhận được bên TRÁI */
 .chat-msg.is-mine {
-  align-self: flex-start;
-  align-items: flex-start;
-}
-.chat-msg:not(.is-mine) {
   align-self: flex-end;
   align-items: flex-end;
+}
+.chat-msg:not(.is-mine) {
+  align-self: flex-start;
+  align-items: flex-start;
 }
 
 .chat-bubble {
@@ -380,11 +381,11 @@
   color: #ffffff;
   border: none;
   border-radius: 18px;
-  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
 }
 .chat-msg:not(.is-mine) .chat-bubble {
   border-radius: 18px;
-  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 6px;
 }
 
 .chat-msg-time {

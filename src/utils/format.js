@@ -28,19 +28,43 @@ export function formatDistance(km) {
   return `${Math.round(n)} km`
 }
 
+/**
+ * Parse a backend datetime an toàn theo UTC.
+ * Backend (Npgsql legacy timestamp) trả về chuỗi KHÔNG có 'Z' (vd "2026-06-21T10:00:00")
+ * → `new Date()` hiểu nhầm là giờ máy (local) gây lệch +7h ở VN. Ta thêm 'Z' để ép UTC.
+ */
+export function toDate(iso) {
+  if (!iso) return null
+  if (typeof iso === 'string') {
+    const s = iso.trim()
+    // Có dạng ISO không kèm timezone (không 'Z', không +hh:mm) → coi là UTC
+    if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(s) && !/[zZ]|[+-]\d{2}:?\d{2}$/.test(s)) {
+      const d = new Date(s.replace(' ', 'T') + 'Z')
+      if (!Number.isNaN(d.getTime())) return d
+    }
+  }
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime()) ? null : d
+}
+
+/** Giờ:phút theo múi giờ VN (cho tin nhắn). */
+export function formatTime(iso) {
+  const d = toDate(iso)
+  if (!d) return ''
+  return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
+}
+
 /** Format an ISO date string as `DD/MM/YYYY`. */
 export function formatDate(iso) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
+  const d = toDate(iso)
+  if (!d) return ''
   return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
 
 /** Relative time like "vừa xong", "5 phút trước", "hôm qua". */
 export function timeAgo(iso) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
+  const d = toDate(iso)
+  if (!d) return ''
   const diff = Date.now() - d.getTime()
   const min = Math.floor(diff / 60_000)
   if (min < 1) return 'vừa xong'

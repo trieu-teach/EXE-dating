@@ -67,7 +67,7 @@ export default function DailyConnection() {
     }
   }, [toast])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps  (chỉ tải 1 lần, tránh reload khi re-render)
 
   const [claiming, setClaiming] = useState(null) // code nhiệm vụ đang nhận
 
@@ -77,10 +77,17 @@ export default function DailyConnection() {
     try {
       await gamificationService.claim(task.code)
       setTasks((cur) => cur.map((t) => (t.code === task.code ? { ...t, claimed: true } : t)))
-      const inv = await gamificationService.inventory().catch(() => null)
-      if (inv) setInventory(Array.isArray(inv?.items) ? inv.items : (Array.isArray(inv) ? inv : []))
+      // Cộng nguyên liệu ngay tại chỗ (không refetch để khỏi nháy/như reload trang)
+      const qty = task.rewardQty ?? 1
+      setInventory((cur) => {
+        const arr = cur.map((it) => ({ ...it }))
+        const idx = arr.findIndex((it) => (it.material ?? it.name) === task.rewardMaterial)
+        if (idx >= 0) arr[idx].quantity = (arr[idx].quantity ?? 0) + qty
+        else arr.push({ material: task.rewardMaterial, quantity: qty })
+        return arr
+      })
       const meta = MATERIAL_META[task.rewardMaterial]
-      toast.success(`Đã nhận ${meta?.emoji ?? '🎁'} ×${task.rewardQty ?? 1}!`)
+      toast.success(`Đã nhận ${meta?.emoji ?? '🎁'} ×${qty}!`)
     } catch (err) {
       toast.error(err?.message || 'Nhận thưởng thất bại.')
     } finally {

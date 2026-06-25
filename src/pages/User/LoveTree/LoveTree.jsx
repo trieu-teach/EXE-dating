@@ -166,9 +166,11 @@ export default function LoveTree() {
     )
   }
 
-  const level = Number(plant?.level ?? 1)
-  const growthPct = Math.max(0, Math.min(100, Number(plant?.growthPercent ?? 0)))
+  const rawLevel = Number(plant?.level ?? 1)
+  const level = Math.min(TREE_MAX_LEVEL, rawLevel)         // hiển thị tối đa Cấp 7
+  const isMaxed = rawLevel >= TREE_MAX_LEVEL
   const perLevel = Math.max(1, Number(plant?.percentPerLevel ?? 100))
+  const growthPct = isMaxed ? perLevel : Math.max(0, Math.min(100, Number(plant?.growthPercent ?? 0)))
   const streak = Number(plant?.streakCount ?? 0)
   const bothWatered = Boolean(plant?.bothWateredToday)
   const iWatered = Boolean(plant?.iWateredToday)
@@ -251,7 +253,9 @@ export default function LoveTree() {
                 {/* Growth progress */}
                 <div className="love-tree-growth-section">
                   <div className="love-tree-growth-header">
-                    <span className="love-tree-growth-title">Tiến độ lên cấp {level + 1}</span>
+                    <span className="love-tree-growth-title">
+                      {isMaxed ? '🌳 Cấp tối đa' : `Tiến độ lên cấp ${level + 1}`}
+                    </span>
                     <span className="love-tree-growth-pct">{growthPct}% / {perLevel}%</span>
                   </div>
                   <div className="love-tree-growth-bar" role="progressbar"
@@ -261,7 +265,7 @@ export default function LoveTree() {
                   </div>
                   <div className="love-tree-growth-detail">
                     <span>{growthPct} / {perLevel} điểm tăng trưởng</span>
-                    <span>Lên Cấp {level + 1} khi đầy</span>
+                    <span>{isMaxed ? 'Cây đã đạt cấp cao nhất 💖' : `Lên Cấp ${level + 1} khi đầy`}</span>
                   </div>
                 </div>
 
@@ -272,7 +276,7 @@ export default function LoveTree() {
                     {MATERIALS.map((m) => {
                       const meta = MATERIAL_META[m]
                       const stock = inventory?.[m] ?? 0
-                      const disabled = watering || loading || !plant || stock <= 0
+                      const disabled = watering || loading || !plant || stock <= 0 || isMaxed
                       return (
                         <button key={m} type="button" className="love-tree-water-btn"
                           data-mat={m} onClick={() => handleWater(m)} disabled={disabled}
