@@ -83,6 +83,7 @@ export default function LoveTree() {
   const [emojiAnim, setEmojiAnim] = useState('')
   const [tab, setTab] = useState('tree')
   const [showcase, setShowcase] = useState(false)
+  const [levelsOpen, setLevelsOpen] = useState(false)
 
   const { user } = useAuth()
   const { inventory } = useInventory()
@@ -186,23 +187,40 @@ export default function LoveTree() {
   const animCls = emojiAnim ? `is-${emojiAnim}` : ''
 
   return (
-    <div className="love-tree-page">
+    <div className="love-tree-page" data-stage={Math.min(TREE_MAX_LEVEL, Math.max(1, level))}>
+      {/* Nền immersive: gradient + tia sáng toả + lấp lánh + confetti */}
+      <div className="lt-page-bg" aria-hidden />
+      <div className="lt-page-rays" aria-hidden />
+      <div className="lt-page-spark" aria-hidden>
+        {Array.from({ length: 22 }).map((_, i) => (
+          <span key={i} style={{
+            left: `${(i * 47 + 5) % 98}%`,
+            top: `${(i * 31 + 7) % 94}%`,
+            animationDelay: `${(i % 8) * 0.4}s`,
+            animationDuration: `${2 + (i % 5) * 0.5}s`,
+          }} />
+        ))}
+      </div>
+      <div className="lt-page-confetti" aria-hidden>
+        {Array.from({ length: 40 }).map((_, i) => {
+          const colors = ['#ff4f8b', '#b14bff', '#ffd76f', '#ff7eb3', '#7ed7ff', '#7CFC9A', '#ffffff']
+          return (
+            <span key={i} style={{
+              left: `${(i * 23 + 3) % 100}%`,
+              background: colors[i % colors.length],
+              width: `${5 + (i % 3) * 3}px`,
+              height: `${9 + (i % 3) * 4}px`,
+              animationDelay: `${(i % 14) * 0.5}s`,
+              animationDuration: `${5 + (i % 6) * 0.8}s`,
+            }} />
+          )
+        })}
+      </div>
+
       {/* ── Left: tree card ─────────────────────────────── */}
-      <section className="love-tree-card">
+      <section className={`love-tree-card${active && tab === 'tree' ? ' is-hud' : ''}`}>
         {active ? (
           <>
-            {/* Hero header */}
-            <div className="love-tree-hero">
-              <div className="love-tree-hero-float" aria-hidden>
-                <span>✨</span><span>💫</span><span>⭐</span><span>🌟</span><span>💫</span>
-              </div>
-              <div className="love-tree-hero-content">
-                <div className="love-tree-hero-label">Cây tình yêu với</div>
-                <div className="love-tree-hero-name">{mName(active)}</div>
-                <div className="love-tree-hero-sub">Match {timeAgo(mWhen(active))}</div>
-              </div>
-            </div>
-
             {/* Co-op stat — streak + hôm nay cùng chăm cây (kiểu Duolingo/Snapchat) */}
             <div className="lt-coop">
               <div className="lt-coop-streak" title="Số ngày liên tiếp cùng chăm cây">
@@ -294,127 +312,73 @@ export default function LoveTree() {
                     </div>
                   )}
                   <div className="love-tree-glow" />
+                  <div className="lt-stage-eyebrow">🌳 {treeStageName(level)}</div>
                   <div className="love-tree-img-wrap">
                     <img
                       src={treeImg}
                       alt={`Cây tình yêu cấp ${level} — ${treeStageName(level)}`}
                       className={`love-tree-img ${animCls}`}
                     />
-                    <div className="love-tree-level-badge">
-                      <span>Cấp</span>
-                      <span className="level-num">{level}</span>
-                      <span>·</span>
-                      <span>{treeStageName(level)}</span>
-                    </div>
+                  </div>
+                  <h2 className="lt-stage-names">Bạn <span>&</span> {partnerName.split(' ')[0]}</h2>
+                  <div className="lt-stage-tag">
+                    Cấp {level} · {isMaxed ? 'Tình yêu bền chặt 💖' : `${growthPct}/${perLevel} điểm tăng trưởng`}
                   </div>
                   <div className="love-tree-ground" />
                 </div>
 
-                {/* Growth progress */}
-                <div className="love-tree-growth-section">
-                  <div className="love-tree-growth-header">
-                    <span className="love-tree-growth-title">
-                      {isMaxed ? '🌳 Cấp tối đa' : `Tiến độ lên cấp ${level + 1}`}
-                    </span>
-                    <span className="love-tree-growth-pct">{growthPct}% / {perLevel}%</span>
-                  </div>
-                  <div className="love-tree-growth-bar" role="progressbar"
-                    aria-valuenow={growthPct} aria-valuemin={0} aria-valuemax={perLevel}>
-                    <div className="love-tree-growth-fill"
-                      style={{ width: `${Math.min(100, (growthPct / perLevel) * 100)}%` }} />
-                  </div>
-                  <div className="love-tree-growth-detail">
-                    <span>{growthPct} / {perLevel} điểm tăng trưởng</span>
-                    <span>{isMaxed ? 'Cây đã đạt cấp cao nhất 💖' : `Lên Cấp ${level + 1} khi đầy`}</span>
-                  </div>
-                </div>
+                {/* ── Dock điều khiển cố định dưới đáy ── */}
+                <div className="lt-dock">
+                  {!isMaxed && (
+                    <div className="lt-dock-progress">
+                      <div className="lt-dock-progress-top">
+                        <span>Tiến độ lên Cấp {level + 1}</span>
+                        <span>{growthPct}/{perLevel}</span>
+                      </div>
+                      <div className="lt-dock-bar">
+                        <div className="lt-dock-bar-fill" style={{ width: `${Math.min(100, (growthPct / perLevel) * 100)}%` }} />
+                      </div>
+                    </div>
+                  )}
 
-                {/* Ăn mừng cấp tối đa — thay cho khu tưới cây */}
-                {isMaxed ? (
-                  <div className="love-tree-maxed">
-                    <span className="love-tree-maxed-shine" aria-hidden />
-                    <div className="love-tree-maxed-emoji">🌳✨</div>
-                    <div className="love-tree-maxed-title">Cây tình yêu vĩnh cửu!</div>
-                    <p className="love-tree-maxed-desc">
-                      Bạn và {partnerName} đã cùng chăm cây đến <strong>cấp tối đa</strong> — biểu tượng cho một tình yêu bền chặt 💖
-                    </p>
-                    <button type="button" className="btn btn-primary" onClick={() => setShowcase(true)}>
-                      🎉 Khoe cây
-                    </button>
-                  </div>
-                ) : (
-                <>
-                <div className="love-tree-water-section">
-                  <div className="love-tree-water-title">Tưới cây</div>
-                  <div className="love-tree-water-grid">
-                    {MATERIALS.map((m) => {
-                      const meta = MATERIAL_META[m]
-                      const stock = inventory?.[m] ?? 0
-                      const disabled = watering || loading || !plant || stock <= 0 || isMaxed
-                      return (
-                        <button key={m} type="button" className="love-tree-water-btn"
-                          data-mat={m} onClick={() => handleWater(m)} disabled={disabled}
-                          aria-label={`Tưới bằng ${meta.label}`}>
-                          <span className="love-tree-water-emoji" aria-hidden>{meta.emoji}</span>
-                          <span className="love-tree-water-label">{meta.label}</span>
-                          <span className="love-tree-water-bonus">+{MATERIAL_BONUS[m]}%</span>
-                          <span className={`love-tree-water-stock${stock <= 0 ? ' is-empty' : ''}`}>
-                            {watering ? '…' : stock}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
+                  <div className="lt-dock-main">
+                    {isMaxed ? (
+                      <button type="button" className="lt-dock-maxed" onClick={() => setShowcase(true)}>
+                        <span className="lt-dock-maxed-shine" aria-hidden />
+                        🎉 Khoe cây tình yêu vĩnh cửu
+                      </button>
+                    ) : (
+                      <div className="lt-dock-water">
+                        {MATERIALS.map((m) => {
+                          const meta = MATERIAL_META[m]
+                          const stock = inventory?.[m] ?? 0
+                          const disabled = watering || loading || !plant || stock <= 0
+                          return (
+                            <button key={m} type="button" className="lt-water-btn" data-mat={m}
+                              onClick={() => handleWater(m)} disabled={disabled}
+                              title={`${meta.label} · +${MATERIAL_BONUS[m]}%`} aria-label={`Tưới bằng ${meta.label}`}>
+                              <span className="lt-water-emoji">{meta.emoji}</span>
+                              <span className="lt-water-meta">
+                                <span className="lt-water-label">{meta.label}</span>
+                                <span className="lt-water-bonus">+{MATERIAL_BONUS[m]}%</span>
+                              </span>
+                              <span className={`lt-water-stock${stock <= 0 ? ' is-empty' : ''}`}>
+                                {watering ? '…' : stock}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
 
-                {/* Inventory bar */}
-                <div className="love-tree-inventory">
-                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 700, marginRight: 4 }}>Kho:</span>
-                  {MATERIALS.map((m) => (
-                    <span key={m} className="love-tree-inv-chip" data-mat={m}>
-                      {MATERIAL_META[m].emoji} {inventory?.[m] ?? 0}
-                    </span>
-                  ))}
-                </div>
-                </>
-                )}
-
-                {/* Action buttons */}
-                <div className="love-tree-actions">
-                  <button type="button" className="btn btn-ghost" onClick={() => navigate(`/chat/${mId(active)}`)}>
-                    <MessageIcon size={14} /> Nhắn tin
-                  </button>
-                  <button type="button" className="btn btn-soft" onClick={() => navigate('/daily-connection')}>
-                    <SparkleIcon size={14} /> Nhiệm vụ
-                  </button>
-                </div>
-
-                {/* Các cấp độ cây + phần thưởng */}
-                <div className="love-tree-levels">
-                  <div className="love-tree-levels-title">Hành trình lớn lên cùng nhau</div>
-                  <div className="love-tree-levels-list is-journey">
-                    {TREE_LEVELS.map((t) => {
-                      const reached = level >= t.lv
-                      const current = level >= t.lv && level < (TREE_LEVELS.find((x) => x.lv > t.lv)?.lv ?? 999)
-                      return (
-                        <div key={t.lv} className={`love-tree-level-row${reached ? ' is-reached' : ''}${current ? ' is-current' : ''}${t.unlock ? ' is-unlock' : ''}`}>
-                          <img src={treeImgByNumber(t.img)} alt="" className="love-tree-level-img" />
-                          <div className="love-tree-level-info">
-                            <div className="love-tree-level-head">
-                              <span className="love-tree-level-lv">Cấp {t.lv}</span>
-                              <span className="love-tree-level-name">{t.name}</span>
-                              {t.unlock && <span className="love-tree-level-tag">🔓 Mở khóa</span>}
-                              {current && <span className="love-tree-level-now">Hiện tại</span>}
-                            </div>
-                            <div className="love-tree-level-desc">{t.desc}</div>
-                          </div>
-                          {reached && <span className="love-tree-level-check">✓</span>}
-                        </div>
-                      )
-                    })}
-                  </div>
-                  <div className="love-tree-levels-note">
-                    🎁 Đạt các mốc <strong>{LEVEL_MILESTONES.join(', ')}</strong> sẽ nhận thưởng nguyên liệu cho cả hai. Lên Cấp tối đa để có <strong>Cây tình yêu vĩnh cửu</strong>!
+                    <div className="lt-dock-side">
+                      <button type="button" className="lt-dock-btn" onClick={() => navigate('/daily-connection')}>
+                        <SparkleIcon size={18} /> <span>Nhiệm vụ</span>
+                      </button>
+                      <button type="button" className="lt-dock-btn" onClick={() => setLevelsOpen(true)}>
+                        <span className="lt-dock-btn-emoji">🗺️</span> <span>Hành trình</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </>
@@ -487,6 +451,42 @@ export default function LoveTree() {
             <button type="button" className="btn btn-primary" onClick={() => setMilestone(null)}>
               Tuyệt vời!
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Overlay lộ trình (mở bằng nút Hành trình) ───────── */}
+      {levelsOpen && (
+        <div className="lt-levels-overlay" onClick={() => setLevelsOpen(false)} role="dialog" aria-modal="true">
+          <div className="lt-levels-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="lt-levels-sheet-head">
+              <h3>Hành trình lớn lên cùng nhau</h3>
+              <button type="button" className="lt-levels-close" onClick={() => setLevelsOpen(false)} aria-label="Đóng">✕</button>
+            </div>
+            <div className="love-tree-levels-list is-journey">
+              {TREE_LEVELS.map((t) => {
+                const reached = level >= t.lv
+                const current = level >= t.lv && level < (TREE_LEVELS.find((x) => x.lv > t.lv)?.lv ?? 999)
+                return (
+                  <div key={t.lv} className={`love-tree-level-row${reached ? ' is-reached' : ''}${current ? ' is-current' : ''}${t.unlock ? ' is-unlock' : ''}`}>
+                    <img src={treeImgByNumber(t.img)} alt="" className="love-tree-level-img" />
+                    <div className="love-tree-level-info">
+                      <div className="love-tree-level-head">
+                        <span className="love-tree-level-lv">Cấp {t.lv}</span>
+                        <span className="love-tree-level-name">{t.name}</span>
+                        {t.unlock && <span className="love-tree-level-tag">🔓 Mở khóa</span>}
+                        {current && <span className="love-tree-level-now">Hiện tại</span>}
+                      </div>
+                      <div className="love-tree-level-desc">{t.desc}</div>
+                    </div>
+                    {reached && <span className="love-tree-level-check">✓</span>}
+                  </div>
+                )
+              })}
+            </div>
+            <div className="love-tree-levels-note">
+              🎁 Đạt các mốc <strong>{LEVEL_MILESTONES.join(', ')}</strong> sẽ nhận thưởng nguyên liệu cho cả hai. Lên Cấp tối đa để có <strong>Cây tình yêu vĩnh cửu</strong>!
+            </div>
           </div>
         </div>
       )}

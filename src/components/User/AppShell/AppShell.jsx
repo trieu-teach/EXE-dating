@@ -10,9 +10,9 @@ function sideConfig(pathname) {
   const p = pathname.toLowerCase()
   // Trang full-width không hiện (Chat, Premium) hoặc đã tự xử lý (Discovery)
   if (p.startsWith('/chat') || p.startsWith('/premium') || p.startsWith('/discovery')) return null
+  if (p.startsWith('/love-tree')) return null // trang Cây có nền immersive riêng
   // Trang full-width có nội dung rộng -> chừa nhiều hơn
   if (p.startsWith('/date-pass')) return { theme: 'datepass', gutter: 560 }
-  if (p.startsWith('/love-tree')) return { theme: 'love', gutter: 600 }
   // Trang constrained (max-width 720 -> nửa = 360)
   let theme = 'love'
   if (p.startsWith('/matches') || p.startsWith('/liked-me')) theme = 'matches'

@@ -1230,3 +1230,360 @@
 @media (prefers-reduced-motion: reduce) {
   .lt-showcase-bg, .lt-showcase-glow, .lt-showcase-rays, .lt-cf, .lt-spark, .lt-shoot, .lt-showcase-tree { animation: none !important; }
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   IMMERSIVE LOVE TREE — tính năng signature (phong cách "khoe cây")
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Nền + lớp hiệu ứng phủ toàn màn */
+.love-tree-page { background: transparent !important; position: relative; }
+.lt-page-bg, .lt-page-rays, .lt-page-spark { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.lt-page-bg {
+  background-size: 200% 200%;
+  animation: lt-pg-shift 16s ease-in-out infinite;
+}
+@keyframes lt-pg-shift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+/* Mỗi cấp một nền riêng — hành trình màu sắc từ mầm non đến vĩnh cửu */
+.love-tree-page[data-stage="1"] .lt-page-bg { /* Mầm xanh — bình minh ngọc lục */
+  background-image: linear-gradient(150deg, #0b3d2e 0%, #1b7a5a 52%, #5fcf9e 100%);
+}
+.love-tree-page[data-stage="2"] .lt-page-bg { /* Cây non — biển xanh */
+  background-image: linear-gradient(150deg, #0b3a4d 0%, #1b80a0 52%, #5cc6d6 100%);
+}
+.love-tree-page[data-stage="3"] .lt-page-bg { /* Cây nhỏ — trời lam tím */
+  background-image: linear-gradient(150deg, #18235e 0%, #3a55b0 52%, #7aa0f0 100%);
+}
+.love-tree-page[data-stage="4"] .lt-page-bg { /* Mở khóa hẹn hò — hoàng hôn */
+  background-image: linear-gradient(150deg, #4a1450 0%, #b83280 48%, #ff9a5b 100%);
+}
+.love-tree-page[data-stage="5"] .lt-page-bg { /* Cây trưởng thành — hồng rose */
+  background-image: linear-gradient(150deg, #6e1640 0%, #c2185b 50%, #ff7eb3 100%);
+}
+.love-tree-page[data-stage="6"] .lt-page-bg { /* Cây đơm hoa — magenta tím */
+  background-image: linear-gradient(150deg, #4a1466 0%, #9c2f7e 52%, #ff6fa5 100%);
+}
+.love-tree-page[data-stage="7"] .lt-page-bg { /* Vĩnh cửu — thiên hà */
+  background-image: linear-gradient(150deg, #1b0f3a 0%, #4a1d7a 32%, #9c2f7e 62%, #ff4f8b 100%);
+}
+/* Tia sáng toả tròn (sau cây) */
+.lt-page-rays {
+  background: repeating-conic-gradient(from 0deg at 50% 38%, rgba(255,255,255,0.08) 0deg 5deg, transparent 5deg 16deg);
+  -webkit-mask: radial-gradient(circle at 50% 38%, #000 4%, transparent 48%);
+  mask: radial-gradient(circle at 50% 38%, #000 4%, transparent 48%);
+  opacity: 0.6;
+  animation: lt-pg-spin 40s linear infinite;
+}
+@keyframes lt-pg-spin { to { transform: rotate(360deg); } }
+/* Lấp lánh */
+.lt-page-spark span {
+  position: absolute; width: 6px; height: 6px; border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, rgba(255,215,111,0.8) 45%, transparent 72%);
+  box-shadow: 0 0 8px rgba(255,255,255,0.8); opacity: 0;
+  animation: lt-pg-tw ease-in-out infinite;
+}
+@keyframes lt-pg-tw { 0%,100% { opacity: 0; transform: scale(0.4); } 50% { opacity: 1; transform: scale(1.3); } }
+
+/* Nội dung nổi trên nền */
+.love-tree-card, .love-tree-match-list, .love-tree-debug { position: relative; z-index: 1; }
+
+/* Thẻ cây: bỏ nền trắng -> hoà vào nền immersive */
+.love-tree-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Hero trong suốt, chữ trắng */
+.love-tree-page .love-tree-hero { background: transparent !important; padding: 28px 24px 6px; }
+.love-tree-page .love-tree-hero::before, .love-tree-page .love-tree-hero::after { display: none; }
+.love-tree-page .love-tree-hero-label {
+  background: rgba(255,255,255,0.18) !important; color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(6px);
+}
+.love-tree-page .love-tree-hero-name { color: #fff !important; text-shadow: 0 2px 16px rgba(0,0,0,0.25); }
+.love-tree-page .love-tree-hero-sub { color: rgba(255,255,255,0.85) !important; }
+
+/* Helper: kính mờ */
+.love-tree-page .lt-coop,
+.love-tree-page .love-tree-growth-section,
+.love-tree-page .love-tree-water-section,
+.love-tree-page .love-tree-inventory,
+.love-tree-page .love-tree-levels,
+.love-tree-page .love-tree-tab-bar {
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  border-radius: 20px;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  margin: 12px 16px; padding: 16px 18px;
+}
+.love-tree-page .love-tree-tab-bar { padding: 6px; gap: 4px; }
+.love-tree-page .love-tree-tab-btn { color: rgba(255,255,255,0.8); border: none; }
+.love-tree-page .love-tree-tab-btn.is-active { background: rgba(255,255,255,0.92); color: var(--color-primary); }
+
+/* Co-op trên nền tối */
+.love-tree-page .lt-coop { display: flex; gap: 12px; }
+.love-tree-page .lt-coop-today { background: rgba(255,255,255,0.12) !important; border-color: rgba(255,255,255,0.18) !important; }
+.love-tree-page .lt-coop-today-lbl { color: #fff; }
+.love-tree-page .lt-coop-name { color: rgba(255,255,255,0.85); }
+.love-tree-page .lt-coop-ava { border-color: rgba(255,255,255,0.4); color: #fff; }
+
+/* Scene: ẩn trời riêng -> để nền trang xuyên qua (liền mạch) */
+.love-tree-page .love-tree-sky { display: none !important; }
+.love-tree-page .love-tree-scene { min-height: 460px; padding: 30px 24px 36px; }
+
+/* Tiến độ */
+.love-tree-page .love-tree-growth-title { color: #fff; }
+.love-tree-page .love-tree-growth-detail { color: rgba(255,255,255,0.82); }
+.love-tree-page .love-tree-growth-bar { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.22); }
+.love-tree-page .love-tree-growth-pct { background: rgba(255,255,255,0.92); color: var(--color-primary); }
+
+/* Tưới cây */
+.love-tree-page .love-tree-water-title { color: #fff; }
+.love-tree-page .love-tree-water-btn {
+  background: rgba(255,255,255,0.14) !important; border-color: rgba(255,255,255,0.22) !important;
+}
+.love-tree-page .love-tree-water-label { color: #fff; }
+.love-tree-page .love-tree-water-bonus { color: rgba(255,255,255,0.85); }
+.love-tree-page .love-tree-inventory { color: #fff; }
+.love-tree-page .love-tree-inventory > span:first-child { color: rgba(255,255,255,0.85) !important; }
+
+/* Hành động */
+.love-tree-page .love-tree-actions { margin: 12px 16px; }
+.love-tree-page .love-tree-actions .btn-ghost {
+  background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* Lộ trình */
+.love-tree-page .love-tree-levels { border-top: none !important; }
+.love-tree-page .love-tree-levels-title { color: #fff; }
+.love-tree-page .love-tree-levels-list.is-journey::before { background: rgba(255,255,255,0.28); }
+.love-tree-page .is-journey .love-tree-level-name { color: #fff; }
+.love-tree-page .is-journey .love-tree-level-desc { color: rgba(255,255,255,0.75); }
+.love-tree-page .is-journey .love-tree-level-row.is-current { background: rgba(255,255,255,0.12); }
+.love-tree-page .love-tree-levels-note { color: rgba(255,255,255,0.8); }
+.love-tree-page .love-tree-levels-note strong { color: #fff; }
+
+/* Sidebar kính mờ */
+.love-tree-page .love-tree-match-list {
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  backdrop-filter: blur(14px);
+}
+.love-tree-page .love-tree-match-list-header h3 { color: #fff; }
+.love-tree-page .love-tree-match-name { color: #fff; }
+.love-tree-page .love-tree-match-sub { color: rgba(255,255,255,0.7); }
+.love-tree-page .love-tree-match-item.is-active { background: rgba(255,255,255,0.18); }
+
+/* ── Confetti nền trang ── */
+.lt-page-confetti { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.lt-page-confetti span {
+  position: absolute; top: -6%; border-radius: 2px; opacity: 0;
+  animation-name: lt-pg-confetti; animation-timing-function: linear; animation-iteration-count: infinite;
+}
+@keyframes lt-pg-confetti {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  8% { opacity: 0.9; }
+  100% { transform: translateY(108vh) rotate(680deg); opacity: 0.85; }
+}
+
+/* ── Bố cục showcase trong scene: eyebrow · tên · tag ── */
+.love-tree-page .love-tree-scene { min-height: 540px; }
+.lt-stage-eyebrow {
+  position: relative; z-index: 1; order: -1;
+  margin-bottom: 14px;
+  padding: 8px 18px; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #fff; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.lt-stage-names {
+  position: relative; z-index: 1;
+  margin-top: 16px; font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 900; color: #fff;
+  letter-spacing: -0.02em; text-shadow: 0 4px 20px rgba(0,0,0,0.3); text-align: center;
+}
+.lt-stage-names span { color: #ffd76f; margin: 0 6px; }
+.lt-stage-tag {
+  position: relative; z-index: 1;
+  margin-top: 6px; font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.92); text-align: center;
+}
+
+/* ════════ HUD 1 MÀN: cây giữa · dock tưới dưới đáy · lộ trình overlay ════════ */
+.love-tree-card.is-hud {
+  height: calc(100vh - 104px);
+  overflow: hidden;
+}
+.love-tree-card.is-hud .love-tree-scene {
+  flex: 1;
+  min-height: 0 !important;
+  padding: 18px 24px 8px;
+}
+.love-tree-card.is-hud .love-tree-img { max-height: 38vh; width: auto; }
+.love-tree-card.is-hud .lt-coop { padding: 10px 16px 0; }
+.love-tree-card.is-hud .lt-stage-names { margin-top: 10px; }
+
+/* Dock điều khiển dưới đáy */
+.lt-dock {
+  flex-shrink: 0;
+  margin: 8px 14px 14px;
+  padding: 12px 14px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.13) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+}
+.lt-dock-progress { margin-bottom: 10px; }
+.lt-dock-progress-top {
+  display: flex; justify-content: space-between;
+  font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.9); margin-bottom: 5px;
+}
+.lt-dock-bar { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.2); overflow: hidden; }
+.lt-dock-bar-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, #ffd76f, #ff7eb3);
+  box-shadow: 0 0 10px rgba(255,215,111,0.6); transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.lt-dock-main { display: flex; flex-direction: column; gap: 10px; }
+.lt-dock-water { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.lt-water-btn {
+  display: flex; align-items: center; gap: 11px;
+  padding: 14px 14px; border-radius: 16px;
+  background: rgba(255,255,255,0.22); border: 1.5px solid rgba(255,255,255,0.38);
+  cursor: pointer; font-family: inherit; transition: transform 0.12s, background 0.15s;
+  position: relative;
+}
+.lt-water-btn:hover:not(:disabled) { transform: translateY(-2px); background: rgba(255,255,255,0.32); }
+.lt-water-btn:active:not(:disabled) { transform: scale(0.96); }
+.lt-water-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.lt-water-emoji { font-size: 1.7rem; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
+.lt-water-meta { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.lt-water-label { font-size: 0.92rem; font-weight: 800; color: #fff; }
+.lt-water-bonus { font-size: 0.74rem; font-weight: 700; color: rgba(255,255,255,0.88); }
+.lt-water-stock {
+  margin-left: auto; min-width: 28px; height: 28px; padding: 0 8px; border-radius: 999px;
+  display: grid; place-items: center; font-size: 0.85rem; font-weight: 800;
+  background: rgba(0,0,0,0.32); color: #fff;
+}
+.lt-water-stock.is-empty { background: rgba(0,0,0,0.2); color: rgba(255,255,255,0.55); }
+.lt-dock-side { display: flex; gap: 10px; }
+.lt-dock-btn {
+  flex: 1; height: 46px; border-radius: 14px;
+  background: rgba(255,255,255,0.2); border: 1.5px solid rgba(255,255,255,0.34);
+  color: #fff; font-size: 0.88rem; font-weight: 800; font-family: inherit; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: transform 0.12s, background 0.15s;
+}
+.lt-dock-btn:hover { transform: translateY(-2px); background: rgba(255,255,255,0.3); }
+.lt-dock-btn-emoji { font-size: 1.1rem; }
+@media (max-width: 560px) { .lt-dock-btn span:not(.lt-dock-btn-emoji) { display: none; } }
+.lt-dock-maxed {
+  position: relative; overflow: hidden; flex: 1;
+  padding: 14px; border-radius: 16px; border: none; cursor: pointer;
+  font-family: inherit; font-size: 0.95rem; font-weight: 900; color: #fff;
+  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  box-shadow: 0 8px 22px rgba(255, 79, 139, 0.4);
+}
+.lt-dock-maxed-shine {
+  position: absolute; inset: 0;
+  background: linear-gradient(110deg, transparent 38%, rgba(255,255,255,0.5) 50%, transparent 62%);
+  background-size: 250% 100%; animation: lt-maxed-shine 4s ease-in-out infinite;
+}
+
+/* Overlay lộ trình */
+.lt-levels-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(20, 8, 30, 0.6); backdrop-filter: blur(6px);
+  animation: lt-sc-in 0.25s ease-out;
+}
+.lt-levels-sheet {
+  width: 100%; max-width: 480px; max-height: 84vh; overflow-y: auto;
+  background: rgba(40, 18, 56, 0.92); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 24px; padding: 20px; box-shadow: 0 24px 70px rgba(0,0,0,0.5);
+  backdrop-filter: blur(20px);
+}
+.lt-levels-sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.lt-levels-sheet-head h3 { font-size: 1.05rem; font-weight: 900; color: #fff; }
+.lt-levels-close {
+  width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+  background: rgba(255,255,255,0.14); color: #fff; font-size: 15px;
+}
+.lt-levels-sheet .love-tree-level-name { color: #fff; }
+.lt-levels-sheet .love-tree-level-desc { color: rgba(255,255,255,0.72); }
+.lt-levels-sheet .is-journey .love-tree-level-row.is-current { background: rgba(255,255,255,0.1); }
+.lt-levels-sheet .is-journey .love-tree-levels-list::before,
+.lt-levels-sheet .love-tree-levels-list.is-journey::before { background: rgba(255,255,255,0.28); }
+.lt-levels-sheet .love-tree-levels-note { color: rgba(255,255,255,0.8); margin-top: 14px; }
+.lt-levels-sheet .love-tree-levels-note strong { color: #fff; }
+
+/* ════════ Nền SCENE sáng theo từng cấp (quầng màu sau cây) ════════ */
+.love-tree-page[data-stage="1"] .love-tree-scene {
+  background: radial-gradient(circle at 50% 40%, rgba(95,230,200,0.45), transparent 56%),
+              linear-gradient(180deg, #1f8f6a 0%, #0f5c45 55%, #082e22 100%) !important;
+}
+.love-tree-page[data-stage="2"] .love-tree-scene {
+  background: radial-gradient(circle at 50% 40%, rgba(95,210,235,0.45), transparent 56%),
+              linear-gradient(180deg, #1b88aa 0%, #0f5d75 55%, #07303f 100%) !important;
+}
+.love-tree-page[data-stage="3"] .love-tree-scene {
+  background: radial-gradient(circle at 50% 40%, rgba(140,170,255,0.45), transparent 56%),
+              linear-gradient(180deg, #3f5cc0 0%, #283f95 55%, #141d50 100%) !important;
+}
+.love-tree-page[data-stage="4"] .love-tree-scene {
+  background: radial-gradient(circle at 50% 40%, rgba(255,180,120,0.45), transparent 56%),
+              linear-gradient(180deg, #d24a86 0%, #8a2566 52%, #3a1038 100%) !important;
+}
+.love-tree-page[data-stage="5"] .love-tree-scene {
+  background: radial-gradient(circle at 50% 40%, rgba(255,150,195,0.5), transparent 56%),
+              linear-gradient(180deg, #d62a72 0%, #951a52 52%, #43102e 100%) !important;
+}
+.love-tree-page[data-stage="6"] .love-tree-scene {
+  background: radial-gradient(circle at 50% 40%, rgba(255,160,210,0.5), transparent 56%),
+              linear-gradient(180deg, #b13a8f 0%, #76246b 52%, #2c1146 100%) !important;
+}
+.love-tree-page[data-stage="7"] .love-tree-scene {
+  background: radial-gradient(circle at 50% 40%, rgba(255,170,225,0.5), transparent 58%),
+              linear-gradient(180deg, #6a2a9a 0%, #4a1d7a 45%, #160a2e 100%) !important;
+}
+
+/* Quầng sáng sau cây — to & rõ hơn */
+.love-tree-page .love-tree-glow {
+  width: 440px; height: 440px; top: 40%;
+  background: radial-gradient(circle, rgba(255,255,255,0.28), rgba(255,255,255,0.08) 40%, transparent 70%) !important;
+}
+
+/* Cây TO hơn nhiều */
+.love-tree-card.is-hud .love-tree-img { max-height: 50vh; width: auto; }
+.love-tree-page .love-tree-img { width: 360px; height: 360px; }
+.lt-stage-tag { text-shadow: 0 2px 8px rgba(0,0,0,0.45); }
+.lt-stage-eyebrow { box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
+
+/* ════════ FIX: mặt trời · chữ hành trình · click nút ════════ */
+
+/* Mặt trời: ẩn tia spiky lỗi, để vầng sáng tròn sạch & rõ */
+.love-tree-page .lt-rays { display: none !important; }
+.love-tree-page .lt-orb {
+  width: 78px; height: 78px;
+  box-shadow: 0 0 60px 20px rgba(255, 226, 122, 0.55), 0 0 24px 6px rgba(255,255,255,0.5) !important;
+}
+
+/* Ghi chú trong overlay Hành trình: nền tối, chữ trắng rõ */
+.lt-levels-sheet .love-tree-levels-note {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.92) !important;
+}
+.lt-levels-sheet .love-tree-levels-note strong { color: #ffd76f !important; }
+.lt-levels-sheet .love-tree-level-lv { color: #fff; }
+
+/* FIX CLICK: nâng dock + nội dung lên trên các lớp nền, chống tràn che nút */
+.love-tree-page { isolation: isolate; }
+.love-tree-card.is-hud .love-tree-scene { overflow: hidden; }
+.lt-dock { position: relative; z-index: 10; pointer-events: auto; }
+.lt-dock-main, .lt-dock-water, .lt-dock-side { position: relative; z-index: 1; }
+.lt-water-btn, .lt-dock-btn { position: relative; z-index: 2; pointer-events: auto; }
+
+/* ════════ FIX click giữa nút: nội dung nút trong suốt với chuột ════════ */
+.lt-dock-btn > *, .lt-water-btn > *, .lt-dock-maxed > * { pointer-events: none; }
+.lt-dock { z-index: 30 !important; }
+/* Trả panel debug về fixed (override immersive trước đó làm sai) */
+.love-tree-page .love-tree-debug { position: fixed !important; z-index: 90; }
