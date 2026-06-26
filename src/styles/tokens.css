@@ -24,15 +24,35 @@
   --color-danger: #ef4444;
   --color-info: #2563eb;
 
+  /* Gradient thương hiệu (dùng chung mọi nơi) */
+  --gradient-primary: linear-gradient(135deg, #ff4f8b, #b14bff);
+  --gradient-primary-soft: linear-gradient(135deg, #ff7eb3, #ff4f8b);
+
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-xl: 28px;
+  --radius-card: 16px;
   --radius-pill: 999px;
 
-  --shadow-sm: 0 1px 2px rgba(255, 79, 139, 0.06);
-  --shadow-md: 0 8px 24px rgba(255, 79, 139, 0.08);
-  --shadow-lg: 0 24px 60px rgba(255, 79, 139, 0.12);
+  /* Bóng đổ 3 cấp — tông hồng nhẹ */
+  --shadow-sm: 0 2px 6px rgba(255, 79, 139, 0.08);
+  --shadow-md: 0 10px 28px rgba(255, 79, 139, 0.12);
+  --shadow-lg: 0 24px 60px rgba(177, 75, 255, 0.18);
+
+  /* ── Typography scale ── */
+  --font-display: 'Plus Jakarta Sans', 'Be Vietnam Pro', system-ui, sans-serif;
+  --text-h1: 2rem;        /* 32 */
+  --text-h2: 1.5rem;      /* 24 */
+  --text-h3: 1.2rem;      /* ~19 */
+  --text-body: 0.95rem;   /* 15 */
+  --text-sm: 0.85rem;     /* ~14 */
+  --text-caption: 0.75rem;/* 12 */
+  --weight-regular: 500;
+  --weight-medium: 600;
+  --weight-bold: 800;
+  --leading-tight: 1.15;
+  --leading-normal: 1.55;
 
   --space-1: 4px;
   --space-2: 8px;

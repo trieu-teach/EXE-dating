@@ -1,0 +1,58 @@
+.sh-sides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+.sh-defs { position: absolute; width: 0; height: 0; }
+
+.sh-col {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(50% - var(--content-half, 360px));
+  min-width: 0;
+  overflow: hidden;
+}
+.sh-col-left { left: 0; }
+.sh-col-right { right: 0; }
+
+.sh-shape {
+  position: absolute;
+  display: block;
+  will-change: transform;
+  transform: translate(-50%, -50%); /* neo theo tâm */
+  animation-name: sh-drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* Lớp xa: tim to, mờ đậm, rất nhạt -> như quầng sáng hình tim */
+.sh-far {
+  filter: blur(30px);
+  opacity: 0.2;
+}
+/* Lớp giữa: mờ nhẹ */
+.sh-mid {
+  filter: blur(1px) drop-shadow(0 6px 14px rgba(255, 79, 139, 0.16));
+  opacity: 0.42;
+}
+/* Lớp trước: tô đặc nhẹ, tông ambient */
+.sh-front {
+  filter: drop-shadow(0 10px 22px rgba(255, 79, 139, 0.2));
+  opacity: 0.6;
+}
+
+@keyframes sh-drift {
+  0%   { transform: translate(-50%, calc(-50% - var(--drift-y, 16px) * 0.5)); }
+  50%  { transform: translate(-50%, calc(-50% + var(--drift-y, 16px) * 0.5)); }
+  100% { transform: translate(-50%, calc(-50% - var(--drift-y, 16px) * 0.5)); }
+}
+
+@media (max-width: 1120px) {
+  .sh-sides { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sh-shape { animation: none; transform: translate(-50%, -50%); }
+}

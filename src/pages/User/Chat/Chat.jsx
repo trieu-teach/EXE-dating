@@ -9,7 +9,6 @@ import { timeAgo, resolveImageUrl, formatDistance } from '../../../utils/format.
 import ChatThreadToolbar from '../../../components/User/ChatThreadToolbar/ChatThreadToolbar.jsx'
 import ProfilePreviewModal from '../../../components/User/ProfilePreviewModal/ProfilePreviewModal.jsx'
 import AISuggestionPanel from '../../../components/User/AISuggestionPanel/AISuggestionPanel.jsx'
-import LoveTreeBondBar from '../../../components/User/LoveTreeBondBar/LoveTreeBondBar.jsx'
 import VenueMessage from '../../../components/User/VenueMessage/VenueMessage.jsx'
 import VenueDetailModal from '../../../components/User/VenueDetailModal/VenueDetailModal.jsx'
 import { Avatar } from '../../../components/ui/Avatar.jsx'
@@ -378,7 +377,8 @@ export default function Chat() {
               exit="exit"
               className="chat-thread-wrapper"
             >
-              <ChatThreadToolbar conversation={conversation} onBack={() => { setConversation(null); navigate('/chat') }}
+              <ChatThreadToolbar conversation={conversation} plant={plant}
+                onBack={() => { setConversation(null); navigate('/chat') }}
                 onBlock={() => setBlockOpen(true)}
                 onAvatarClick={async () => {
                   if (!conversation?.otherUserId) return
@@ -386,50 +386,64 @@ export default function Chat() {
                   catch (err) { toast.error(err?.message || 'Không tải được hồ sơ.') }
                 }} />
 
-              {plant && (
-                <div className="chat-bond-bar-wrapper">
-                  <LoveTreeBondBar plant={plant} matchId={conversation?.matchId} onWater={handleWater} loading={watering} />
-                </div>
-              )}
-
               <div className="chat-messages">
                 {threadLoading ? (
                   <div className="chat-loading-state">Đang tải tin nhắn…</div>
                 ) : messages.length === 0 ? (
-                  <div className="chat-empty-thread">
-                    <div className="chat-empty-thread-icon"><HeartChatIcon size={40} /></div>
-                    <h3>Chưa có tin nhắn</h3>
-                    <p>Hãy bắt đầu bằng lời chào</p>
+                  <div className="chat-empty-thread chat-empty-convo">
+                    <div
+                      className="chat-empty-avatar"
+                      style={resolveImageUrl(conversation?.otherAvatarUrl)
+                        ? { backgroundImage: `url(${resolveImageUrl(conversation.otherAvatarUrl)})` } : undefined}
+                    >
+                      {!resolveImageUrl(conversation?.otherAvatarUrl) && (
+                        <span>{(conversation?.otherDisplayName || '?').charAt(0).toUpperCase()}</span>
+                      )}
+                      <span className="chat-empty-avatar-badge"><HeartChatIcon size={16} /></span>
+                    </div>
+                    <h3>Bắt đầu trò chuyện với {conversation?.otherDisplayName || 'người ấy'} 👋</h3>
+                    <p>Gửi lời chào đầu tiên — một câu mở lời thân thiện luôn ghi điểm. Thử một gợi ý bên dưới nhé!</p>
+                    {conversation?.matchId && (
+                      <div className="chat-empty-ai">
+                        <AISuggestionPanel matchId={conversation.matchId} onPick={(t) => setText(t)} />
+                      </div>
+                    )}
                   </div>
                 ) : messages.map((m) => {
+                  const mine = isOwn(m, user?.id)
+                  const ava = mine
+                    ? resolveImageUrl(user?.avatarUrl)
+                    : resolveImageUrl(conversation?.otherAvatarUrl)
+                  const initial = (mine ? (user?.displayName || 'B') : (conversation?.otherDisplayName || '?')).charAt(0).toUpperCase()
+                  const avatarEl = (
+                    <span className="chat-msg-avatar" style={ava ? { backgroundImage: `url(${ava})` } : undefined}>
+                      {!ava && initial}
+                    </span>
+                  )
                   if (m.type === 'venue') {
                     return (
-                      <motion.div
-                        key={m.id}
-                        className={`chat-msg${isOwn(m, user?.id) ? ' is-mine' : ''}`}
-                        variants={msgVariants}
-                        initial="hidden"
-                        animate="show"
-                      >
-                        <VenueMessage
-                          venue={{ id: m.venueId, name: m.venueName, imageUrl: m.venueImageUrl, address: m.venueAddress, category: m.venueCategory, distanceKm: m.distanceKm }}
-                          meta={isOwn(m, user?.id) ? 'Bạn đã chia sẻ' : `${conversation?.otherDisplayName} đã chia sẻ`}
-                          onClick={() => openVenueDetail({ id: m.venueId, venueName: m.venueName })}
-                        />
-                        <div className="chat-msg-time">{timeAgo(m.sentAt)}</div>
+                      <motion.div key={m.id} className={`chat-msg${mine ? ' is-mine' : ''}`}
+                        variants={msgVariants} initial="hidden" animate="show">
+                        {avatarEl}
+                        <div className="chat-msg-col">
+                          <VenueMessage
+                            venue={{ id: m.venueId, name: m.venueName, imageUrl: m.venueImageUrl, address: m.venueAddress, category: m.venueCategory, distanceKm: m.distanceKm }}
+                            meta={mine ? 'Bạn đã chia sẻ' : `${conversation?.otherDisplayName} đã chia sẻ`}
+                            onClick={() => openVenueDetail({ id: m.venueId, venueName: m.venueName })}
+                          />
+                          <div className="chat-msg-time">{timeAgo(m.sentAt)}</div>
+                        </div>
                       </motion.div>
                     )
                   }
                   return (
-                    <motion.div
-                      key={m.id}
-                      className={`chat-msg${isOwn(m, user?.id) ? ' is-mine' : ''}`}
-                      variants={msgVariants}
-                      initial="hidden"
-                      animate="show"
-                    >
-                      <div className="chat-bubble">{m.content}</div>
-                      <div className="chat-msg-time">{timeAgo(m.sentAt)}</div>
+                    <motion.div key={m.id} className={`chat-msg${mine ? ' is-mine' : ''}`}
+                      variants={msgVariants} initial="hidden" animate="show">
+                      {avatarEl}
+                      <div className="chat-msg-col">
+                        <div className="chat-bubble">{m.content}</div>
+                        <div className="chat-msg-time">{timeAgo(m.sentAt)}</div>
+                      </div>
                     </motion.div>
                   )
                 })}
@@ -447,12 +461,6 @@ export default function Chat() {
                       </button>
                     </div>
                   ))}
-                </div>
-              )}
-
-              {conversation?.matchId && !threadLoading && messages.length === 0 && (
-                <div className="chat-ai-panel-wrapper">
-                  <AISuggestionPanel matchId={conversation.matchId} onPick={(t) => setText(t)} />
                 </div>
               )}
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useToast } from '../../../context/ToastContext.jsx'
+import { useAuth } from '../../../context/AuthContext.jsx'
 import { useInventory } from '../../../context/InventoryContext.jsx'
 import { matchesService, chatService } from '../../../api'
 import { usePlant } from '../../../hooks/usePlant.js'
@@ -81,7 +82,9 @@ export default function LoveTree() {
   const [milestone, setMilestone] = useState(null)
   const [emojiAnim, setEmojiAnim] = useState('')
   const [tab, setTab] = useState('tree')
+  const [showcase, setShowcase] = useState(false)
 
+  const { user } = useAuth()
   const { inventory } = useInventory()
   const { plant, loading, watering, water, lastResult } = usePlant(activeMatchId)
 
@@ -174,6 +177,11 @@ export default function LoveTree() {
   const streak = Number(plant?.streakCount ?? 0)
   const bothWatered = Boolean(plant?.bothWateredToday)
   const iWatered = Boolean(plant?.iWateredToday)
+  const partnerWatered = bothWatered || Boolean(plant?.partnerWateredToday)
+  const myAvatar = resolveImageUrl(user?.avatarUrl)
+  const myInitial = (user?.displayName || 'B').charAt(0).toUpperCase()
+  const partnerAvatar = resolveImageUrl(mAvatar(active))
+  const partnerName = mName(active)
   const treeImg = getTreeImage(level)
   const animCls = emojiAnim ? `is-${emojiAnim}` : ''
 
@@ -192,16 +200,36 @@ export default function LoveTree() {
                 <div className="love-tree-hero-label">Cây tình yêu với</div>
                 <div className="love-tree-hero-name">{mName(active)}</div>
                 <div className="love-tree-hero-sub">Match {timeAgo(mWhen(active))}</div>
-                <div className="love-tree-hero-badges">
-                  {streak > 0 && (
-                    <span className="love-tree-hero-badge is-fire"><FireIcon size={14} /> {streak} ngày streak</span>
-                  )}
-                  {bothWatered && (
-                    <span className="love-tree-hero-badge is-duo"><DuoIcon size={14} /> Cả hai đã tưới hôm nay</span>
-                  )}
-                  {iWatered && !bothWatered && (
-                    <span className="love-tree-hero-badge"><CheckIcon size={12} /> Bạn đã tưới</span>
-                  )}
+              </div>
+            </div>
+
+            {/* Co-op stat — streak + hôm nay cùng chăm cây (kiểu Duolingo/Snapchat) */}
+            <div className="lt-coop">
+              <div className="lt-coop-streak" title="Số ngày liên tiếp cùng chăm cây">
+                <span className="lt-coop-flame">🔥</span>
+                <span className="lt-coop-streak-num">{streak}</span>
+                <span className="lt-coop-streak-lbl">ngày<br />streak</span>
+              </div>
+              <div className="lt-coop-today">
+                <div className="lt-coop-today-lbl">
+                  {bothWatered ? '💞 Cả hai đã tưới hôm nay!' : 'Hôm nay cùng chăm cây'}
+                </div>
+                <div className="lt-coop-avatars">
+                  <div className={`lt-coop-person${iWatered ? ' is-done' : ''}`}>
+                    <span className="lt-coop-ava" style={myAvatar ? { backgroundImage: `url(${myAvatar})` } : undefined}>
+                      {!myAvatar && myInitial}
+                      <span className="lt-coop-badge">{iWatered ? <CheckIcon size={11} /> : '·'}</span>
+                    </span>
+                    <span className="lt-coop-name">Bạn</span>
+                  </div>
+                  <span className="lt-coop-amp"><HeartIcon size={16} /></span>
+                  <div className={`lt-coop-person${partnerWatered ? ' is-done' : ''}`}>
+                    <span className="lt-coop-ava" style={partnerAvatar ? { backgroundImage: `url(${partnerAvatar})` } : undefined}>
+                      {!partnerAvatar && partnerName.charAt(0).toUpperCase()}
+                      <span className="lt-coop-badge">{partnerWatered ? <CheckIcon size={11} /> : '·'}</span>
+                    </span>
+                    <span className="lt-coop-name">{partnerName.split(' ')[0]}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -231,8 +259,40 @@ export default function LoveTree() {
               />
             ) : (
               <>
-                {/* Tree scene */}
-                <div className="love-tree-scene">
+                {/* Tree scene — nền cảnh đổi theo cấp */}
+                <div className="love-tree-scene" data-stage={Math.min(TREE_MAX_LEVEL, Math.max(1, level))}>
+                  <div className="love-tree-sky" />
+                  <div className="lt-orb" aria-hidden />
+                  <div className="lt-rays" aria-hidden />
+                  <div className="lt-bokeh" aria-hidden>
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <span key={i} className="lt-bokeh-dot" style={{
+                        left: `${(i * 41 + 8) % 92}%`,
+                        bottom: `${-20 - (i % 4) * 10}px`,
+                        width: `${22 + (i % 4) * 14}px`,
+                        height: `${22 + (i % 4) * 14}px`,
+                        animationDelay: `${i * 0.9}s`,
+                        animationDuration: `${7 + (i % 5)}s`,
+                      }} />
+                    ))}
+                  </div>
+                  <div className="lt-sparkles" aria-hidden>
+                    {Array.from({ length: 18 }).map((_, i) => (
+                      <span key={i} className="lt-sparkle" style={{
+                        left: `${(i * 37 + 6) % 96}%`,
+                        top: `${(i * 53 + 8) % 78}%`,
+                        animationDelay: `${(i % 7) * 0.4}s`,
+                        animationDuration: `${2.2 + (i % 5) * 0.5}s`,
+                      }} />
+                    ))}
+                  </div>
+                  {animCls && (
+                    <div className="lt-drops" aria-hidden>
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <span key={i} className="lt-drop" style={{ left: `${20 + i * 12}%`, animationDelay: `${i * 0.12}s` }} />
+                      ))}
+                    </div>
+                  )}
                   <div className="love-tree-glow" />
                   <div className="love-tree-img-wrap">
                     <img
@@ -269,7 +329,21 @@ export default function LoveTree() {
                   </div>
                 </div>
 
-                {/* Water buttons */}
+                {/* Ăn mừng cấp tối đa — thay cho khu tưới cây */}
+                {isMaxed ? (
+                  <div className="love-tree-maxed">
+                    <span className="love-tree-maxed-shine" aria-hidden />
+                    <div className="love-tree-maxed-emoji">🌳✨</div>
+                    <div className="love-tree-maxed-title">Cây tình yêu vĩnh cửu!</div>
+                    <p className="love-tree-maxed-desc">
+                      Bạn và {partnerName} đã cùng chăm cây đến <strong>cấp tối đa</strong> — biểu tượng cho một tình yêu bền chặt 💖
+                    </p>
+                    <button type="button" className="btn btn-primary" onClick={() => setShowcase(true)}>
+                      🎉 Khoe cây
+                    </button>
+                  </div>
+                ) : (
+                <>
                 <div className="love-tree-water-section">
                   <div className="love-tree-water-title">Tưới cây</div>
                   <div className="love-tree-water-grid">
@@ -302,6 +376,8 @@ export default function LoveTree() {
                     </span>
                   ))}
                 </div>
+                </>
+                )}
 
                 {/* Action buttons */}
                 <div className="love-tree-actions">
@@ -315,8 +391,8 @@ export default function LoveTree() {
 
                 {/* Các cấp độ cây + phần thưởng */}
                 <div className="love-tree-levels">
-                  <div className="love-tree-levels-title">Các cấp độ & phần thưởng</div>
-                  <div className="love-tree-levels-list">
+                  <div className="love-tree-levels-title">Hành trình lớn lên cùng nhau</div>
+                  <div className="love-tree-levels-list is-journey">
                     {TREE_LEVELS.map((t) => {
                       const reached = level >= t.lv
                       const current = level >= t.lv && level < (TREE_LEVELS.find((x) => x.lv > t.lv)?.lv ?? 999)
@@ -411,6 +487,69 @@ export default function LoveTree() {
             <button type="button" className="btn btn-primary" onClick={() => setMilestone(null)}>
               Tuyệt vời!
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Khoe cây: showcase full màn hình + hiệu ứng mạnh ───────── */}
+      {showcase && (
+        <div className="lt-showcase" role="dialog" aria-modal="true">
+          <div className="lt-showcase-bg" aria-hidden />
+          <div className="lt-showcase-glow" aria-hidden />
+          <div className="lt-showcase-rays" aria-hidden />
+
+          {/* Confetti */}
+          <div className="lt-showcase-confetti" aria-hidden>
+            {Array.from({ length: 60 }).map((_, i) => {
+              const colors = ['#ff4f8b', '#b14bff', '#ffd76f', '#ff7eb3', '#7ed7ff', '#7CFC9A', '#ffffff']
+              return (
+                <span key={i} className="lt-cf" style={{
+                  left: `${(i * 17 + 3) % 100}%`,
+                  background: colors[i % colors.length],
+                  width: `${6 + (i % 3) * 3}px`,
+                  height: `${10 + (i % 3) * 5}px`,
+                  animationDelay: `${(i % 12) * 0.28}s`,
+                  animationDuration: `${3 + (i % 5) * 0.7}s`,
+                }} />
+              )
+            })}
+          </div>
+
+          {/* Lấp lánh */}
+          <div className="lt-showcase-sparks" aria-hidden>
+            {Array.from({ length: 28 }).map((_, i) => (
+              <span key={i} className="lt-spark" style={{
+                left: `${(i * 53 + 4) % 98}%`,
+                top: `${(i * 37 + 6) % 92}%`,
+                animationDelay: `${(i % 9) * 0.35}s`,
+                animationDuration: `${1.8 + (i % 5) * 0.5}s`,
+              }} />
+            ))}
+          </div>
+
+          {/* Sao băng */}
+          <div className="lt-showcase-shoot" aria-hidden>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i} className="lt-shoot" style={{
+                top: `${8 + i * 12}%`,
+                left: `${50 + i * 9}%`,
+                animationDelay: `${i * 1.4 + 0.5}s`,
+              }} />
+            ))}
+          </div>
+
+          <button type="button" className="lt-showcase-close" onClick={() => setShowcase(false)} aria-label="Đóng">✕</button>
+
+          <div className="lt-showcase-content">
+            <div className="lt-showcase-eyebrow">🌳 Cây tình yêu vĩnh cửu</div>
+            <div className="lt-showcase-tree-wrap">
+              <img src={treeImgByNumber(7)} alt="Cây tình yêu vĩnh cửu" className="lt-showcase-tree" />
+            </div>
+            <h2 className="lt-showcase-names">Bạn <span>&</span> {partnerName}</h2>
+            <p className="lt-showcase-tag">Cấp tối đa · Tình yêu bền chặt 💖</p>
+            <div className="lt-showcase-actions">
+              <button type="button" className="lt-showcase-dismiss" onClick={() => setShowcase(false)}>Đóng</button>
+            </div>
           </div>
         </div>
       )}

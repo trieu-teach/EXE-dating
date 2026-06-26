@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
 import { swipesService, discoveryService, profileService, chatService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { useAuth } from '../../../context/AuthContext.jsx'
@@ -9,7 +9,7 @@ import {
   HeartIcon, XIcon, StarIcon, MatchHeartIcon, SparkleIcon,
   RefreshIcon, PinIcon, ShieldCheckIcon, CrownIcon,
 } from '../../../components/ui/CustomIcons.jsx'
-import FallingPetals from '../../../components/ui/FallingPetals.jsx'
+import SideHearts from '../../../components/ui/SideHearts.jsx'
 import MatchesSidebar from '../../../components/User/MatchesSidebar/MatchesSidebar.jsx'
 import './Discovery.css'
 
@@ -23,6 +23,43 @@ const orderedPhotos = (p) => {
   const list = Array.isArray(p?.photos) ? [...p.photos] : []
   list.sort((a, b) => (b.isPrimary === true) - (a.isPrimary === true))
   return list.map((x) => resolveImageUrl(x.url)).filter(Boolean)
+}
+
+/**
+ * Thẻ vuốt — MỖI thẻ có motion value RIÊNG (mount theo key userId) nên không bị
+ * dư góc xoay sang thẻ kế tiếp. Kéo ngang → xoay + hiện nhãn THÍCH/BỎ QUA.
+ */
+function SwipeCard({ disabled, onDecide, innerRef, children }) {
+  const x = useMotionValue(0)
+  const rotate = useTransform(x, [-260, 0, 260], [-13, 0, 13])
+  const likeOpacity = useTransform(x, [30, 140], [0, 1])
+  const nopeOpacity = useTransform(x, [-140, -30], [1, 0])
+
+  const onDragEnd = (_e, info) => {
+    if (disabled) return
+    if (info.offset.x > 120 || info.velocity.x > 600) onDecide('Like')
+    else if (info.offset.x < -120 || info.velocity.x < -600) onDecide('Pass')
+  }
+
+  return (
+    <motion.div
+      ref={innerRef}
+      className="disc-scroll"
+      style={{ x, rotate }}
+      drag={disabled ? false : 'x'}
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.65}
+      onDragEnd={onDragEnd}
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.92 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+    >
+      <motion.div className="disc-swipe-label disc-like-label" style={{ opacity: likeOpacity }} aria-hidden>THÍCH</motion.div>
+      <motion.div className="disc-swipe-label disc-nope-label" style={{ opacity: nopeOpacity }} aria-hidden>BỎ QUA</motion.div>
+      {children}
+    </motion.div>
+  )
 }
 
 export default function Discovery() {
@@ -249,7 +286,7 @@ export default function Discovery() {
         <div className="disc-root">
           <MatchesSidebar />
           <div className="disc-main">
-            <FallingPetals count={20} />
+            <SideHearts />
             <div className="loading-block"><span className="spinner" /> Đang tìm thêm người…</div>
             {matchModalEl}
           </div>
@@ -261,7 +298,7 @@ export default function Discovery() {
       <div className="disc-root">
         <MatchesSidebar />
         <div className="disc-main">
-          <FallingPetals count={20} />
+          <SideHearts />
           <div className="discovery-empty">
             <div className="discovery-empty-icon"><SparkleIcon size={56} /></div>
             <h2>Hết người mới rồi!</h2>
@@ -290,18 +327,10 @@ export default function Discovery() {
     <div className="disc-root">
       <MatchesSidebar />
       <div className="disc-main">
-      <FallingPetals count={26} />
+      <SideHearts />
 
       <AnimatePresence mode="wait">
-        <motion.div
-          key={current.userId}
-          ref={scrollRef}
-          className="disc-scroll"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -16 }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
-        >
+        <SwipeCard key={current.userId} disabled={actionLoading} onDecide={decide} innerRef={scrollRef}>
           {/* Ảnh chính + tên */}
           <div className="disc-photo disc-photo-hero" style={photos[0] ? { backgroundImage: `url(${photos[0]})` } : undefined}>
             <div className="disc-photo-gradient" />
@@ -360,7 +389,7 @@ export default function Discovery() {
           ))}
 
           <div className="disc-scroll-end">Hết hồ sơ · Bạn nghĩ sao?</div>
-        </motion.div>
+        </SwipeCard>
       </AnimatePresence>
 
       {/* Nút hành động nổi */}

@@ -8,6 +8,7 @@
 }
 
 .app-shell-body {
+  position: relative;            /* gốc định vị cho lớp emoji nền hai bên */
   flex: 1;
   display: flex;
   justify-content: center;
@@ -22,6 +23,8 @@
 
 /* Default: content constrained */
 .app-shell-main {
+  position: relative;            /* nằm trên lớp emoji nền */
+  z-index: 1;
   width: 100%;
   max-width: 720px;
 }

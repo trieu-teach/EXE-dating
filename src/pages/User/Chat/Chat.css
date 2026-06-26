@@ -238,11 +238,46 @@
 .chat-toolbar-status {
   font-size: 0.75rem;
   color: var(--color-primary);
-  font-weight: 500;
+  font-weight: 600;
   margin-top: 2px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+}
+.chat-toolbar-status-muted { color: var(--color-text-muted); font-weight: 500; }
+.chat-toolbar-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #34c759;
+  box-shadow: 0 0 0 2px rgba(52, 199, 89, 0.22);
+}
+
+/* Chip Cây tình yêu gọn trong header (kiểu streak) */
+.chat-toolbar-tree {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  background: linear-gradient(135deg, rgba(255,79,139,0.10), rgba(177,75,255,0.12));
+  border: 1px solid rgba(255,79,139,0.22);
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.chat-toolbar-tree:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(255, 79, 139, 0.18);
+  text-decoration: none;
+}
+.chat-toolbar-tree-emoji { font-size: 0.95rem; line-height: 1; }
+.chat-toolbar-tree-streak {
+  color: #f97316;
+  font-weight: 800;
+}
+@media (max-width: 560px) {
+  .chat-toolbar-tree-lv { display: none; }
 }
 
 .chat-toolbar-actions { display: flex; gap: 4px; align-items: center; }
@@ -347,21 +382,43 @@
 }
 
 /* Message bubbles */
+/* Hàng tin: [avatar][nội dung]; mình bên phải (đảo hàng), đối phương bên trái */
 .chat-msg {
   display: flex;
-  flex-direction: column;
-  max-width: 68%;
-  gap: 3px;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 82%;
 }
-/* Tin của mình hiện bên TRÁI; tin nhận được hiện bên PHẢI (đối xứng 2 phía) */
-/* Tin của mình bên PHẢI; tin nhận được bên TRÁI */
 .chat-msg.is-mine {
   align-self: flex-end;
-  align-items: flex-end;
+  flex-direction: row-reverse;
 }
 .chat-msg:not(.is-mine) {
   align-self: flex-start;
-  align-items: flex-start;
+}
+.chat-msg-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.chat-msg.is-mine .chat-msg-col { align-items: flex-end; }
+.chat-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-surface-2);
+  display: grid;
+  place-items: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: 16px;
+  border: 1.5px solid var(--color-border);
 }
 
 .chat-bubble {
@@ -377,11 +434,15 @@
   border-top-left-radius: 18px;
 }
 .chat-msg.is-mine .chat-bubble {
-  background: #ff4f8b;
+  background: linear-gradient(135deg, #ff4f8b 0%, #b14bff 100%);
   color: #ffffff;
   border: none;
   border-radius: 18px;
   border-bottom-right-radius: 6px;
+  box-shadow: 0 4px 14px rgba(255, 79, 139, 0.28);
+}
+.chat-msg:not(.is-mine) .chat-bubble {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 .chat-msg:not(.is-mine) .chat-bubble {
   border-radius: 18px;
@@ -609,6 +670,50 @@
   text-align: center;
   line-height: 1.5;
 }
+
+/* Empty-state kiểu Hinge: avatar match + tên + gợi ý mở lời */
+.chat-empty-convo {
+  gap: 16px;
+  padding: 32px 24px;
+}
+.chat-empty-avatar {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-surface-2);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 0 4px var(--color-surface), 0 0 0 6px rgba(255, 79, 139, 0.35), 0 16px 36px rgba(255, 79, 139, 0.22);
+}
+.chat-empty-avatar > span {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+.chat-empty-avatar-badge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 4px 12px rgba(255, 79, 139, 0.4);
+}
+.chat-empty-convo h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.chat-empty-convo p { max-width: 340px; }
+.chat-empty-ai { width: 100%; max-width: 440px; margin-top: 4px; }
 
 /* Loading & empty states */
 .chat-loading-state {

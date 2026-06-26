@@ -154,17 +154,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 28px 24px 20px;
-  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 100%);
-  min-height: 260px;
+  padding: 52px 24px 60px;
+  min-height: 560px;
+  overflow: hidden;
+  isolation: isolate;
 }
 .love-tree-glow {
   position: absolute;
   top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 220px;
-  height: 220px;
+  width: 360px;
+  height: 360px;
   background: radial-gradient(circle, rgba(255, 79, 139, 0.16) 0%, rgba(177, 75, 255, 0.08) 40%, transparent 70%);
   pointer-events: none;
   border-radius: 50%;
@@ -178,8 +179,8 @@
   z-index: 1;
 }
 .love-tree-img {
-  width: 180px;
-  height: 180px;
+  width: 290px;
+  height: 290px;
   object-fit: contain;
   filter: drop-shadow(0 8px 24px rgba(255, 79, 139, 0.25));
   transition: transform 0.3s;
@@ -235,7 +236,6 @@
 /* Growth progress */
 .love-tree-growth-section {
   padding: 20px 24px 12px;
-  border-top: 1px solid var(--color-border);
 }
 .love-tree-growth-header {
   display: flex;
@@ -786,12 +786,12 @@
     max-height: 200px;
   }
   .love-tree-img {
-    width: 140px;
-    height: 140px;
+    width: 190px;
+    height: 190px;
   }
   .love-tree-scene {
-    min-height: 200px;
-    padding: 20px 16px 16px;
+    min-height: 320px;
+    padding: 28px 16px 24px;
   }
 }
 @media (max-width: 480px) {
@@ -833,3 +833,400 @@
 }
 [data-theme='dark'] .love-tree-match-item:hover { background: var(--color-surface-2); }
 [data-theme='dark'] .love-tree-debug-pre { background: rgba(0,0,0,0.9); }
+
+/* ============================================================
+   NỀN CẢNH CÂY THEO CẤP (1→7) — nhiều màu + hiệu ứng đặc biệt
+   ============================================================ */
+
+/* Bầu trời — gradient ĐỘNG (chuyển màu chậm) theo cấp */
+.love-tree-sky {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  /* Nhấp nháy độ sáng nhẹ thay vì dịch nền -> không bao giờ lộ mép gradient */
+  animation: lt-sky-shift 16s ease-in-out infinite;
+}
+@keyframes lt-sky-shift {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50%      { filter: brightness(1.06) saturate(1.12); }
+}
+.love-tree-scene[data-stage="1"] .love-tree-sky,
+.love-tree-scene[data-stage="2"] .love-tree-sky {
+  background-image: linear-gradient(160deg, #fff0f6 0%, #ffd9ea 45%, #ffc6b3 100%);
+}
+.love-tree-scene[data-stage="3"] .love-tree-sky,
+.love-tree-scene[data-stage="4"] .love-tree-sky {
+  background-image: linear-gradient(160deg, #bfe9ff 0%, #d9f7ec 50%, #b7f0c2 100%);
+}
+.love-tree-scene[data-stage="5"] .love-tree-sky {
+  background-image: linear-gradient(160deg, #fff0c2 0%, #ffd28a 50%, #ff9e7a 100%);
+}
+.love-tree-scene[data-stage="6"] .love-tree-sky {
+  background-image: linear-gradient(160deg, #ffba8a 0%, #ff7eb3 45%, #a85bff 100%);
+}
+.love-tree-scene[data-stage="7"] .love-tree-sky {
+  background-image: linear-gradient(160deg, #1b0f3a 0%, #4a1d7a 40%, #9c2f7e 75%, #ff7eb3 100%);
+}
+
+/* Mặt trời / Mặt trăng */
+.lt-orb {
+  position: absolute; top: 26px; right: 36px;
+  width: 64px; height: 64px; border-radius: 50%;
+  z-index: 1; pointer-events: none;
+  animation: lt-orb-float 7s ease-in-out infinite;
+}
+.love-tree-scene[data-stage="1"] .lt-orb,
+.love-tree-scene[data-stage="2"] .lt-orb,
+.love-tree-scene[data-stage="3"] .lt-orb,
+.love-tree-scene[data-stage="4"] .lt-orb {
+  background: radial-gradient(circle, #fff7c2 0%, #ffe27a 55%, rgba(255,226,122,0) 72%);
+  box-shadow: 0 0 50px 14px rgba(255, 226, 122, 0.6);
+}
+.love-tree-scene[data-stage="5"] .lt-orb,
+.love-tree-scene[data-stage="6"] .lt-orb {
+  background: radial-gradient(circle, #fff0c2 0%, #ff9e5e 55%, rgba(255,158,94,0) 72%);
+  box-shadow: 0 0 60px 16px rgba(255, 140, 90, 0.7);
+}
+.love-tree-scene[data-stage="7"] .lt-orb {
+  background: radial-gradient(circle, #fff 0%, #e8d9ff 50%, rgba(232,217,255,0) 72%);
+  box-shadow: 0 0 50px 12px rgba(220, 200, 255, 0.7);
+}
+@keyframes lt-orb-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+/* Tia sáng xoay (ban ngày) — ẩn ở cấp 7 */
+.lt-rays {
+  position: absolute; top: 58px; right: 68px;
+  width: 0; height: 0; z-index: 0; pointer-events: none;
+  background: conic-gradient(from 0deg,
+    rgba(255,255,255,0.0) 0deg, rgba(255,255,255,0.28) 8deg, rgba(255,255,255,0) 16deg,
+    rgba(255,255,255,0) 30deg, rgba(255,255,255,0.28) 38deg, rgba(255,255,255,0) 46deg,
+    rgba(255,255,255,0) 60deg, rgba(255,255,255,0.28) 68deg, rgba(255,255,255,0) 76deg,
+    rgba(255,255,255,0) 90deg, rgba(255,255,255,0.28) 98deg, rgba(255,255,255,0) 106deg);
+  width: 220px; height: 220px; border-radius: 50%;
+  transform: translate(50%, -50%);
+  filter: blur(1px);
+  opacity: 0.5;
+  animation: lt-rays-spin 22s linear infinite;
+}
+.love-tree-scene[data-stage="7"] .lt-rays { display: none; }
+@keyframes lt-rays-spin { to { transform: translate(50%, -50%) rotate(360deg); } }
+
+/* Quầng sáng sau cây — đổi màu theo cấp, đập nhẹ */
+.love-tree-glow {
+  width: 280px; height: 280px;
+  animation: lt-glow-pulse 4.5s ease-in-out infinite;
+}
+.love-tree-scene[data-stage="6"] .love-tree-glow { background: radial-gradient(circle, rgba(255,140,90,0.25), transparent 70%); }
+.love-tree-scene[data-stage="7"] .love-tree-glow { background: radial-gradient(circle, rgba(177,75,255,0.4), rgba(255,126,179,0.15) 45%, transparent 72%); }
+@keyframes lt-glow-pulse {
+  0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 1; transform: translate(-50%, -50%) scale(1.12); }
+}
+
+/* Bokeh: vầng sáng tròn bay lên */
+.lt-bokeh { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.lt-bokeh-dot {
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.7), rgba(255,255,255,0) 70%);
+  opacity: 0; filter: blur(1px);
+  animation: lt-bokeh-rise linear infinite;
+}
+.love-tree-scene[data-stage="6"] .lt-bokeh-dot { background: radial-gradient(circle, rgba(255,200,150,0.8), transparent 70%); }
+.love-tree-scene[data-stage="7"] .lt-bokeh-dot { background: radial-gradient(circle, rgba(255,215,111,0.85), transparent 70%); }
+@keyframes lt-bokeh-rise {
+  0%   { opacity: 0; transform: translateY(0) scale(0.7); }
+  20%  { opacity: 0.85; }
+  100% { opacity: 0; transform: translateY(-300px) scale(1.2); }
+}
+
+/* Mặt đất / bãi cỏ */
+.love-tree-ground {
+  display: block !important;
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 70px; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse 75% 120% at 50% 100%, rgba(120, 205, 130, 0.6), transparent 72%),
+              linear-gradient(180deg, transparent, rgba(86, 165, 100, 0.4));
+}
+.love-tree-scene[data-stage="6"] .love-tree-ground { background: radial-gradient(ellipse 75% 120% at 50% 100%, rgba(190, 120, 160, 0.5), transparent 72%); }
+.love-tree-scene[data-stage="7"] .love-tree-ground { background: radial-gradient(ellipse 75% 120% at 50% 100%, rgba(177, 75, 255, 0.5), transparent 72%); }
+
+/* Hạt lấp lánh */
+.lt-sparkles { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.lt-sparkle {
+  position: absolute;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, rgba(255,255,255,0.6) 40%, transparent 70%);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.95);
+  opacity: 0;
+  animation: lt-twinkle 3s ease-in-out infinite;
+}
+.love-tree-scene[data-stage="7"] .lt-sparkle {
+  background: radial-gradient(circle, #fff 0%, #ffd76f 50%, transparent 75%);
+  box-shadow: 0 0 10px rgba(255, 215, 111, 0.95);
+}
+@keyframes lt-twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4); }
+  50%      { opacity: 1; transform: scale(1.3); }
+}
+
+/* Sao băng (cấp 6–7) */
+.lt-shooting { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+.lt-star {
+  position: absolute; top: 12%; left: 78%;
+  width: 90px; height: 2px;
+  /* Đuôi mờ cả hai đầu -> giống sao chổi, không còn vạch cứng */
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 70%, #fff 100%);
+  border-radius: 2px;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.9));
+  opacity: 0;
+  transform: rotate(26deg);
+  animation: lt-shoot 6s ease-in infinite;
+}
+@keyframes lt-shoot {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(26deg); }
+  4%   { opacity: 0.9; }
+  9%   { opacity: 0.9; transform: translate(-120px, 62px) rotate(26deg); }
+  12%  { opacity: 0; transform: translate(-150px, 78px) rotate(26deg); }
+  100% { opacity: 0; transform: translate(-150px, 78px) rotate(26deg); }
+}
+
+/* Giọt nước khi tưới */
+.lt-drops { position: absolute; top: 8px; left: 0; right: 0; height: 62%; z-index: 5; pointer-events: none; }
+.lt-drop {
+  position: absolute; top: 0;
+  width: 10px; height: 14px;
+  background: linear-gradient(180deg, #d4f1ff, #4ba8f5);
+  border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+  box-shadow: 0 2px 8px rgba(75, 168, 245, 0.6);
+  opacity: 0;
+  animation: lt-droplet 0.9s ease-in forwards;
+}
+@keyframes lt-droplet {
+  0%   { opacity: 0; transform: translateY(-10px) scale(0.8); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(160px) scale(1); }
+}
+
+/* ════════ GAME-IFY: co-op stat · ăn mừng max · lộ trình journey ════════ */
+
+/* ── Co-op stat: streak + hôm nay cùng chăm cây ── */
+.lt-coop { display: flex; gap: 12px; align-items: stretch; padding: 14px 18px 4px; }
+.lt-coop-streak {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 86px; padding: 10px 14px; border-radius: 16px;
+  background: linear-gradient(135deg, #fff3e0, #ffe2ec);
+  border: 1px solid rgba(249, 115, 22, 0.22);
+}
+.lt-coop-flame { font-size: 1.35rem; line-height: 1; }
+.lt-coop-streak-num { font-size: 1.7rem; font-weight: 900; color: #f97316; line-height: 1; margin-top: 2px; }
+.lt-coop-streak-lbl {
+  font-size: 0.6rem; font-weight: 800; color: #f97316; text-align: center;
+  line-height: 1.15; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.lt-coop-today {
+  flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 9px;
+  padding: 10px 16px; border-radius: 16px;
+  background: var(--color-surface-2); border: 1px solid var(--color-border);
+}
+.lt-coop-today-lbl { font-size: 0.82rem; font-weight: 800; color: var(--color-text); }
+.lt-coop-avatars { display: flex; align-items: center; gap: 14px; }
+.lt-coop-person { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.lt-coop-ava {
+  position: relative; width: 46px; height: 46px; border-radius: 50%;
+  background-size: cover; background-position: center; background-color: var(--color-surface);
+  display: grid; place-items: center; font-weight: 800; color: var(--color-primary); font-size: 1rem;
+  border: 2px solid var(--color-border); transition: border-color 0.2s;
+}
+.lt-coop-person.is-done .lt-coop-ava { border-color: #16a34a; }
+.lt-coop-badge {
+  position: absolute; right: -3px; bottom: -3px; width: 19px; height: 19px; border-radius: 50%;
+  display: grid; place-items: center; color: #fff; background: var(--color-text-muted);
+  border: 2px solid var(--color-surface);
+}
+.lt-coop-person.is-done .lt-coop-badge { background: #16a34a; }
+.lt-coop-name { font-size: 0.7rem; font-weight: 700; color: var(--color-text-soft); }
+.lt-coop-amp { color: var(--color-primary); display: grid; place-items: center; }
+
+/* ── Ăn mừng cấp tối đa ── */
+.love-tree-maxed {
+  position: relative; overflow: hidden; text-align: center;
+  margin: 16px 0 4px; padding: 26px 22px; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 79, 139, 0.12), rgba(177, 75, 255, 0.15));
+  border: 1px solid rgba(177, 75, 255, 0.3);
+}
+.love-tree-maxed-shine {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.55) 50%, transparent 65%);
+  background-size: 250% 100%; animation: lt-maxed-shine 4.5s ease-in-out infinite;
+}
+@keyframes lt-maxed-shine { 0% { background-position: 170% 0; } 55%, 100% { background-position: -170% 0; } }
+.love-tree-maxed-emoji { position: relative; font-size: 2.6rem; line-height: 1; animation: lt-maxed-bob 3s ease-in-out infinite; }
+@keyframes lt-maxed-bob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-6px) rotate(2deg); } }
+.love-tree-maxed-title {
+  position: relative; font-size: 1.25rem; font-weight: 900; margin-top: 8px;
+  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.love-tree-maxed-desc { position: relative; font-size: 0.85rem; color: var(--color-text-soft); line-height: 1.5; margin: 6px auto 16px; max-width: 340px; }
+.love-tree-maxed .btn { position: relative; }
+
+/* ── Lộ trình journey (timeline dọc) ── */
+.love-tree-levels-list.is-journey { position: relative; gap: 2px; padding-left: 4px; }
+.love-tree-levels-list.is-journey::before {
+  content: ''; position: absolute; left: 31px; top: 30px; bottom: 30px; width: 3px;
+  background: var(--color-border); border-radius: 2px; z-index: 0;
+}
+.is-journey .love-tree-level-row {
+  border: none; background: transparent; opacity: 1;
+  padding: 8px 10px; border-radius: 16px; position: relative; z-index: 1;
+}
+.is-journey .love-tree-level-row:not(.is-reached) { opacity: 0.5; }
+.is-journey .love-tree-level-row.is-current { background: linear-gradient(135deg, rgba(255,79,139,0.08), rgba(177,75,255,0.10)); box-shadow: none; }
+.is-journey .love-tree-level-img {
+  width: 54px; height: 54px; border-radius: 50%; padding: 5px; object-fit: contain;
+  background: var(--color-surface-2); box-shadow: 0 0 0 2px var(--color-border);
+  position: relative; z-index: 1;
+}
+.is-journey .love-tree-level-row:not(.is-reached) .love-tree-level-img { filter: grayscale(0.85); }
+.is-journey .love-tree-level-row.is-reached .love-tree-level-img { background: var(--color-surface); box-shadow: 0 0 0 3px var(--color-primary); }
+.is-journey .love-tree-level-row.is-current .love-tree-level-img {
+  box-shadow: 0 0 0 3px var(--color-primary), 0 0 18px rgba(255, 79, 139, 0.5);
+  animation: lt-node-pulse 2.2s ease-in-out infinite;
+}
+@keyframes lt-node-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px var(--color-primary), 0 0 14px rgba(255, 79, 139, 0.4); }
+  50% { box-shadow: 0 0 0 4px var(--color-primary), 0 0 28px rgba(255, 79, 139, 0.7); }
+}
+.is-journey .love-tree-level-check { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: #16a34a; color: #fff; font-size: 0.85rem; }
+
+/* ════════ KHOE CÂY — showcase full màn hình + hiệu ứng mạnh ════════ */
+.lt-showcase {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  animation: lt-sc-in 0.4s ease-out;
+}
+@keyframes lt-sc-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* Nền gradient động rực rỡ */
+.lt-showcase-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(135deg, #1b0f3a 0%, #4a1d7a 32%, #9c2f7e 62%, #ff4f8b 100%);
+  background-size: 220% 220%;
+  animation: lt-sc-shift 12s ease-in-out infinite;
+}
+@keyframes lt-sc-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+/* Quầng sáng đập */
+.lt-showcase-glow {
+  position: absolute; top: 46%; left: 50%; z-index: 1;
+  width: 70vmin; height: 70vmin; transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255,126,179,0.55), rgba(177,75,255,0.25) 45%, transparent 72%);
+  border-radius: 50%; pointer-events: none;
+  animation: lt-sc-glow 4s ease-in-out infinite;
+}
+@keyframes lt-sc-glow {
+  0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.12); }
+}
+/* Tia sáng quay sau cây */
+.lt-showcase-rays {
+  position: absolute; top: 46%; left: 50%; z-index: 1;
+  width: 120vmin; height: 120vmin; transform: translate(-50%, -50%);
+  pointer-events: none; opacity: 0.5;
+  background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.10) 0deg 6deg, transparent 6deg 18deg);
+  -webkit-mask: radial-gradient(circle, #000 12%, transparent 60%);
+  mask: radial-gradient(circle, #000 12%, transparent 60%);
+  animation: lt-sc-spin 26s linear infinite;
+}
+@keyframes lt-sc-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+/* Confetti rơi */
+.lt-showcase-confetti { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.lt-cf {
+  position: absolute; top: -6%; border-radius: 2px; opacity: 0;
+  animation-name: lt-cf-fall; animation-timing-function: linear; animation-iteration-count: infinite;
+}
+@keyframes lt-cf-fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  8% { opacity: 1; }
+  100% { transform: translateY(108vh) rotate(720deg); opacity: 0.9; }
+}
+
+/* Lấp lánh */
+.lt-showcase-sparks { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.lt-spark {
+  position: absolute; width: 8px; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, #ffd76f 50%, transparent 72%);
+  box-shadow: 0 0 10px rgba(255,215,111,0.9); opacity: 0;
+  animation: lt-spark-tw ease-in-out infinite;
+}
+@keyframes lt-spark-tw { 0%, 100% { opacity: 0; transform: scale(0.4); } 50% { opacity: 1; transform: scale(1.4); } }
+
+/* Sao băng */
+.lt-showcase-shoot { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+.lt-shoot {
+  position: absolute; width: 120px; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 70%, #fff 100%);
+  filter: drop-shadow(0 0 6px #fff); opacity: 0; transform: rotate(26deg);
+  animation: lt-shoot-go 6s ease-in infinite;
+}
+@keyframes lt-shoot-go {
+  0% { opacity: 0; transform: translate(0,0) rotate(26deg); }
+  4% { opacity: 0.95; }
+  12% { opacity: 0; transform: translate(-220px, 120px) rotate(26deg); }
+  100% { opacity: 0; transform: translate(-220px, 120px) rotate(26deg); }
+}
+
+/* Nội dung */
+.lt-showcase-content {
+  position: relative; z-index: 5; text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 24px; animation: lt-sc-pop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+@keyframes lt-sc-pop { from { opacity: 0; transform: scale(0.8) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.lt-showcase-eyebrow {
+  font-size: 0.8rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+  color: #fff; padding: 7px 16px; border-radius: 999px;
+  background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+  backdrop-filter: blur(8px); margin-bottom: 18px;
+}
+.lt-showcase-tree-wrap { position: relative; }
+.lt-showcase-tree {
+  width: min(58vmin, 440px); height: auto; object-fit: contain;
+  filter: drop-shadow(0 20px 50px rgba(255, 79, 139, 0.55)) drop-shadow(0 0 40px rgba(255,215,111,0.4));
+  animation: lt-sc-tree 4.5s ease-in-out infinite;
+}
+@keyframes lt-sc-tree {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg) scale(1); }
+  50% { transform: translateY(-12px) rotate(1.5deg) scale(1.03); }
+}
+.lt-showcase-names {
+  margin-top: 14px; font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 900; color: #fff;
+  letter-spacing: -0.02em; text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.lt-showcase-names span { color: #ffd76f; margin: 0 6px; }
+.lt-showcase-tag { margin-top: 6px; font-size: 1rem; color: rgba(255,255,255,0.92); font-weight: 600; }
+.lt-showcase-actions { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; justify-content: center; }
+.lt-showcase-dismiss {
+  padding: 11px 22px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.12); color: #fff; font-weight: 700; font-family: inherit;
+  cursor: pointer; backdrop-filter: blur(6px); transition: background 0.15s;
+}
+.lt-showcase-dismiss:hover { background: rgba(255,255,255,0.22); }
+.lt-showcase-close {
+  position: absolute; top: 18px; right: 20px; z-index: 6;
+  width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+  background: rgba(255,255,255,0.18); color: #fff; font-size: 18px; backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.3); transition: background 0.15s, transform 0.15s;
+}
+.lt-showcase-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.06); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lt-showcase-bg, .lt-showcase-glow, .lt-showcase-rays, .lt-cf, .lt-spark, .lt-shoot, .lt-showcase-tree { animation: none !important; }
+}

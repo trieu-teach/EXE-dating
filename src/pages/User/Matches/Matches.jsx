@@ -97,21 +97,34 @@ export default function Matches() {
           <div className="matches-hero-eyebrow"><HeartIcon size={12} /> Kết nối</div>
           <h1>Lượt thích & Match</h1>
           <p className="matches-hero-subtitle">Ai đã thích bạn và những người đã match — tất cả ở đây.</p>
+          <div className="mt-hero-stats">
+            <button type="button" className="mt-stat" onClick={() => setTab('likes')}>
+              <span className="mt-stat-num">{likers.length}</span>
+              <span className="mt-stat-lbl"><HeartIcon size={11} /> Lượt thích</span>
+            </button>
+            <span className="mt-stat-div" aria-hidden />
+            <button type="button" className="mt-stat" onClick={() => setTab('matches')}>
+              <span className="mt-stat-num">{matches.length}</span>
+              <span className="mt-stat-lbl"><SparkleIcon size={11} /> Match</span>
+            </button>
+          </div>
         </div>
         <HeroFX emojis={['💕', '💖', '💞', '❤️', '💗', '💘', '😍', '💓']} />
         <span className="hero-deco" aria-hidden>💞</span>
       </div>
 
-      {/* Tabs */}
-      <div className="mt-tabs">
-        <button className={`mt-tab${tab === 'likes' ? ' is-active' : ''}`} onClick={() => setTab('likes')}>
-          <HeartIcon size={15} /> Đã thích bạn
-          {likers.length > 0 && <span className="mt-tab-count">{likers.length}</span>}
-        </button>
-        <button className={`mt-tab${tab === 'matches' ? ' is-active' : ''}`} onClick={() => setTab('matches')}>
-          <MessageIcon size={15} /> Match
-          {matches.length > 0 && <span className="mt-tab-count">{matches.length}</span>}
-        </button>
+      {/* Tabs — segmented control nổi, đè mép dưới hero */}
+      <div className="mt-tabs-wrap">
+        <div className="mt-tabs">
+          <button className={`mt-tab${tab === 'likes' ? ' is-active' : ''}`} onClick={() => setTab('likes')}>
+            <HeartIcon size={15} /> Đã thích bạn
+            {likers.length > 0 && <span className="mt-tab-count">{likers.length}</span>}
+          </button>
+          <button className={`mt-tab${tab === 'matches' ? ' is-active' : ''}`} onClick={() => setTab('matches')}>
+            <MessageIcon size={15} /> Match
+            {matches.length > 0 && <span className="mt-tab-count">{matches.length}</span>}
+          </button>
+        </div>
       </div>
 
       <div className="mt-body">
@@ -184,6 +197,29 @@ export default function Matches() {
                   <button className="btn btn-primary" onClick={() => navigate('/discovery')}>Khám phá ngay</button>
                 </div>
               ) : (
+                <>
+                  {/* Hàng match mới — avatar viền gradient (kiểu Bumble) */}
+                  <div className="mt-new-row">
+                    <div className="mt-new-track">
+                      {matches.slice(0, 14).map((m, i) => {
+                        const matchId = m.matchId ?? m.id
+                        const avatar = resolveImageUrl(m.avatarUrl)
+                        const name = (m.displayName || 'Người dùng').split(' ')[0]
+                        return (
+                          <button key={matchId ?? `n${i}`} type="button" className="mt-new" onClick={() => openChat(matchId)} title={`Nhắn ${name}`}>
+                            <span className="mt-new-ring">
+                              <span className="mt-new-photo" style={avatar ? { backgroundImage: `url(${avatar})` } : undefined}>
+                                {!avatar && <span className="mt-new-initial">{(m.displayName || '?').charAt(0).toUpperCase()}</span>}
+                              </span>
+                            </span>
+                            <span className="mt-new-name">{name}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="mt-list-label">Tất cả match</div>
                 <div className="matches-list">
                   {matches.map((m, i) => {
                     const matchId = m.matchId ?? m.id
@@ -209,10 +245,22 @@ export default function Matches() {
                     )
                   })}
                 </div>
+                </>
               )}
             </motion.div>
           )}
         </AnimatePresence>
+
+        {((tab === 'likes' && likers.length > 0) || (tab === 'matches' && matches.length > 0)) && (
+          <div className="mt-cta">
+            <div className="mt-cta-icon"><SparkleIcon size={22} /></div>
+            <div className="mt-cta-text">
+              <strong>Muốn nhiều kết nối hơn?</strong>
+              <span>Lướt Khám phá để xuất hiện với nhiều người và nhận thêm lượt thích mỗi ngày.</span>
+            </div>
+            <button className="btn btn-primary" onClick={() => navigate('/discovery')}>Khám phá ngay</button>
+          </div>
+        )}
       </div>
 
       <ProfileDetailModal profile={detail} open={!!detail} onClose={() => setDetail(null)} onSwipe={onDetailSwipe} />

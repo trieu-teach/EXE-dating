@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useNotifications } from '../../../hooks/useNotifications.js'
-import { timeAgo } from '../../../utils/format.js'
+import { timeAgo, resolveImageUrl } from '../../../utils/format.js'
+import { matchesService, chatService } from '../../../api'
 import { Bell, CheckCheck, Heart, MessageCircle, Calendar, Star } from 'lucide-react'
 import { cn } from '../../../lib/utils'
 import './NotificationBell.css'
@@ -18,6 +19,7 @@ const TYPE_FALLBACK = { Icon: Bell, grad: 'linear-gradient(135deg, #ff9ec4, #b14
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false)
+  const [avatarMap, setAvatarMap] = useState({}) // id (conversation/match/user) → avatar url
   const ref = useRef(null)
   const navigate = useNavigate()
   const { items, unreadCount, markRead, loading } = useNotifications({ pollIntervalMs: 30_000 })
@@ -27,6 +29,35 @@ export default function NotificationBell() {
     const onClick = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
     document.addEventListener('mousedown', onClick)
     return () => document.removeEventListener('mousedown', onClick)
+  }, [open])
+
+  // Khi mở dropdown: dựng map id → avatar từ danh sách match + hội thoại
+  useEffect(() => {
+    if (!open) return
+    let cancelled = false
+    Promise.all([
+      matchesService.list().catch(() => []),
+      chatService.conversations().catch(() => []),
+    ]).then(([m, c]) => {
+      if (cancelled) return
+      const norm = (x) => (Array.isArray(x) ? x : (x?.items ?? []))
+      const map = {}
+      for (const mm of norm(m)) {
+        const av = resolveImageUrl(mm.avatarUrl)
+        if (!av) continue
+        const mid = mm.matchId ?? mm.id
+        if (mid) map[mid] = av
+        if (mm.userId) map[mm.userId] = av
+      }
+      for (const cc of norm(c)) {
+        const av = resolveImageUrl(cc.otherAvatarUrl)
+        if (!av) continue
+        if (cc.id) map[cc.id] = av
+        if (cc.otherUserId) map[cc.otherUserId] = av
+      }
+      setAvatarMap(map)
+    })
+    return () => { cancelled = true }
   }, [open])
 
   const handleItemClick = async (item) => {
@@ -77,6 +108,7 @@ export default function NotificationBell() {
             {items.map((it) => {
               const meta = TYPE_META[it.type] || TYPE_FALLBACK
               const Icon = meta.Icon
+              const avatar = it.data ? avatarMap[it.data] : null
               return (
                 <div
                   key={it.id}
@@ -86,9 +118,18 @@ export default function NotificationBell() {
                   tabIndex={0}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleItemClick(it) }}
                 >
-                  <div className="notif-item-icon" style={{ background: meta.grad }}>
-                    <Icon size={17} />
-                  </div>
+                  {avatar ? (
+                    <div className="notif-item-avatar-wrap">
+                      <span className="notif-item-avatar" style={{ backgroundImage: `url(${avatar})` }} />
+                      <span className="notif-item-badge" style={{ background: meta.grad }}>
+                        <Icon size={11} />
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="notif-item-icon" style={{ background: meta.grad }}>
+                      <Icon size={17} />
+                    </div>
+                  )}
                   <div className="notif-item-content">
                     <div className="notif-item-title">{it.title || it.type}</div>
                     {it.body && <div className="notif-item-body">{it.body}</div>}

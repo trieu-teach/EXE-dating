@@ -102,35 +102,88 @@
   color: var(--color-text-muted);
 }
 
-/* ── Tabs ──────────────────────────────────────────────────── */
-.mt-tabs {
+/* ── Chip số liệu trong hero (kiểu Tinder) ── */
+.mt-hero-stats {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 4px;
+  margin-top: 20px;
+  padding: 8px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.mt-stat {
   display: flex;
-  gap: 8px;
-  max-width: 880px;
-  margin: 0 auto;
-  padding: 16px 16px 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 92px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.mt-stat:hover { background: rgba(255, 255, 255, 0.18); }
+.mt-stat-num {
+  font-size: 1.7rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+  letter-spacing: -0.03em;
+}
+.mt-stat-lbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+}
+.mt-stat-div { width: 1px; background: rgba(255, 255, 255, 0.3); margin: 6px 0; }
+
+/* ── Tabs — segmented control nằm gọn dưới hero ── */
+.matches-root .matches-hero { margin-bottom: 6px !important; }
+.mt-tabs-wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+  padding: 0 16px;
+}
+.mt-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 10px 30px rgba(255, 79, 139, 0.16);
 }
 .mt-tab {
-  flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1.5px solid var(--color-border);
-  background: var(--color-surface);
+  padding: 11px 22px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
   color: var(--color-text-soft);
   font-family: inherit;
   font-size: 0.9rem;
   font-weight: 800;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  transition: color 0.15s, background 0.15s;
 }
-.mt-tab:hover { border-color: var(--color-primary); }
+.mt-tab:hover { color: var(--color-text); }
 .mt-tab.is-active {
   color: #fff;
-  border-color: transparent;
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   box-shadow: 0 6px 18px rgba(255, 79, 139, 0.3);
 }
@@ -149,7 +202,109 @@
 }
 .mt-tab.is-active .mt-tab-count { background: rgba(255,255,255,0.25); color: #fff; }
 
-.mt-body { max-width: 880px; margin: 0 auto; padding: 18px 16px 56px; }
+.mt-body { max-width: 880px; margin: 0 auto; padding: 24px 16px 56px; }
+
+/* Lưới "đã thích bạn" — canh giữa khi ít, mở rộng khi nhiều */
+.mt-body .liked-grid {
+  grid-template-columns: repeat(auto-fill, minmax(208px, 1fr));
+  justify-content: center;
+  gap: 18px;
+}
+
+/* ── Thẻ CTA "khám phá thêm" — lấp khoảng trống & dẫn hành động ── */
+.mt-cta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 26px;
+  padding: 18px 22px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255,79,139,0.08), rgba(177,75,255,0.10));
+  border: 1px solid rgba(255,79,139,0.18);
+}
+.mt-cta-icon {
+  flex-shrink: 0;
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  display: grid; place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 6px 16px rgba(255, 79, 139, 0.32);
+}
+.mt-cta-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.mt-cta-text strong { font-size: 0.95rem; color: var(--color-text); }
+.mt-cta-text span { font-size: 0.82rem; color: var(--color-text-soft); line-height: 1.45; }
+.mt-cta .btn { flex-shrink: 0; }
+@media (max-width: 560px) {
+  .mt-cta { flex-direction: column; text-align: center; }
+  .mt-cta-text { align-items: center; }
+}
+
+/* ── Hàng "Match mới" — avatar viền gradient (kiểu Bumble) ── */
+.mt-new-row {
+  overflow-x: auto;
+  margin-bottom: 22px;
+  scrollbar-width: none;
+}
+.mt-new-row::-webkit-scrollbar { display: none; }
+.mt-new-track {
+  display: flex;
+  gap: 16px;
+  padding: 4px 2px 6px;
+  width: max-content;
+}
+.mt-new {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 76px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.mt-new-ring {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  display: grid;
+  place-items: center;
+  box-shadow: 0 6px 16px rgba(255, 79, 139, 0.28);
+  transition: transform 0.18s;
+}
+.mt-new:hover .mt-new-ring { transform: translateY(-3px) scale(1.04); }
+.mt-new-photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-surface-2);
+  border: 2.5px solid var(--color-surface);
+  display: grid;
+  place-items: center;
+}
+.mt-new-initial { font-size: 1.4rem; font-weight: 800; color: var(--color-primary); }
+.mt-new-name {
+  max-width: 100%;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--color-text-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mt-list-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin: 0 4px 10px;
+}
 .mt-body .matches-list {
   background: var(--color-surface);
   border: 1px solid var(--color-border);

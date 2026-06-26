@@ -67,8 +67,33 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700; }
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: var(--leading-tight);
+}
 p { margin: 0; }
+
+/* ── Typography utility (dùng cho component mới) ── */
+.t-h1 { font-family: var(--font-display); font-size: var(--text-h1); font-weight: var(--weight-bold); line-height: var(--leading-tight); letter-spacing: -0.02em; }
+.t-h2 { font-family: var(--font-display); font-size: var(--text-h2); font-weight: var(--weight-bold); line-height: var(--leading-tight); letter-spacing: -0.015em; }
+.t-h3 { font-family: var(--font-display); font-size: var(--text-h3); font-weight: var(--weight-bold); line-height: 1.25; }
+.t-body { font-size: var(--text-body); font-weight: var(--weight-regular); line-height: var(--leading-normal); }
+.t-caption { font-size: var(--text-caption); color: var(--color-text-muted); font-weight: var(--weight-medium); }
+
+/* Shadow & radius helper */
+.u-shadow-sm { box-shadow: var(--shadow-sm); }
+.u-shadow-md { box-shadow: var(--shadow-md); }
+.u-shadow-lg { box-shadow: var(--shadow-lg); }
+.u-card { border-radius: var(--radius-card); }
+.u-pill { border-radius: var(--radius-pill); }
+.u-gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 a { color: inherit; text-decoration: none; }
 button, input, textarea, select { font: inherit; }
 button { cursor: pointer; border: none; background: transparent; padding: 0; }
