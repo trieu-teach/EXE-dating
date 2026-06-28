@@ -102,58 +102,143 @@
   color: var(--color-text-muted);
 }
 
-/* ── Chip số liệu trong hero (kiểu Tinder) ── */
-.mt-hero-stats {
+/* ── Header sạch + accent thương hiệu (kiểu Hinge) ── */
+.mt-header {
+  position: relative;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 30px 6px 0;
+  overflow: visible;
+}
+/* Quầng sáng mềm trang trí (nhẹ, không phải banner) */
+.mt-glow {
+  position: absolute;
+  top: -30px;
+  right: -10px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 79, 139, 0.18) 0%, rgba(177, 75, 255, 0.10) 45%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(4px);
+}
+.mt-header > *:not(.mt-glow) { position: relative; z-index: 1; }
+
+.mt-eyebrow {
   display: inline-flex;
-  align-items: stretch;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 4px 14px rgba(255, 79, 139, 0.32);
+  margin-bottom: 12px;
+}
+.mt-title {
+  font-size: clamp(2.2rem, 6.5vw, 3.1rem);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: var(--color-text);
+  animation: mt-rise 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+/* "& Match" gradient chảy động + ánh sáng quét */
+.mt-title span {
+  background: linear-gradient(100deg, #ff4f8b 0%, #b14bff 35%, #ff7eb3 55%, #b14bff 75%, #ff4f8b 100%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: mt-title-flow 5s linear infinite;
+}
+@keyframes mt-title-flow { to { background-position: 220% center; } }
+@keyframes mt-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.mt-eyebrow { animation: mt-rise 0.5s ease-out both; }
+/* Icon tim đập nhẹ như nhịp tim (double-thump) */
+.mt-eyebrow svg {
+  transform-origin: center;
+  animation: mt-heartbeat 1.6s ease-in-out infinite;
+}
+@keyframes mt-heartbeat {
+  0%, 55%, 100% { transform: scale(1); }
+  12% { transform: scale(1.28); }
+  24% { transform: scale(1); }
+  36% { transform: scale(1.18); }
+}
+.mt-subtitle { animation: mt-rise 0.7s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .mt-title, .mt-title span, .mt-eyebrow, .mt-eyebrow svg, .mt-subtitle { animation: none; }
+}
+.mt-subtitle {
+  font-size: 0.92rem;
+  color: var(--color-text-soft);
+  margin-top: 7px;
+}
+
+/* Thẻ số liệu: icon tròn gradient + số + nhãn */
+.mt-stats {
+  display: flex;
+  gap: 12px;
   margin-top: 20px;
-  padding: 8px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 .mt-stat {
+  flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-  min-width: 92px;
-  padding: 8px 16px;
-  border: none;
-  background: transparent;
-  border-radius: 12px;
+  gap: 13px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--color-border);
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-2) 100%);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  text-align: left;
 }
-.mt-stat:hover { background: rgba(255, 255, 255, 0.18); }
+.mt-stat:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(255, 79, 139, 0.3);
+}
+.mt-stat-ico {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  border-radius: 14px;
+  display: grid; place-items: center;
+  color: #fff;
+}
+.mt-ico-pink { background: linear-gradient(135deg, #ff7eb3, #ff2d6b); box-shadow: 0 6px 16px rgba(255, 45, 107, 0.32); }
+.mt-ico-purple { background: linear-gradient(135deg, #c084fc, #9333ea); box-shadow: 0 6px 16px rgba(147, 51, 234, 0.3); }
+.mt-stat-body { display: flex; flex-direction: column; gap: 1px; }
 .mt-stat-num {
   font-size: 1.7rem;
   font-weight: 900;
   line-height: 1;
-  color: #fff;
   letter-spacing: -0.03em;
+  color: var(--color-text);
 }
 .mt-stat-lbl {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--color-text-muted);
 }
-.mt-stat-div { width: 1px; background: rgba(255, 255, 255, 0.3); margin: 6px 0; }
 
-/* ── Tabs — segmented control nằm gọn dưới hero ── */
-.matches-root .matches-hero { margin-bottom: 6px !important; }
+/* ── Tabs — segmented control ── */
 .mt-tabs-wrap {
   position: relative;
   z-index: 2;
   display: flex;
   justify-content: center;
-  margin-top: 18px;
+  margin-top: 22px;
   padding: 0 16px;
 }
 .mt-tabs {

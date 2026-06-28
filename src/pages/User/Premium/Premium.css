@@ -547,3 +547,119 @@
     margin: 0 48px;
   }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   REDESIGN PREMIUM — colorful, hiện đại, hướng chuyển đổi (override)
+   ════════════════════════════════════════════════════════════════ */
+.premium-root { background: #0a0612; }
+
+/* Bố cục desktop: nội dung canh giữa rộng rãi */
+.premium-content { max-width: 1080px; margin: 0 auto; width: 100%; padding-bottom: 64px; }
+
+/* ── Hero: aurora nhiều màu ── */
+.premium-hero { padding: 60px 24px 56px; background: #0a0612; }
+.premium-hero::before {
+  width: 900px; height: 600px; top: -260px;
+  background:
+    radial-gradient(circle at 30% 50%, rgba(255,79,139,0.30), transparent 55%),
+    radial-gradient(circle at 60% 30%, rgba(177,75,255,0.28), transparent 55%),
+    radial-gradient(circle at 78% 60%, rgba(255,200,90,0.18), transparent 55%);
+  filter: blur(10px);
+}
+.premium-hero-title { font-size: clamp(2.3rem, 7vw, 3.4rem); }
+.premium-hero-title span {
+  background: linear-gradient(100deg, #ff4f8b, #b14bff 45%, #ffd76f);
+  background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: pm-flow 5s linear infinite;
+}
+@keyframes pm-flow { to { background-position: 200% center; } }
+.premium-hero-subtitle { color: rgba(255,255,255,0.62); max-width: 460px; font-size: 1rem; }
+
+/* ── Đang dùng ── */
+.premium-current {
+  background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(255,79,139,0.06));
+  border: 1px solid rgba(245,166,35,0.3);
+}
+
+/* ── Lưới gói: 3 cột desktop, thẻ phổ biến nổi lên ── */
+.premium-plans-section-title { color: rgba(255,255,255,0.5); font-size: 0.78rem; }
+.premium-plans-grid { gap: 18px; }
+@media (min-width: 880px) {
+  .premium-plans-grid { grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+  .premium-plan-card.popular { transform: scale(1.04); z-index: 2; }
+  .premium-plan-card.popular:hover { transform: scale(1.05) translateY(-2px); }
+}
+
+.premium-plan-card {
+  background: rgba(255,255,255,0.045);
+  border: 1.5px solid rgba(255,255,255,0.09);
+  border-radius: 24px; padding: 26px 24px;
+}
+
+/* Free — tím nhẹ */
+.premium-plan-card[data-plan="Free"] { background: linear-gradient(160deg, rgba(167,139,250,0.08), rgba(255,255,255,0.03)); }
+
+/* Plus (phổ biến) — hồng–tím rực, viền sáng */
+.premium-plan-card[data-plan="Plus"].popular {
+  background: linear-gradient(160deg, rgba(255,79,139,0.16), rgba(177,75,255,0.12));
+  border-color: transparent;
+  box-shadow: 0 0 0 1.5px rgba(255,79,139,0.6), 0 18px 50px rgba(255,79,139,0.28), 0 0 80px rgba(177,75,255,0.18);
+}
+
+/* Gold — sang trọng vàng */
+.premium-plan-card[data-plan="Gold"] {
+  background: linear-gradient(160deg, rgba(255,215,111,0.14), rgba(245,166,35,0.06));
+  border-color: rgba(245,166,35,0.4);
+}
+.premium-plan-card[data-plan="Gold"]:hover { box-shadow: 0 14px 44px rgba(245,166,35,0.22); }
+
+/* Tên + giá nổi bật theo màu gói */
+.premium-plan-icon { width: 52px; height: 52px; border-radius: 16px; }
+.premium-plan-name { font-size: 1.5rem; }
+.premium-plan-amount { font-size: 2.5rem; }
+.premium-plan-card[data-plan="Plus"] .premium-plan-amount {
+  background: linear-gradient(135deg, #ff7eb3, #ff4f8b); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.premium-plan-card[data-plan="Gold"] .premium-plan-amount {
+  background: linear-gradient(135deg, #ffe08a, #f5a623); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.premium-plan-currency { color: rgba(255,255,255,0.5); }
+.premium-plan-blurb { color: rgba(255,255,255,0.55); }
+.premium-plan-features li span { color: rgba(255,255,255,0.82); }
+.premium-check-icon { color: #4ade80 !important; }
+
+/* Badge phổ biến + shine */
+.premium-plan-badge { padding: 6px 18px; box-shadow: 0 6px 20px rgba(255,79,139,0.55); }
+
+/* ── Nút CTA theo gói ── */
+.premium-plan-btn {
+  margin-top: auto; padding: 14px; border-radius: 14px; font-size: 0.95rem; font-weight: 800;
+  letter-spacing: 0.01em; transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+.premium-plan-card[data-plan="Plus"] .premium-plan-btn {
+  background: linear-gradient(135deg, #ff4f8b, #b14bff); color: #fff; border: none;
+  box-shadow: 0 10px 28px rgba(255,79,139,0.45);
+  animation: pm-cta-pulse 2.2s ease-in-out infinite;
+}
+.premium-plan-card[data-plan="Gold"] .premium-plan-btn:not(:disabled) {
+  background: linear-gradient(135deg, #ffd76f, #f5a623); color: #3a2600; border: none;
+  box-shadow: 0 10px 28px rgba(245,166,35,0.4);
+}
+.premium-plan-btn:not(:disabled):hover { transform: translateY(-2px); filter: brightness(1.05); }
+.premium-plan-btn.is-secondary {
+  background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.18);
+}
+.premium-plan-btn:disabled { opacity: 0.6; }
+@keyframes pm-cta-pulse {
+  0%,100% { box-shadow: 0 10px 28px rgba(255,79,139,0.45); }
+  50% { box-shadow: 0 12px 36px rgba(255,79,139,0.7); }
+}
+
+/* ── Trust strip ── */
+.premium-trust {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 22px;
+  margin: 26px 16px 0; padding: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.55);
+}
+.premium-trust span { display: inline-flex; align-items: center; gap: 6px; }

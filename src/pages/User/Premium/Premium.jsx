@@ -153,13 +153,8 @@ export default function Premium() {
           <div className="premium-hero-icon"><CrownIcon size={30} /></div>
           <h1 className="premium-hero-title">SameMess <span>Premium</span></h1>
           <p className="premium-hero-subtitle">
-            Mở khoá trải nghiệm không giới hạn. Kết nối nhanh hơn, hiệu quả hơn.
+            Mở khoá trải nghiệm không giới hạn — kết nối nhanh hơn, nổi bật hơn, match nhiều hơn.
           </p>
-          <div className="premium-features-strip">
-            {['Thích không giới hạn', 'Xem ai thích bạn', 'Tăng lượt hiển thị', 'Không quảng cáo'].map((f) => (
-              <span key={f} className="premium-feature-pill"><CheckIcon size={12} /> {f}</span>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -188,6 +183,7 @@ export default function Premium() {
               return (
                 <motion.div
                   key={p.code}
+                  data-plan={p.code}
                   className={`premium-plan-card${isPopular ? ' popular' : ''}${isCurrent ? ' is-current' : ''}`}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -244,15 +240,11 @@ export default function Premium() {
           </div>
         </div>
 
-        {/* ── Quyền lợi nổi bật ── */}
-        <div className="premium-features-grid">
-          {FEATURE_HIGHLIGHTS.map((f) => (
-            <div key={f.name} className="premium-feature-card">
-              <div className="premium-feature-icon"><f.icon size={18} /></div>
-              <div className="premium-feature-name">{f.name}</div>
-              <p className="premium-feature-desc">{f.desc}</p>
-            </div>
-          ))}
+        {/* ── Cam kết / trust ── */}
+        <div className="premium-trust">
+          <span>🔒 Thanh toán an toàn</span>
+          <span>↺ Huỷ bất cứ lúc nào</span>
+          <span>⚡ Kích hoạt tức thì</span>
         </div>
 
         {import.meta.env.DEV && (

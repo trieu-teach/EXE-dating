@@ -4,7 +4,6 @@ import { datePassService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
 import { HeartIcon, SparkleIcon, CheckIcon } from '../../../components/ui/CustomIcons.jsx'
-import HeroFX from '../../../components/User/HeroFX/HeroFX.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import './DatePass.css'
 
@@ -99,16 +98,13 @@ export default function DatePass() {
 
   return (
     <div className="dp-root">
-      {/* Hero banner */}
-      <div className="dp-hero">
-        <div className="dp-hero-inner">
-          <div className="dp-hero-eyebrow"><SparkleIcon size={12} /> Ưu đãi hẹn hò</div>
-          <h1>Combo cho buổi hẹn của bạn 💕</h1>
-          <p>Đặt combo ưu đãi tại quán đối tác — nhận voucher qua email, ra quán chỉ cần đưa mã QR.</p>
-        </div>
-        <HeroFX emojis={['🎟️', '☕', '🍕', '🍷', '💕', '🍰', '🎬', '✨']} />
-        <div className="dp-hero-deco" aria-hidden>🎟️</div>
-      </div>
+      {/* Header sạch + accent thương hiệu */}
+      <header className="dc-header">
+        <span className="dc-glow" aria-hidden />
+        <span className="dc-eyebrow"><SparkleIcon size={12} /> Ưu đãi hẹn hò</span>
+        <h1 className="dc-title">Combo cho <span>buổi hẹn</span></h1>
+        <p className="dc-subtitle">Đặt combo ưu đãi tại quán đối tác — nhận voucher qua email, ra quán chỉ cần đưa mã QR.</p>
+      </header>
 
       {/* Tabs */}
       <div className="dp-tabs">

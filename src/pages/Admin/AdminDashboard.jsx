@@ -3,10 +3,23 @@ import { useNavigate } from 'react-router-dom'
 import { adminService } from '../../api'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../context/ToastContext.jsx'
-import { resolveImageUrl } from '../../utils/format.js'
+import { resolveImageUrl, toDate } from '../../utils/format.js'
 import './AdminDashboard.css'
 
 const vnd = (n) => (n ?? 0).toLocaleString('vi-VN') + 'đ'
+
+// Khoảng offline đọc được từ lastActiveAt (UTC). Trả về chuỗi "x phút/giờ/ngày".
+function offlineFor(lastActiveAt) {
+  if (!lastActiveAt) return 'chưa từng hoạt động'
+  const diff = Date.now() - toDate(lastActiveAt).getTime()
+  const m = Math.floor(diff / 60000)
+  if (m < 1) return 'vừa xong'
+  if (m < 60) return `${m} phút`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h} giờ ${m % 60} phút`
+  const d = Math.floor(h / 24)
+  return `${d} ngày`
+}
 const CATEGORIES = ['cafe', 'restaurant', 'cinema', 'park', 'bar', 'dessert']
 
 const NAV = [
@@ -210,6 +223,10 @@ export default function AdminDashboard() {
                         </span>
                       </div>
                       <div className="admin-user-email">{u.email}</div>
+                      <div className={`admin-user-presence${u.isOnline ? ' is-online' : ''}`}>
+                        <span className="admin-presence-dot" />
+                        {u.isOnline ? 'Đang hoạt động' : `Offline ${offlineFor(u.lastActiveAt)}`}
+                      </div>
                     </div>
                     <div className="admin-user-actions">
                       {u.role !== 'Admin' && u.status !== 'Banned' && (

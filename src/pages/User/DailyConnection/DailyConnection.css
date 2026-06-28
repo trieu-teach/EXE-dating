@@ -257,3 +257,136 @@
   .material-row { gap: 8px; }
   .material-chip { flex-direction: column; text-align: center; gap: 6px; padding: 12px 8px; }
 }
+
+/* ════════ Header sạch + accent thương hiệu (kiểu Hinge) ════════ */
+.dc-header { position: relative; padding: 8px 4px 0; }
+.dc-glow {
+  position: absolute; top: -34px; right: 0; width: 250px; height: 250px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,79,139,0.18) 0%, rgba(177,75,255,0.10) 45%, transparent 70%);
+  pointer-events: none; z-index: 0; filter: blur(4px);
+}
+.dc-header > *:not(.dc-glow) { position: relative; z-index: 1; }
+.dc-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 13px; border-radius: 999px;
+  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 4px 14px rgba(255,79,139,0.32); margin-bottom: 12px;
+  animation: dc-rise 0.5s ease-out both;
+}
+.dc-eyebrow svg { transform-origin: center; animation: dc-beat 1.8s ease-in-out infinite; }
+.dc-title {
+  font-size: clamp(2.1rem, 6vw, 3rem); font-weight: 900; letter-spacing: -0.035em;
+  line-height: 1.05; color: var(--color-text); margin: 0;
+  animation: dc-rise 0.6s cubic-bezier(0.2,0.9,0.3,1) both;
+}
+.dc-title span {
+  background: linear-gradient(100deg, #ff4f8b 0%, #b14bff 35%, #ff7eb3 55%, #b14bff 75%, #ff4f8b 100%);
+  background-size: 220% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: dc-flow 5s linear infinite;
+}
+.dc-subtitle { font-size: 0.92rem; color: var(--color-text-soft); margin: 7px 0 0; animation: dc-rise 0.7s ease-out both; }
+
+/* Tiến độ hôm nay — thẻ sạch */
+.dc-progress {
+  margin-top: 18px; max-width: 460px;
+  padding: 14px 16px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-2) 100%);
+  border: 1px solid var(--color-border); box-shadow: var(--shadow-sm);
+}
+.dc-progress-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.84rem; font-weight: 700; color: var(--color-text); margin-bottom: 9px;
+}
+.dc-progress-head span:first-child { display: inline-flex; align-items: center; gap: 6px; }
+.dc-progress-head svg { color: var(--color-primary); }
+.dc-progress-count {
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+@keyframes dc-flow { to { background-position: 220% center; } }
+@keyframes dc-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes dc-beat { 0%,55%,100% { transform: scale(1); } 12% { transform: scale(1.28); } 24% { transform: scale(1); } 36% { transform: scale(1.18); } }
+@media (prefers-reduced-motion: reduce) {
+  .dc-title, .dc-title span, .dc-eyebrow, .dc-eyebrow svg, .dc-subtitle { animation: none; }
+}
+
+/* ════════════════ REDESIGN trang Hằng ngày (override) ════════════════ */
+/* FIX thanh tiến độ "Nhiệm vụ hôm nay" (trước trắng trên nền sáng -> tàng hình) */
+.dc-progress .daily-bar { height: 10px; background: var(--color-surface-2); border: 1px solid var(--color-border); }
+.dc-progress .daily-bar-fill { background: linear-gradient(90deg, #ff7eb3, #ff4f8b 55%, #b14bff); box-shadow: 0 0 10px rgba(255,79,139,0.45); }
+
+/* Tiêu đề mục — gạch nhấn gradient */
+.daily-section-title { display: flex; align-items: center; gap: 9px; font-size: 1.1rem; font-weight: 900; letter-spacing: -0.01em; }
+.daily-section-title::before { content: ''; width: 4px; height: 18px; border-radius: 99px; background: linear-gradient(180deg, #ff4f8b, #b14bff); }
+
+/* Kho nguyên liệu */
+.material-row { gap: 14px; }
+.material-chip { border: 1px solid rgba(255,255,255,0.6); box-shadow: 0 6px 18px rgba(0,0,0,0.05); transition: transform 0.15s, box-shadow 0.15s; }
+.material-chip:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(0,0,0,0.08); }
+.material-emoji { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: rgba(255,255,255,0.7); font-size: 26px; box-shadow: 0 3px 8px rgba(0,0,0,0.06); }
+.material-qty { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.02em; }
+.material-name { font-size: 0.78rem; font-weight: 700; }
+
+/* Task: thẻ thân thiện có icon */
+.task-list { gap: 10px; }
+.task-row { gap: 13px; padding: 13px 14px; border-radius: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.04); transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
+.task-row:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(255,79,139,0.1); }
+.task-row.is-done:not(.is-claimed) { border-color: rgba(22,163,74,0.35); background: linear-gradient(135deg, var(--color-surface), rgba(22,163,74,0.05)); }
+.task-row.is-claimed { opacity: 0.7; }
+.task-ico { flex-shrink: 0; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 22px; font-weight: 900; }
+.task-ico.is-ready { background: rgba(22,163,74,0.14); color: #16a34a; }
+.task-ico.is-claimed { background: #16a34a; color: #fff; }
+.task-row-title { font-size: 0.92rem; font-weight: 800; }
+.task-progress { margin-top: 8px; }
+.task-progress-bar { height: 8px; background: var(--color-surface-2); }
+.task-progress-fill { background: linear-gradient(90deg, #ff7eb3, #ff4f8b); box-shadow: 0 0 8px rgba(255,79,139,0.3); }
+.task-row.is-done .task-progress-fill { background: linear-gradient(90deg, #4ade80, #16a34a); box-shadow: 0 0 8px rgba(22,163,74,0.3); }
+.task-progress-text { font-size: 0.74rem; font-weight: 700; }
+.task-group { gap: 10px; margin-top: 4px; }
+.task-group-label { font-size: 0.78rem; font-weight: 800; padding: 6px 13px; }
+
+/* Reminders */
+.reminder-list { gap: 10px; }
+.reminder-item { padding: 14px 16px; border-radius: 16px; background: linear-gradient(135deg, rgba(255,79,139,0.07), rgba(177,75,255,0.07)); border: 1px solid rgba(255,79,139,0.16); box-shadow: 0 3px 10px rgba(255,79,139,0.05); font-size: 0.88rem; font-weight: 600; transition: transform 0.15s; }
+.reminder-item:hover { transform: translateX(3px); }
+.reminder-item svg { width: 30px; height: 30px; padding: 7px; border-radius: 10px; background: rgba(255,79,139,0.12); box-sizing: border-box; }
+
+/* ════════ Hiệu ứng nguyên liệu bay vào kho ════════ */
+.dc-flyers { position: fixed; inset: 0; z-index: 1200; pointer-events: none; }
+.dc-flyer {
+  position: fixed;
+  font-size: 30px;
+  line-height: 1;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
+  animation-name: dc-fly;
+  animation-timing-function: cubic-bezier(0.5, 0, 0.4, 1);
+  animation-fill-mode: both;
+}
+@keyframes dc-fly {
+  0%   { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+  14%  { transform: translate(calc(-50% + var(--bx)), calc(-50% + var(--by))) scale(1.3); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.45); opacity: 0; }
+}
+
+/* Ô kho nảy lên khi nhận nguyên liệu */
+.material-chip.is-bump { animation: dc-bump 0.5s cubic-bezier(0.2, 1.4, 0.4, 1); }
+@keyframes dc-bump {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.16); box-shadow: 0 14px 30px rgba(255, 79, 139, 0.25); }
+  100% { transform: scale(1); }
+}
+.material-chip.is-bump .material-qty { animation: dc-qty-pop 0.5s ease-out; }
+@keyframes dc-qty-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dc-flyer { animation-duration: 0.01ms !important; }
+  .material-chip.is-bump { animation: none; }
+}

@@ -7,7 +7,6 @@ import { HeartIcon, MessageIcon, SparkleIcon, StarIcon, CrownIcon } from '../../
 import { motion, AnimatePresence } from 'framer-motion'
 import ProfileDetailModal from '../../../components/User/ProfileDetailModal/ProfileDetailModal.jsx'
 import ProfilePreviewModal from '../../../components/User/ProfilePreviewModal/ProfilePreviewModal.jsx'
-import HeroFX from '../../../components/User/HeroFX/HeroFX.jsx'
 import './Matches.css'
 import '../LikedMe/LikedMe.css'
 
@@ -91,29 +90,31 @@ export default function Matches() {
 
   return (
     <div className="matches-root">
-      {/* Hero */}
-      <div className="matches-hero">
-        <div className="matches-hero-content">
-          <div className="matches-hero-eyebrow"><HeartIcon size={12} /> Kết nối</div>
-          <h1>Lượt thích & Match</h1>
-          <p className="matches-hero-subtitle">Ai đã thích bạn và những người đã match — tất cả ở đây.</p>
-          <div className="mt-hero-stats">
-            <button type="button" className="mt-stat" onClick={() => setTab('likes')}>
+      {/* Header sạch + accent thương hiệu (kiểu Hinge) */}
+      <header className="mt-header">
+        <span className="mt-glow" aria-hidden />
+        <span className="mt-eyebrow"><HeartIcon size={12} /> Kết nối</span>
+        <h1 className="mt-title">Lượt thích <span>&amp; Match</span></h1>
+        <p className="mt-subtitle">Ai đã thích bạn và những người đã match.</p>
+        <div className="mt-stats">
+          <button type="button" className="mt-stat" onClick={() => setTab('likes')}>
+            <span className="mt-stat-ico mt-ico-pink"><HeartIcon size={18} /></span>
+            <span className="mt-stat-body">
               <span className="mt-stat-num">{likers.length}</span>
-              <span className="mt-stat-lbl"><HeartIcon size={11} /> Lượt thích</span>
-            </button>
-            <span className="mt-stat-div" aria-hidden />
-            <button type="button" className="mt-stat" onClick={() => setTab('matches')}>
+              <span className="mt-stat-lbl">Lượt thích bạn</span>
+            </span>
+          </button>
+          <button type="button" className="mt-stat" onClick={() => setTab('matches')}>
+            <span className="mt-stat-ico mt-ico-purple"><SparkleIcon size={18} /></span>
+            <span className="mt-stat-body">
               <span className="mt-stat-num">{matches.length}</span>
-              <span className="mt-stat-lbl"><SparkleIcon size={11} /> Match</span>
-            </button>
-          </div>
+              <span className="mt-stat-lbl">Đã match</span>
+            </span>
+          </button>
         </div>
-        <HeroFX emojis={['💕', '💖', '💞', '❤️', '💗', '💘', '😍', '💓']} />
-        <span className="hero-deco" aria-hidden>💞</span>
-      </div>
+      </header>
 
-      {/* Tabs — segmented control nổi, đè mép dưới hero */}
+      {/* Tabs — segmented control */}
       <div className="mt-tabs-wrap">
         <div className="mt-tabs">
           <button className={`mt-tab${tab === 'likes' ? ' is-active' : ''}`} onClick={() => setTab('likes')}>

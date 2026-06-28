@@ -247,3 +247,38 @@
 .dp-success p { font-size: 0.84rem; color: var(--color-text-soft); line-height: 1.6; margin: 0; }
 
 [data-theme='dark'] .dp-modal, [data-theme='dark'] .dp-combo-card, [data-theme='dark'] .dp-voucher, [data-theme='dark'] .dp-stat { background: var(--color-surface, #1c1722); }
+
+/* ════════ Header sạch + accent thương hiệu (đồng bộ toàn app) ════════ */
+.dc-header { position: relative; padding: 8px 4px 4px; }
+.dc-glow {
+  position: absolute; top: -34px; right: 0; width: 250px; height: 250px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,79,139,0.18) 0%, rgba(177,75,255,0.10) 45%, transparent 70%);
+  pointer-events: none; z-index: 0; filter: blur(4px);
+}
+.dc-header > *:not(.dc-glow) { position: relative; z-index: 1; }
+.dc-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 13px; border-radius: 999px;
+  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 4px 14px rgba(255,79,139,0.32); margin-bottom: 12px;
+  animation: dc-rise 0.5s ease-out both;
+}
+.dc-eyebrow svg { transform-origin: center; animation: dc-beat 1.8s ease-in-out infinite; }
+.dc-title {
+  font-size: clamp(2.1rem, 6vw, 3rem); font-weight: 900; letter-spacing: -0.035em;
+  line-height: 1.05; color: var(--color-text); margin: 0;
+  animation: dc-rise 0.6s cubic-bezier(0.2,0.9,0.3,1) both;
+}
+.dc-title span {
+  background: linear-gradient(100deg, #ff4f8b 0%, #b14bff 35%, #ff7eb3 55%, #b14bff 75%, #ff4f8b 100%);
+  background-size: 220% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: dc-flow 5s linear infinite;
+}
+.dc-subtitle { font-size: 0.92rem; color: var(--color-text-soft); margin: 7px 0 0; max-width: 560px; animation: dc-rise 0.7s ease-out both; }
+@keyframes dc-flow { to { background-position: 220% center; } }
+@keyframes dc-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes dc-beat { 0%,55%,100% { transform: scale(1); } 12% { transform: scale(1.28); } 24% { transform: scale(1); } 36% { transform: scale(1.18); } }
+@media (prefers-reduced-motion: reduce) {
+  .dc-title, .dc-title span, .dc-eyebrow, .dc-eyebrow svg, .dc-subtitle { animation: none; }
+}

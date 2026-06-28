@@ -3,8 +3,6 @@ import { gamificationService, connectionRemindersService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { MATERIALS, MATERIAL_META, TASK_TYPE_META, TASK_TYPE_ORDER } from '../../../constants/gamification.js'
 import { SparkleIcon, HeartIcon, TrophyIcon } from '../../../components/ui/CustomIcons.jsx'
-import HeroFX from '../../../components/User/HeroFX/HeroFX.jsx'
-import { motion } from 'framer-motion'
 import './DailyConnection.css'
 
 // Reset theo UTC: daily 00:00 UTC (07:00 VN), weekly Thứ 2 00:00 UTC, achievement không reset
@@ -70,23 +68,59 @@ export default function DailyConnection() {
   useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps  (chỉ tải 1 lần, tránh reload khi re-render)
 
   const [claiming, setClaiming] = useState(null) // code nhiệm vụ đang nhận
+  const [flyers, setFlyers] = useState([])       // nguyên liệu đang bay vào kho
+  const [bumpMat, setBumpMat] = useState(null)   // ô kho đang nảy khi nhận xong
 
-  const handleClaim = async (task) => {
+  // Bắn nguyên liệu từ nút Nhận -> bay vào đúng ô kho tương ứng
+  const flyToInventory = (startRect, material) => {
+    const target = document.querySelector(`.material-chip[data-mat="${material}"]`)
+    if (!startRect || !target) return 0
+    const end = target.getBoundingClientRect()
+    const x0 = startRect.left + startRect.width / 2
+    const y0 = startRect.top + startRect.height / 2
+    const dx = end.left + end.width / 2 - x0
+    const dy = end.top + end.height / 2 - y0
+    const emoji = MATERIAL_META[material]?.emoji ?? '🎁'
+    const count = 9
+    const batch = Array.from({ length: count }).map((_, i) => ({
+      id: `${Date.now()}-${i}-${Math.random().toString(36).slice(2, 6)}`,
+      emoji, x0, y0, dx, dy,
+      bx: Math.random() * 150 - 75,
+      by: -(30 + Math.random() * 80),
+      delay: i * 55,
+      dur: 720 + Math.random() * 260,
+    }))
+    setFlyers((cur) => [...cur, ...batch])
+    const landMs = (count - 1) * 55 + 900
+    const ids = new Set(batch.map((b) => b.id))
+    setTimeout(() => setFlyers((cur) => cur.filter((f) => !ids.has(f.id))), landMs + 300)
+    return landMs
+  }
+
+  const handleClaim = async (task, btnEl) => {
     if (!task?.code || claiming) return
+    const startRect = btnEl?.getBoundingClientRect()
     setClaiming(task.code)
     try {
       await gamificationService.claim(task.code)
       setTasks((cur) => cur.map((t) => (t.code === task.code ? { ...t, claimed: true } : t)))
-      // Cộng nguyên liệu ngay tại chỗ (không refetch để khỏi nháy/như reload trang)
       const qty = task.rewardQty ?? 1
-      setInventory((cur) => {
-        const arr = cur.map((it) => ({ ...it }))
-        const idx = arr.findIndex((it) => (it.material ?? it.name) === task.rewardMaterial)
-        if (idx >= 0) arr[idx].quantity = (arr[idx].quantity ?? 0) + qty
-        else arr.push({ material: task.rewardMaterial, quantity: qty })
-        return arr
-      })
       const meta = MATERIAL_META[task.rewardMaterial]
+      const landMs = flyToInventory(startRect, task.rewardMaterial)
+      // Cộng nguyên liệu + cho ô kho nảy ĐÚNG LÚC nguyên liệu bay tới
+      const addToInventory = () => {
+        setInventory((cur) => {
+          const arr = cur.map((it) => ({ ...it }))
+          const idx = arr.findIndex((it) => (it.material ?? it.name) === task.rewardMaterial)
+          if (idx >= 0) arr[idx].quantity = (arr[idx].quantity ?? 0) + qty
+          else arr.push({ material: task.rewardMaterial, quantity: qty })
+          return arr
+        })
+        setBumpMat(task.rewardMaterial)
+        setTimeout(() => setBumpMat(null), 500)
+      }
+      if (landMs > 0) setTimeout(addToInventory, landMs - 150)
+      else addToInventory()
       toast.success(`Đã nhận ${meta?.emoji ?? '🎁'} ×${qty}!`)
     } catch (err) {
       toast.error(err?.message || 'Nhận thưởng thất bại.')
@@ -119,33 +153,23 @@ export default function DailyConnection() {
 
   return (
     <div className="daily-page">
-      {/* ── Hero ── */}
-      <motion.div
-        className="daily-hero"
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="daily-hero-top">
-          <div>
-            <div className="daily-hero-eyebrow"><TrophyIcon size={12} /> Hằng ngày</div>
-            <h1 className="daily-hero-title">Nhiệm vụ & Phần thưởng</h1>
-            <p className="daily-hero-sub">Hoàn thành nhiệm vụ để nhận nguyên liệu chăm sóc Cây tình yêu</p>
-          </div>
-        </div>
+      {/* ── Header sạch + accent thương hiệu ── */}
+      <header className="dc-header">
+        <span className="dc-glow" aria-hidden />
+        <span className="dc-eyebrow"><TrophyIcon size={12} /> Hằng ngày</span>
+        <h1 className="dc-title">Nhiệm vụ <span>&amp; Phần thưởng</span></h1>
+        <p className="dc-subtitle">Hoàn thành nhiệm vụ để nhận nguyên liệu chăm sóc Cây tình yêu.</p>
 
         {tasks.length > 0 && (
-          <div className="daily-hero-progress">
-            <div className="daily-hero-progress-head">
-              <span>Nhiệm vụ đã hoàn thành</span>
-              <span>{doneCount}/{tasks.length}</span>
+          <div className="dc-progress">
+            <div className="dc-progress-head">
+              <span><TrophyIcon size={13} /> Nhiệm vụ hôm nay</span>
+              <span className="dc-progress-count">{doneCount}/{tasks.length}</span>
             </div>
             <div className="daily-bar"><div className="daily-bar-fill" style={{ width: `${dailyPct}%` }} /></div>
           </div>
         )}
-        <HeroFX emojis={['🎁', '🏆', '⭐', '✨', '🌟', '💧', '🎉', '🥇']} />
-        <span className="hero-deco" aria-hidden>🎁</span>
-      </motion.div>
+      </header>
 
       {/* ── Kho nguyên liệu ── */}
       <section className="daily-section">
@@ -154,7 +178,7 @@ export default function DailyConnection() {
           {MATERIALS.map((m) => {
             const meta = MATERIAL_META[m]
             return (
-              <div key={m} className="material-chip" style={{ background: meta.bg }}>
+              <div key={m} data-mat={m} className={`material-chip${bumpMat === m ? ' is-bump' : ''}`} style={{ background: meta.bg }}>
                 <span className="material-emoji">{meta.emoji}</span>
                 <div className="material-info">
                   <span className="material-qty" style={{ color: meta.color }}>{invByMaterial[m] ?? 0}</span>
@@ -188,6 +212,10 @@ export default function DailyConnection() {
                     const pct = Math.round((prog / target) * 100)
                     return (
                       <div key={t.code || t.id} className={`task-row${t.completed ? ' is-done' : ''}${t.claimed ? ' is-claimed' : ''}`}>
+                        <span className={`task-ico${t.claimed ? ' is-claimed' : t.completed ? ' is-ready' : ''}`}
+                          style={mat && !t.claimed && !t.completed ? { background: mat.bg, color: mat.color } : undefined}>
+                          {t.claimed ? '✓' : t.completed ? '✓' : (mat?.emoji || '🎯')}
+                        </span>
                         <div className="task-row-main">
                           <div className="task-row-title">
                             {t.description || t.title}
@@ -211,7 +239,7 @@ export default function DailyConnection() {
                               type="button"
                               className="task-claim-btn"
                               disabled={claiming === t.code}
-                              onClick={() => handleClaim(t)}
+                              onClick={(e) => handleClaim(t, e.currentTarget)}
                               title={`Nhận ${mat.label} ×${t.rewardQty}`}
                             >
                               {claiming === t.code
@@ -248,6 +276,30 @@ export default function DailyConnection() {
             ))}
           </div>
         </section>
+      )}
+
+      {/* Lớp nguyên liệu bay vào kho */}
+      {flyers.length > 0 && (
+        <div className="dc-flyers" aria-hidden>
+          {flyers.map((f) => (
+            <span
+              key={f.id}
+              className="dc-flyer"
+              style={{
+                left: `${f.x0}px`,
+                top: `${f.y0}px`,
+                '--dx': `${f.dx}px`,
+                '--dy': `${f.dy}px`,
+                '--bx': `${f.bx}px`,
+                '--by': `${f.by}px`,
+                animationDelay: `${f.delay}ms`,
+                animationDuration: `${f.dur}ms`,
+              }}
+            >
+              {f.emoji}
+            </span>
+          ))}
+        </div>
       )}
     </div>
   )

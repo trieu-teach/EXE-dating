@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { reputationService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { ShieldCheckIcon, SparkleIcon, ChevronRightIcon } from '../../../components/ui/CustomIcons.jsx'
-import { motion } from 'framer-motion'
 import './Reputation.css'
 
 const EVENT_META = {
@@ -33,7 +32,10 @@ const LOSE = [
   { d: '−20', label: 'Bị báo cáo & admin xử lý', note: 'mức nặng' },
 ]
 
+const SEG_W = [40, 30, 20, 10] // bề rộng % mỗi mức trên dải (0-39 · 40-69 · 70-89 · 90-100)
+const SEG_SHORT = ['Mới', 'Bình thường', 'Tốt', 'Cao'] // nhãn ngắn cho dải
 const tierColor = (tier) => (TIERS.find((t) => t.key === tier)?.color || '#3b82f6')
+const tierEmojiOf = (tier) => (TIERS.find((t) => t.key === tier)?.emoji || '🙂')
 
 export default function Reputation() {
   const navigate = useNavigate()
@@ -53,34 +55,36 @@ export default function Reputation() {
 
   const score = Math.max(0, Math.min(100, data.score ?? 0))
   const color = tierColor(data.tier)
-  const R = 54
-  const C = 2 * Math.PI * R
-  const offset = C * (1 - score / 100)
+  const tierEmoji = tierEmojiOf(data.tier)
 
   return (
     <div className="rep-root">
-      {/* Hero gauge */}
+      {/* Hero — điểm + dải mức (kiểu app credit score) */}
       <div className="rep-hero">
-        <motion.div className="rep-gauge" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 18 }}>
-          <svg viewBox="0 0 128 128" className="rep-gauge-svg">
-            <circle cx="64" cy="64" r={R} className="rep-gauge-track" />
-            <motion.circle
-              cx="64" cy="64" r={R}
-              className="rep-gauge-fill"
-              style={{ stroke: color }}
-              strokeDasharray={C}
-              initial={{ strokeDashoffset: C }}
-              animate={{ strokeDashoffset: offset }}
-              transition={{ duration: 0.9, ease: 'easeOut' }}
-            />
-          </svg>
-          <div className="rep-gauge-center">
-            <span className="rep-gauge-score" style={{ color }}>{score}</span>
-            <span className="rep-gauge-max">/100</span>
+        <span className="rep-hero-glow" aria-hidden />
+        <div className="rep-hero-eyebrow">Điểm uy tín của bạn</div>
+        <div className="rep-hero-row">
+          <div className="rep-score" style={{ color }}>
+            {score}<span className="rep-score-max">/100</span>
           </div>
-        </motion.div>
-        <div className="rep-tier-label" style={{ color }}>{data.tierLabel || data.tier}</div>
-        <p className="rep-hero-sub">Điểm uy tín thể hiện mức độ đáng tin của bạn trong cộng đồng SameMess.</p>
+          <div className="rep-tier-pill" style={{ '--tc': color }}>
+            <span className="rep-tier-pill-emoji">{tierEmoji}</span>
+            {data.tierLabel || data.tier}
+          </div>
+        </div>
+
+        <div className="rep-band" role="img" aria-label={`Điểm ${score} trên 100`}>
+          {TIERS.map((t, i) => (
+            <div key={t.key} className="rep-band-seg" style={{ flexBasis: `${SEG_W[i]}%`, background: t.color }}>
+              <span className="rep-band-seg-label">{SEG_SHORT[i]}</span>
+            </div>
+          ))}
+          <span className="rep-band-marker" style={{ left: `${score}%`, '--tc': color }} />
+        </div>
+
+        <p className="rep-hero-sub">
+          Điểm thể hiện mức độ đáng tin của bạn. Người khác chỉ thấy <strong>mức</strong>, không thấy con số.
+        </p>
       </div>
 
       {/* Cap warning */}
