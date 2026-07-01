@@ -3,6 +3,8 @@ import { useEffect } from 'react'
 import { useAuth } from '../../../context/AuthContext.jsx'
 
 const PUBLIC_ROUTES = new Set(['/', '/login', '/register', '/verify-otp', '/forgot-password', '/reset-password'])
+// Route công khai có tham số động (khách/quán không đăng nhập vẫn xem được), so khớp theo tiền tố.
+const PUBLIC_PREFIXES = ['/voucher/']
 
 /**
  * Redirects unauthenticated users to /login. Runs on every navigation so
@@ -15,7 +17,8 @@ export default function SessionGuard() {
 
   useEffect(() => {
     if (bootstrapping) return
-    if (!isAuthenticated && !PUBLIC_ROUTES.has(pathname)) {
+    const isPublic = PUBLIC_ROUTES.has(pathname) || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))
+    if (!isAuthenticated && !isPublic) {
       navigate('/', { replace: true, state: { from: pathname } })
     }
   }, [bootstrapping, isAuthenticated, pathname, navigate])
