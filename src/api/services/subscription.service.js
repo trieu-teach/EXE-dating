@@ -23,6 +23,11 @@ export const subscriptionService = {
     return post(API_ENDPOINTS.subscription.order, { planCode })
   },
 
+  // PayOS: tạo đơn → trả { checkoutUrl, qrCode, orderCode, amountVnd }
+  payosCreate(planCode) {
+    return post(API_ENDPOINTS.subscription.payosCreate, { planCode })
+  },
+
   mockConfirm(txnRef) {
     return post(API_ENDPOINTS.subscription.mockConfirm(txnRef))
   },

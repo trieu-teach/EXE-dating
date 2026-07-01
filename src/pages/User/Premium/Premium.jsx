@@ -126,18 +126,16 @@ export default function Premium() {
     if (planCode === 'Free') return
     setOrdering(planCode)
     try {
-      const res = await subscriptionService.order(planCode)
-      if (res?.paymentUrl) {
-        window.open(res.paymentUrl, '_blank', 'noopener,noreferrer')
-        toast.info('Đã mở trang thanh toán. Sau khi hoàn tất, hãy quay lại.')
-      } else if (res?.txnRef) {
-        await subscriptionService.mockConfirm(res.txnRef)
-        toast.success('Đã kích hoạt gói (mock).')
-        const me = await subscriptionService.me()
-        setCurrent(me)
+      // PayOS: tạo đơn → chuyển hướng người dùng sang trang thanh toán VietQR
+      const res = await subscriptionService.payosCreate(planCode)
+      if (res?.checkoutUrl) {
+        toast.info('Đang chuyển tới trang thanh toán PayOS…')
+        window.location.href = res.checkoutUrl
+        return
       }
+      toast.error('Không nhận được link thanh toán.')
     } catch (err) {
-      toast.error(err?.message || 'Không tạo được đơn.')
+      toast.error(err?.message || 'Không tạo được đơn thanh toán.')
     } finally {
       setOrdering(null)
     }
