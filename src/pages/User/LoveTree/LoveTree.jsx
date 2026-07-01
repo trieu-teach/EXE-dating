@@ -86,8 +86,15 @@ export default function LoveTree() {
   const [levelsOpen, setLevelsOpen] = useState(false)
 
   const { user } = useAuth()
-  const { inventory } = useInventory()
+  const { inventory, refresh: refreshInventory } = useInventory()
   const { plant, loading, watering, water, lastResult } = usePlant(activeMatchId)
+
+  // Tải lại kho nguyên liệu mỗi khi mở trang Cây. Provider chỉ nạp 1 lần lúc
+  // khởi động app (có thể chạy trước khi token sẵn sàng → kho = 0), nên nếu
+  // không refresh ở đây thì dock tưới cây sẽ hiện 0 cho tới khi đổi tab.
+  useEffect(() => {
+    refreshInventory('visible')
+  }, [refreshInventory])
 
   // Load matches once.
   useEffect(() => {
