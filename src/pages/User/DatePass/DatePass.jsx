@@ -47,6 +47,22 @@ export default function DatePass() {
     }).finally(() => setLoading(false))
   }, [])
 
+  // Quay về từ PayOS: hiện kết quả + làm mới danh sách voucher
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const payment = params.get('payment')
+    if (!payment) return
+    if (payment === 'success') {
+      toast.success('Thanh toán thành công! Voucher đã gửi tới email của cả hai bạn 🎟️')
+      setTab('vouchers')
+      reloadOrders()
+    } else {
+      toast.error('Thanh toán đã bị hủy hoặc không thành công.')
+    }
+    window.history.replaceState({}, '', '/date-pass')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const openBuy = (combo) => {
     setBuyCombo(combo)
     setMatchId(matches[0]?.matchId || '')
@@ -57,11 +73,14 @@ export default function DatePass() {
     if (!buyCombo || !matchId) { toast.warn('Hãy chọn người hẹn.'); return }
     setPaying(true)
     try {
-      const created = await datePassService.createOrder({ comboId: buyCombo.id, matchId })
-      const paid = await datePassService.confirm(created.id)
-      toast.success('Thanh toán thành công! Voucher đã được gửi tới email 🎟️')
-      setVoucher(paid)
-      reloadOrders()
+      // PayOS: tạo đơn → chuyển hướng sang trang thanh toán VietQR (tiền thật)
+      const res = await datePassService.payosCreate({ comboId: buyCombo.id, matchId })
+      if (res?.checkoutUrl) {
+        toast.info('Đang chuyển tới trang thanh toán PayOS…')
+        window.location.href = res.checkoutUrl
+        return
+      }
+      toast.error('Không nhận được link thanh toán.')
     } catch (err) {
       if (err?.status === 409) toast.error(err?.message || 'Cặp của bạn đã có voucher cho combo này.')
       else toast.error(err?.message || 'Đặt combo thất bại.')
@@ -287,7 +306,7 @@ export default function DatePass() {
 
                       <div className="dp-modal-actions">
                         <button className="dp-pay-btn" disabled={paying} onClick={pay}>
-                          {paying ? <span className="spinner" /> : `Thanh toán ${vnd(buyCombo.salePriceVnd)} (mock)`}
+                          {paying ? <span className="spinner" /> : `Thanh toán ${vnd(buyCombo.salePriceVnd)}`}
                         </button>
                         <button className="btn btn-ghost btn-sm" disabled={paying} onClick={() => setBuyCombo(null)}>Hủy</button>
                       </div>

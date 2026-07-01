@@ -26,6 +26,7 @@ import Profile from './pages/User/Profile/Profile.jsx'
 import Reputation from './pages/User/Reputation/Reputation.jsx'
 import LikedMe from './pages/User/LikedMe/LikedMe.jsx'
 import DatePass from './pages/User/DatePass/DatePass.jsx'
+import Voucher from './pages/Public/Voucher/Voucher.jsx'
 import AdminDashboard from './pages/Admin/AdminDashboard.jsx'
 import LoveTree from './pages/User/LoveTree/LoveTree.jsx'
 import Tasks from './pages/User/Tasks/Tasks.jsx'
@@ -91,6 +92,9 @@ export default function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/logout" element={<Logout />} />
+
+            {/* Trang voucher công khai — quán quét QR mở ra, không cần đăng nhập */}
+            <Route path="/voucher/:orderId" element={<Voucher />} />
 
             {/* Onboarding (chỉ cần auth, chưa cần xác minh khuôn mặt) */}
             <Route path="/onboarding/preferences" element={<AuthOnly><OnboardingPreferences /></AuthOnly>} />

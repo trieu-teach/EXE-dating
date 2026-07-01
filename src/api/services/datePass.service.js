@@ -24,6 +24,13 @@ export const datePassService = {
   },
   confirm(orderId) { return post(API_ENDPOINTS.datepass.confirm(orderId)) },
   redeem(orderId) { return post(API_ENDPOINTS.datepass.redeem(orderId)) },
+  // PayOS: tạo đơn ưu đãi + trả { checkoutUrl, qrCode, orderCode, amountVnd }
+  payosCreate({ comboId, matchId }) {
+    return post(API_ENDPOINTS.datepass.payos, { comboId, matchId })
+  },
+  // Trang voucher công khai (quán quét QR) — không cần đăng nhập
+  getVoucher(orderId) { return get(API_ENDPOINTS.datepass.voucher(orderId)) },
+  redeemVoucher(orderId) { return post(API_ENDPOINTS.datepass.voucherRedeem(orderId)) },
   my() { return get(API_ENDPOINTS.datepass.my) },
   revenue() { return get(API_ENDPOINTS.datepass.revenue) },
 }
