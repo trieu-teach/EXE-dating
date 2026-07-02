@@ -82,19 +82,24 @@ export default function Premium() {
       .finally(() => setLoading(false))
   }, [toast])
 
-  // Quay về từ VNPay: hiển thị kết quả + làm mới trạng thái gói
+  // Quay về từ PayOS: chốt thanh toán (hỏi PayOS trạng thái thật) rồi làm mới trạng thái gói
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const payment = params.get('payment')
     if (!payment) return
+    const orderCode = params.get('orderCode')
+    // Xoá query param khỏi URL ngay để tránh lặp
+    window.history.replaceState({}, '', '/premium')
     if (payment === 'success') {
-      toast.success('Thanh toán thành công! Gói của bạn đã được kích hoạt 🎉')
-      subscriptionService.me().then(setCurrent).catch(() => {})
+      ;(async () => {
+        // Chốt Paid không phụ thuộc webhook (Render Free hay ngủ → webhook có thể trượt)
+        if (orderCode) { try { await subscriptionService.payosVerify(orderCode) } catch { /* vẫn refresh bên dưới */ } }
+        toast.success('Thanh toán thành công! Gói của bạn đã được kích hoạt 🎉')
+        subscriptionService.me().then(setCurrent).catch(() => {})
+      })()
     } else {
       toast.error('Thanh toán không thành công hoặc đã bị hủy.')
     }
-    // Xoá query param khỏi URL
-    window.history.replaceState({}, '', '/premium')
   }, [toast])
 
   // Ghép giá từ backend vào meta, sắp xếp Free → Plus → Gold

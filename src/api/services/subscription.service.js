@@ -28,6 +28,11 @@ export const subscriptionService = {
     return post(API_ENDPOINTS.subscription.payosCreate, { planCode })
   },
 
+  // PayOS: chốt thanh toán khi quay về (hỏi PayOS trạng thái thật) — dùng cho cả gói lẫn voucher
+  payosVerify(orderCode) {
+    return post(API_ENDPOINTS.subscription.payosVerify, { orderCode: Number(orderCode) })
+  },
+
   mockConfirm(txnRef) {
     return post(API_ENDPOINTS.subscription.mockConfirm(txnRef))
   },

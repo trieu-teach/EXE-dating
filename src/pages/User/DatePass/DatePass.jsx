@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { datePassService } from '../../../api'
+import { datePassService, subscriptionService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
 import { HeartIcon, SparkleIcon, CheckIcon } from '../../../components/ui/CustomIcons.jsx'
@@ -47,19 +47,24 @@ export default function DatePass() {
     }).finally(() => setLoading(false))
   }, [])
 
-  // Quay về từ PayOS: hiện kết quả + làm mới danh sách voucher
+  // Quay về từ PayOS: chốt thanh toán (hỏi PayOS trạng thái thật) rồi làm mới voucher
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const payment = params.get('payment')
     if (!payment) return
+    const orderCode = params.get('orderCode')
+    window.history.replaceState({}, '', '/date-pass')
     if (payment === 'success') {
-      toast.success('Thanh toán thành công! Voucher đã gửi tới email của cả hai bạn 🎟️')
-      setTab('vouchers')
-      reloadOrders()
+      ;(async () => {
+        // Chốt Paid + phát voucher không phụ thuộc webhook (Render Free hay ngủ → webhook có thể trượt)
+        if (orderCode) { try { await subscriptionService.payosVerify(orderCode) } catch { /* vẫn reload bên dưới */ } }
+        toast.success('Thanh toán thành công! Voucher đã gửi tới email của cả hai bạn 🎟️')
+        setTab('vouchers')
+        reloadOrders()
+      })()
     } else {
       toast.error('Thanh toán đã bị hủy hoặc không thành công.')
     }
-    window.history.replaceState({}, '', '/date-pass')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

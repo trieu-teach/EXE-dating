@@ -108,6 +108,7 @@ export const API_ENDPOINTS = {
     order: '/api/subscription/order',
     mockConfirm: (txnRef) => `/api/subscription/mock-confirm/${txnRef}`,
     payosCreate: '/api/payments/payos/create',
+    payosVerify: '/api/payments/payos/verify',
   },
   gamification: {
     tasks: '/api/tasks',
