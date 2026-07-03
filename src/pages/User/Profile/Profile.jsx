@@ -146,6 +146,7 @@ export default function Profile() {
             {/* Ảnh */}
             <ProfilePhotoManager
               photos={photos}
+              avatarFrame={profile.avatarFrame}
               onChange={async () => {
                 const updated = await profileService.me()
                 setProfile(updated)

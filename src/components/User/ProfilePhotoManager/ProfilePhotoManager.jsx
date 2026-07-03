@@ -4,11 +4,12 @@ import { isImage, fileToDataUrl } from '../../../utils/imageFile.js'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
 import { StarIcon, XIcon } from '../../ui/CustomIcons.jsx'
+import AvatarFrame from '../AvatarFrame/AvatarFrame.jsx'
 
 /**
  * Quản lý ảnh: upload, kéo-thả đổi thứ tự (ô lớn đầu tiên = ảnh đại diện), xoá.
  */
-export default function ProfilePhotoManager({ photos, onChange }) {
+export default function ProfilePhotoManager({ photos, onChange, avatarFrame }) {
   const fileRef = useRef(null)
   const [uploading, setUploading] = useState(false)
   const [previews, setPreviews] = useState([])
@@ -98,35 +99,48 @@ export default function ProfilePhotoManager({ photos, onChange }) {
       </header>
 
       <div className="photo-mgr-grid">
-        {all.map((p, i) => (
-          <div
-            key={p.id}
-            className={`photo-tile${i === 0 ? ' is-featured' : ''}${p.isPreview ? ' is-preview' : ''}${dragIndex === i ? ' is-dragging' : ''}${overIndex === i && dragIndex !== null ? ' is-over' : ''}`}
-            style={{ backgroundImage: `url(${resolveImageUrl(p.url)})` }}
-            draggable={!p.isPreview}
-            onDragStart={() => !p.isPreview && onDragStart(i)}
-            onDragOver={(e) => !p.isPreview && onDragOver(e, i)}
-            onDrop={() => !p.isPreview && onDrop(i)}
-            onDragEnd={onDragEnd}
-          >
-            {i === 0 && !p.isPreview && (
-              <span className="photo-tile-badge"><StarIcon size={11} /> Ảnh đại diện</span>
-            )}
-            {p.isPreview ? (
-              <div className="photo-tile-uploading"><span className="spinner" /></div>
-            ) : (
-              <button
-                type="button"
-                className="photo-tile-del"
-                title="Xoá ảnh"
-                disabled={busyId === p.id}
-                onClick={() => handleDelete(p.id)}
-              >
-                <XIcon size={15} />
-              </button>
-            )}
-          </div>
-        ))}
+        {all.map((p, i) => {
+          const tile = (
+            <div
+              className={`photo-tile${i === 0 ? ' is-featured' : ''}${p.isPreview ? ' is-preview' : ''}${dragIndex === i ? ' is-dragging' : ''}${overIndex === i && dragIndex !== null ? ' is-over' : ''}`}
+              style={{ backgroundImage: `url(${resolveImageUrl(p.url)})` }}
+              draggable={!p.isPreview}
+              onDragStart={() => !p.isPreview && onDragStart(i)}
+              onDragOver={(e) => !p.isPreview && onDragOver(e, i)}
+              onDrop={() => !p.isPreview && onDrop(i)}
+              onDragEnd={onDragEnd}
+            >
+              {i === 0 && !p.isPreview && (
+                <span className="photo-tile-badge"><StarIcon size={11} /> Ảnh đại diện</span>
+              )}
+              {p.isPreview ? (
+                <div className="photo-tile-uploading"><span className="spinner" /></div>
+              ) : (
+                <button
+                  type="button"
+                  className="photo-tile-del"
+                  title="Xoá ảnh"
+                  disabled={busyId === p.id}
+                  onClick={() => handleDelete(p.id)}
+                >
+                  <XIcon size={15} />
+                </button>
+              )}
+            </div>
+          )
+
+          return (
+            <AvatarFrame
+              key={p.id}
+              frame={i === 0 && !p.isPreview ? avatarFrame : null}
+              shape="square"
+              size="xl"
+              className="avatar-frame-block photo-tile-frame-slot"
+            >
+              {tile}
+            </AvatarFrame>
+          )
+        })}
 
         {Array.from({ length: emptySlots }).map((_, i) => (
           <button
