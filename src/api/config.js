@@ -81,6 +81,7 @@ export const API_ENDPOINTS = {
     combo: (id) => `/api/admin/combos/${id}`,
     users: '/api/admin/users',
     usersBulk: '/api/admin/users/bulk-action',
+    grantPlan: '/api/admin/plans/grant',
   },
   matches: {
     list: '/api/matches',

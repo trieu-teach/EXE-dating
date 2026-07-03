@@ -197,3 +197,17 @@
   border: 2px solid var(--color-surface);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
+
+/* ── Popup cảm ơn khi admin tặng premium ─────────────────── */
+.gift-modal { text-align: center; padding: var(--space-2) 0; }
+.gift-modal-icon {
+  width: 64px; height: 64px;
+  margin: 0 auto var(--space-4);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 2rem;
+  background: linear-gradient(135deg, #f472b6, #a855f7);
+  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.35);
+}
+.gift-modal-title { margin: 0 0 var(--space-2); }
+.gift-modal-body { color: var(--color-text-soft); margin-bottom: var(--space-5); }

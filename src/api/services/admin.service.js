@@ -33,4 +33,7 @@ export const adminService = {
   },
   banUser(userId) { return post(API_ENDPOINTS.admin.usersBulk, { action: 'ban', userIds: [userId] }) },
   unbanUser(userId) { return post(API_ENDPOINTS.admin.usersBulk, { action: 'unban', userIds: [userId] }) },
+
+  // Tặng premium miễn phí (không thanh toán)
+  grantPlan(userId, planCode) { return post(API_ENDPOINTS.admin.grantPlan, { userId, planCode }) },
 }

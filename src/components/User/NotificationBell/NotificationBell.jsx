@@ -3,26 +3,41 @@ import { useNavigate } from 'react-router-dom'
 import { useNotifications } from '../../../hooks/useNotifications.js'
 import { timeAgo, resolveImageUrl } from '../../../utils/format.js'
 import { matchesService, chatService } from '../../../api'
-import { Bell, CheckCheck, Heart, MessageCircle, Calendar, Star } from 'lucide-react'
+import { Bell, CheckCheck, Heart, MessageCircle, Calendar, Star, Gift } from 'lucide-react'
 import { cn } from '../../../lib/utils'
+import Modal from '../Modal/Modal.jsx'
 import './NotificationBell.css'
 
-// Icon + màu theo loại thông báo (đúng giá trị backend: Match / Message / SuperLike)
+// Icon + màu theo loại thông báo (đúng giá trị backend: Match / Message / SuperLike / PlanGranted)
 const TYPE_META = {
-  Match:     { Icon: Heart,         grad: 'linear-gradient(135deg, #ff7eb3, #ff2d6b)' },
-  Message:   { Icon: MessageCircle, grad: 'linear-gradient(135deg, #5eead4, #3b82f6)' },
-  SuperLike: { Icon: Star,          grad: 'linear-gradient(135deg, #c084fc, #9333ea)' },
-  Event:     { Icon: Calendar,      grad: 'linear-gradient(135deg, #fbbf24, #f59e0b)' },
-  Reputation:{ Icon: Star,          grad: 'linear-gradient(135deg, #34d399, #16a34a)' },
+  Match:       { Icon: Heart,         grad: 'linear-gradient(135deg, #ff7eb3, #ff2d6b)' },
+  Message:     { Icon: MessageCircle, grad: 'linear-gradient(135deg, #5eead4, #3b82f6)' },
+  SuperLike:   { Icon: Star,          grad: 'linear-gradient(135deg, #c084fc, #9333ea)' },
+  Event:       { Icon: Calendar,      grad: 'linear-gradient(135deg, #fbbf24, #f59e0b)' },
+  Reputation:  { Icon: Star,          grad: 'linear-gradient(135deg, #34d399, #16a34a)' },
+  PlanGranted: { Icon: Gift,          grad: 'linear-gradient(135deg, #f472b6, #a855f7)' },
 }
 const TYPE_FALLBACK = { Icon: Bell, grad: 'linear-gradient(135deg, #ff9ec4, #b14bff)' }
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false)
   const [avatarMap, setAvatarMap] = useState({}) // id (conversation/match/user) → avatar url
+  const [giftItem, setGiftItem] = useState(null)
   const ref = useRef(null)
   const navigate = useNavigate()
   const { items, unreadCount, markRead, loading } = useNotifications({ pollIntervalMs: 30_000 })
+
+  // Quà tặng premium từ admin hiện popup cảm ơn riêng, không chỉ nằm trong dropdown
+  useEffect(() => {
+    const gift = items.find((it) => it.type === 'PlanGranted' && !it.isRead)
+    if (gift && gift.id !== giftItem?.id) setGiftItem(gift)
+  }, [items]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const closeGift = async () => {
+    if (!giftItem) return
+    try { await markRead([giftItem.id]) } catch { /* ignore */ }
+    setGiftItem(null)
+  }
 
   useEffect(() => {
     if (!open) return undefined
@@ -142,6 +157,15 @@ export default function NotificationBell() {
           </div>
         </div>
       )}
+
+      <Modal open={!!giftItem} onClose={closeGift} labelledBy="gift-modal-title">
+        <div className="gift-modal">
+          <div className="gift-modal-icon">🎁</div>
+          <h2 id="gift-modal-title" className="gift-modal-title">{giftItem?.title || 'Quà tặng từ SameMess'}</h2>
+          <p className="gift-modal-body">{giftItem?.body}</p>
+          <button type="button" className="btn btn-primary" onClick={closeGift}>Trải nghiệm ngay</button>
+        </div>
+      </Modal>
     </div>
   )
 }

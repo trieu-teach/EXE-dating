@@ -45,6 +45,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState([])
   const [userSearch, setUserSearch] = useState('')
   const [banTarget, setBanTarget] = useState(null)
+  const [grantTarget, setGrantTarget] = useState(null)
   const [loading, setLoading] = useState(false)
   const [busy, setBusy] = useState(null)
 
@@ -92,6 +93,18 @@ export default function AdminDashboard() {
       toast.success('Đã cấm người dùng.')
       setBanTarget(null)
     } catch (e) { toast.error(e?.message || 'Cấm thất bại.') }
+    finally { setBusy(null) }
+  }
+
+  const confirmGrant = async (planCode) => {
+    const u = grantTarget
+    if (!u) return
+    setBusy(u.id)
+    try {
+      await adminService.grantPlan(u.id, planCode)
+      toast.success(`Đã tặng gói ${planCode} cho ${u.displayName || u.email}.`)
+      setGrantTarget(null)
+    } catch (e) { toast.error(e?.message || 'Tặng gói thất bại.') }
     finally { setBusy(null) }
   }
 
@@ -229,6 +242,11 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                     <div className="admin-user-actions">
+                      {u.status !== 'Banned' && (
+                        <button className="btn btn-ghost btn-sm" disabled={busy === u.id} onClick={() => setGrantTarget(u)}>
+                          {busy === u.id ? <span className="spinner" /> : '🎁 Tặng Premium'}
+                        </button>
+                      )}
                       {u.role !== 'Admin' && u.status !== 'Banned' && (
                         <button className="btn btn-danger btn-sm" disabled={busy === u.id} onClick={() => setBanTarget(u)}>
                           {busy === u.id ? <span className="spinner" /> : 'Cấm'}
@@ -300,6 +318,28 @@ export default function AdminDashboard() {
               <button className="btn btn-ghost btn-sm" disabled={busy === banTarget.id} onClick={() => setBanTarget(null)}>Huỷ</button>
               <button className="btn btn-danger btn-sm" disabled={busy === banTarget.id} onClick={confirmBan}>
                 {busy === banTarget.id ? <span className="spinner" /> : 'Cấm người dùng'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup chọn gói tặng premium */}
+      {grantTarget && (
+        <div className="admin-modal-backdrop" onClick={() => busy !== grantTarget.id && setGrantTarget(null)}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal-icon">🎁</div>
+            <div className="admin-modal-title">Tặng Premium cho {grantTarget.displayName || grantTarget.email}?</div>
+            <p className="admin-modal-text">
+              Kích hoạt ngay, không cần thanh toán. Người dùng sẽ nhận thông báo và popup cảm ơn từ SameMess.
+            </p>
+            <div className="admin-modal-actions">
+              <button className="btn btn-ghost btn-sm" disabled={busy === grantTarget.id} onClick={() => setGrantTarget(null)}>Huỷ</button>
+              <button className="btn btn-primary btn-sm" disabled={busy === grantTarget.id} onClick={() => confirmGrant('Plus')}>
+                {busy === grantTarget.id ? <span className="spinner" /> : 'Tặng gói Plus'}
+              </button>
+              <button className="btn btn-primary btn-sm" disabled={busy === grantTarget.id} onClick={() => confirmGrant('Gold')}>
+                {busy === grantTarget.id ? <span className="spinner" /> : 'Tặng gói Gold'}
               </button>
             </div>
           </div>
