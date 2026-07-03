@@ -513,6 +513,10 @@
   overflow: hidden;
 }
 .disc-photo-hero { aspect-ratio: 3 / 4; }
+
+/* Khi thẻ đầu có khung hiệu ứng (admin), chính khung mới cần chiếm đúng khổ 3:4 */
+.disc-photo-hero-frame-slot { width: 100%; aspect-ratio: 3 / 4; flex-shrink: 0; }
+.disc-photo-hero-frame-slot > .disc-photo-hero { width: 100%; height: 100%; }
 .disc-photo-gradient {
   position: absolute;
   inset: 0;

@@ -15,6 +15,8 @@ import { useToast } from '../../../context/ToastContext.jsx'
 import {
   HeartIcon, XIcon, StarIcon, PinIcon, ShieldCheckIcon, TrophyIcon, FireIcon
 } from '../../../components/ui/CustomIcons.jsx'
+import AdminBadge from '../AdminBadge/AdminBadge.jsx'
+import AdminFireName from '../AdminBadge/AdminFireName.jsx'
 import './ProfileDetailModal.css'
 
 const BADGE_LABELS = {
@@ -173,8 +175,9 @@ export default function ProfileDetailModal({ profile, open, onClose, onSwipe }) 
           <div className="pdm-info">
             <div className="pdm-name-row">
               <h2 className="pdm-name" id="pdm-title">
-                {profile.displayName}
+                {profile.isAdmin ? <AdminFireName>{profile.displayName}</AdminFireName> : profile.displayName}
                 {profile.age != null && <span className="pdm-age">, {profile.age}</span>}
+                {profile.isAdmin && <AdminBadge />}
               </h2>
             </div>
 

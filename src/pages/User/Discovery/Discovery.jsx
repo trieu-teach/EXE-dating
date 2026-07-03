@@ -13,6 +13,7 @@ import SideHearts from '../../../components/ui/SideHearts.jsx'
 import MatchesSidebar from '../../../components/User/MatchesSidebar/MatchesSidebar.jsx'
 import AdminBadge from '../../../components/User/AdminBadge/AdminBadge.jsx'
 import AdminFireName from '../../../components/User/AdminBadge/AdminFireName.jsx'
+import AvatarFrame from '../../../components/User/AvatarFrame/AvatarFrame.jsx'
 import './Discovery.css'
 
 const GOAL_LABEL = {
@@ -334,23 +335,25 @@ export default function Discovery() {
       <AnimatePresence mode="wait">
         <SwipeCard key={current.userId} disabled={actionLoading} onDecide={decide} innerRef={scrollRef}>
           {/* Ảnh chính + tên */}
-          <div className="disc-photo disc-photo-hero" style={photos[0] ? { backgroundImage: `url(${photos[0]})` } : undefined}>
-            <div className="disc-photo-gradient" />
-            <div className="disc-hero-info">
-              <div className="disc-hero-name">
-                {current.isAdmin ? <AdminFireName>{current.displayName}</AdminFireName> : current.displayName}
-                {current.age ? `, ${current.age}` : ''}
-                {current.isPhotoVerified && <span className="disc-verified" title="Đã xác minh"><ShieldCheckIcon size={16} /></span>}
-                {current.isAdmin && <AdminBadge />}
-              </div>
-              <div className="disc-hero-meta">
-                {current.location && <span><PinIcon size={12} /> {current.location}</span>}
-                {current.reputationTier && current.reputationTier !== 'Standard' && (
-                  <span className="disc-tier"><StarIcon size={11} /> {current.reputationTier}</span>
-                )}
+          <AvatarFrame frame={current.avatarFrame} shape="square" size="xl" className="avatar-frame-block disc-photo-hero-frame-slot">
+            <div className="disc-photo disc-photo-hero" style={photos[0] ? { backgroundImage: `url(${photos[0]})` } : undefined}>
+              <div className="disc-photo-gradient" />
+              <div className="disc-hero-info">
+                <div className="disc-hero-name">
+                  {current.isAdmin ? <AdminFireName>{current.displayName}</AdminFireName> : current.displayName}
+                  {current.age ? `, ${current.age}` : ''}
+                  {current.isPhotoVerified && <span className="disc-verified" title="Đã xác minh"><ShieldCheckIcon size={16} /></span>}
+                  {current.isAdmin && <AdminBadge />}
+                </div>
+                <div className="disc-hero-meta">
+                  {current.location && <span><PinIcon size={12} /> {current.location}</span>}
+                  {current.reputationTier && current.reputationTier !== 'Standard' && (
+                    <span className="disc-tier"><StarIcon size={11} /> {current.reputationTier}</span>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          </AvatarFrame>
 
           {/* Giới thiệu */}
           {current.bio && (

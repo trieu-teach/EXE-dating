@@ -1,6 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { resolveImageUrl } from '../../../utils/format.js'
 import { PinIcon, ShieldCheckIcon, XIcon, HeartIcon, StarIcon } from '../../ui/CustomIcons.jsx'
+import AdminBadge from '../AdminBadge/AdminBadge.jsx'
+import AdminFireName from '../AdminBadge/AdminFireName.jsx'
+import AvatarFrame from '../AvatarFrame/AvatarFrame.jsx'
 import './ProfilePreviewModal.css'
 
 const GOAL_LABEL = {
@@ -46,16 +49,20 @@ export default function ProfilePreviewModal({ profile, open, onClose, ownerView 
               {ownerView && <div className="pv-hint">👀 Đây là hồ sơ của bạn khi người khác nhìn thấy</div>}
 
               {photos[0] ? (
-                <div className="pv-photo pv-photo-hero" style={{ backgroundImage: `url(${photos[0]})` }}>
-                  <div className="pv-photo-gradient" />
-                  <div className="pv-hero-info">
-                    <div className="pv-hero-name">
-                      {name}{profile.age ? `, ${profile.age}` : ''}
-                      {profile.isPhotoVerified && <span className="pv-verified"><ShieldCheckIcon size={16} /></span>}
+                <AvatarFrame frame={profile.avatarFrame} shape="square" size="xl" className="avatar-frame-block pv-photo-hero-frame-slot">
+                  <div className="pv-photo pv-photo-hero" style={{ backgroundImage: `url(${photos[0]})` }}>
+                    <div className="pv-photo-gradient" />
+                    <div className="pv-hero-info">
+                      <div className="pv-hero-name">
+                        {profile.isAdmin ? <AdminFireName>{name}</AdminFireName> : name}
+                        {profile.age ? `, ${profile.age}` : ''}
+                        {profile.isPhotoVerified && <span className="pv-verified"><ShieldCheckIcon size={16} /></span>}
+                        {profile.isAdmin && <AdminBadge />}
+                      </div>
+                      {location && <div className="pv-hero-meta"><PinIcon size={12} /> {location}</div>}
                     </div>
-                    {location && <div className="pv-hero-meta"><PinIcon size={12} /> {location}</div>}
                   </div>
-                </div>
+                </AvatarFrame>
               ) : (
                 <div className="pv-photo pv-photo-empty">Chưa có ảnh nào — thêm ảnh để hồ sơ hấp dẫn hơn 📸</div>
               )}
