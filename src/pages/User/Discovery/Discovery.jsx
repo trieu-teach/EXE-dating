@@ -347,7 +347,9 @@ export default function Discovery() {
                 </div>
                 <div className="disc-hero-meta">
                   {current.location && <span><PinIcon size={12} /> {current.location}</span>}
-                  {current.reputationTier && current.reputationTier !== 'Standard' && (
+                  {current.isAdmin ? (
+                    <span className="disc-tier disc-tier-vip"><CrownIcon size={13} /> VIP</span>
+                  ) : current.reputationTier && current.reputationTier !== 'Standard' && (
                     <span className="disc-tier"><StarIcon size={11} /> {current.reputationTier}</span>
                   )}
                 </div>

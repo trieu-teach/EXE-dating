@@ -547,6 +547,27 @@
 .disc-hero-meta span { display: inline-flex; align-items: center; gap: 5px; }
 .disc-tier { color: #ffd76f; }
 
+/* Hạng VIP của Admin — chip vàng kim nổi khối, phát sáng nhẹ */
+.disc-tier-vip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #3a2500;
+  background: linear-gradient(135deg, #ffe28a, #f5b915, #ffd76f);
+  box-shadow: 0 0 10px rgba(255, 200, 60, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  text-shadow: none;
+  animation: disc-tier-vip-glow 1.8s ease-in-out infinite;
+}
+@keyframes disc-tier-vip-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(255, 200, 60, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.6); }
+  50%      { box-shadow: 0 0 18px rgba(255, 210, 80, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.6); }
+}
+
 /* ── Info panels ───────────────────────────────────────────── */
 .disc-panel {
   background: linear-gradient(160deg, #ffffff 0%, #fff5fb 100%);
