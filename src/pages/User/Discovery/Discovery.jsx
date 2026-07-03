@@ -335,7 +335,7 @@ export default function Discovery() {
       <AnimatePresence mode="wait">
         <SwipeCard key={current.userId} disabled={actionLoading} onDecide={decide} innerRef={scrollRef}>
           {/* Ảnh chính + tên */}
-          <AvatarFrame frame={current.avatarFrame} shape="square" size="xl" className="avatar-frame-block disc-photo-hero-frame-slot">
+          <AvatarFrame frame={current.avatarFrame} size="xl">
             <div className="disc-photo disc-photo-hero" style={photos[0] ? { backgroundImage: `url(${photos[0]})` } : undefined}>
               <div className="disc-photo-gradient" />
               <div className="disc-hero-info">

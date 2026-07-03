@@ -49,7 +49,7 @@ export default function ProfilePreviewModal({ profile, open, onClose, ownerView 
               {ownerView && <div className="pv-hint">👀 Đây là hồ sơ của bạn khi người khác nhìn thấy</div>}
 
               {photos[0] ? (
-                <AvatarFrame frame={profile.avatarFrame} shape="square" size="xl" className="avatar-frame-block pv-photo-hero-frame-slot">
+                <AvatarFrame frame={profile.avatarFrame} size="xl">
                   <div className="pv-photo pv-photo-hero" style={{ backgroundImage: `url(${photos[0]})` }}>
                     <div className="pv-photo-gradient" />
                     <div className="pv-hero-info">

@@ -193,14 +193,6 @@
   outline-offset: -3px;
 }
 
-/* Khi ô ảnh chính có khung hiệu ứng (admin), chính khung mới là grid item 2×2 */
-.photo-tile-frame-slot {
-  grid-column: span 2;
-  grid-row: span 2;
-  aspect-ratio: 1 / 1;
-}
-.photo-tile-frame-slot > .photo-tile { width: 100%; height: 100%; }
-
 .photo-tile-badge {
   position: absolute;
   top: 8px;

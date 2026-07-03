@@ -1,122 +1,136 @@
-/* ── Khung hiệu ứng avatar/ảnh kiểu game — vòng xoay + hào quang, đổi màu theo theme ── */
-.avatar-frame {
-  position: relative;
-  display: inline-block;
-  line-height: 0;
-  isolation: isolate;
+/* ── Vật chủ (avatar/ảnh) khi có khung — luôn position:relative + overflow:hidden để
+   hiệu ứng nằm khít bên trong, không lộ ra ngoài mép ảnh dù avatar tròn hay ảnh vuông. ── */
+.avatar-frame-host {
+  position: relative !important;
+  overflow: hidden !important;
 }
-.avatar-frame > :first-child { position: relative; z-index: 2; }
 
-.avatar-frame::before,
-.avatar-frame::after {
-  content: '';
+.avatar-frame-fx {
   position: absolute;
+  inset: 0;
+  /* Không set z-index: để mặc định (auto) — các lớp info/badge có z-index riêng (vd
+     .disc-hero-info, .pv-hero-info) sẽ tự động nổi lên trên, lửa chỉ cháy quanh chứ
+     không che chữ tên. */
   pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
 }
-.avatar-frame::before {
-  z-index: 1;
-  box-sizing: border-box;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: avatar-frame-spin linear infinite;
+.avatar-frame-fx-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
 }
-.avatar-frame::after {
-  z-index: 0;
-  filter: blur(7px);
-  opacity: 0.6;
-  animation: avatar-frame-pulse ease-in-out infinite;
+.avatar-frame-fx-icon {
+  position: absolute;
+  bottom: -8%;
+  transform: translateX(-50%);
+  animation: avatar-frame-flame-rise 1.8s ease-in infinite;
 }
-
-/* Hình dạng: tròn (avatar) hoặc vuông bo góc (ảnh đại diện lớn) */
-.avatar-frame-circle,
-.avatar-frame-circle::before,
-.avatar-frame-circle::after { border-radius: 50%; }
-.avatar-frame-square { border-radius: 22px; }
-.avatar-frame-square::before,
-.avatar-frame-square::after { border-radius: 22px; }
-
-/* Kích thước: bề dày viền + khoảng nhô ra tỉ lệ theo avatar nhỏ/vừa/lớn/ảnh lớn */
-.avatar-frame-sm::before { inset: -5px; padding: 2px; animation-duration: 3.2s; }
-.avatar-frame-sm::after  { inset: -5px; animation-duration: 2s; }
-.avatar-frame-md::before { inset: -7px; padding: 3px; animation-duration: 3.6s; }
-.avatar-frame-md::after  { inset: -7px; animation-duration: 2.2s; }
-.avatar-frame-lg::before { inset: -10px; padding: 4px; animation-duration: 4.2s; }
-.avatar-frame-lg::after  { inset: -10px; animation-duration: 2.4s; }
-.avatar-frame-xl::before { inset: -12px; padding: 6px; animation-duration: 4.6s; }
-.avatar-frame-xl::after  { inset: -12px; filter: blur(14px); animation-duration: 2s; }
-
-/* Tiện ích bố cục: dùng khi khung phải là một grid item (vd ô ảnh đại diện 2×2) */
-.avatar-frame-block { display: block; }
-
-@keyframes avatar-frame-spin { to { transform: rotate(360deg); } }
-@keyframes avatar-frame-pulse {
-  0%, 100% { opacity: 0.45; transform: scale(1); }
-  50%      { opacity: 0.85; transform: scale(1.08); }
+@keyframes avatar-frame-flame-rise {
+  0%   { transform: translateX(-50%) translateY(0) scale(0.8) rotate(-4deg); opacity: 0; }
+  18%  { opacity: 1; }
+  55%  { transform: translateX(-50%) translateY(-42%) scale(1.08) rotate(3deg); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(-78%) scale(0.65) rotate(-2deg); opacity: 0; }
 }
 
-/* ── Lửa: bùng cháy dữ dội — nhiều lớp cam-đỏ-vàng-trắng nóng, xoay + nhấp nháy lửa ── */
-.avatar-frame-fire::before {
-  background: conic-gradient(from 0deg,
-    #6b0d0d, #ff3d00, #ff8c00, #ffd23f, #fff6c8, #ffd23f, #ff8c00, #ff3d00, #6b0d0d);
-  animation-duration: 2.2s;
-  animation-name: avatar-frame-spin, avatar-frame-fire-flicker;
-  animation-timing-function: linear, ease-in-out;
-  animation-iteration-count: infinite, infinite;
+/* Kích thước icon theo size của avatar/ảnh */
+.avatar-frame-fx-sm .avatar-frame-fx-icon { width: 11px; height: 11px; }
+.avatar-frame-fx-md .avatar-frame-fx-icon { width: 15px; height: 15px; }
+.avatar-frame-fx-lg .avatar-frame-fx-icon { width: 22px; height: 22px; }
+.avatar-frame-fx-xl .avatar-frame-fx-icon { width: 30px; height: 30px; }
+
+/* ── Lửa thật: viền trong rực cháy + lửa bốc lên từ đáy ── */
+.avatar-frame-host-fire { animation: avatar-frame-rim-fire 1.5s ease-in-out infinite; }
+@keyframes avatar-frame-rim-fire {
+  0%, 100% { box-shadow: inset 0 -45% 34px -6px rgba(255, 90, 0, 0.6), inset 0 0 0 2px rgba(255, 150, 0, 0.55); }
+  50%      { box-shadow: inset 0 -60% 50px -4px rgba(255, 150, 0, 0.9), inset 0 0 0 2px rgba(255, 210, 70, 0.85); }
 }
-.avatar-frame-fire::after {
-  background: radial-gradient(circle, #ffe08a, #ff8c00 45%, #ff3d00 70%, transparent 82%);
-  animation-duration: 1.1s;
-  animation-name: avatar-frame-pulse, avatar-frame-fire-flicker;
-  opacity: 0.8;
+.avatar-frame-fx-fire .avatar-frame-fx-glow {
+  background: linear-gradient(to top, rgba(255, 70, 0, 0.7), rgba(255, 150, 0, 0.28) 42%, transparent 72%);
+  animation: avatar-frame-glow-flicker 1.05s ease-in-out infinite;
 }
-@keyframes avatar-frame-fire-flicker {
-  0%   { filter: brightness(1) saturate(1); }
-  20%  { filter: brightness(1.35) saturate(1.25); }
-  40%  { filter: brightness(0.9) saturate(1); }
-  60%  { filter: brightness(1.45) saturate(1.3); }
-  80%  { filter: brightness(1.05) saturate(1.1); }
-  100% { filter: brightness(1) saturate(1); }
+.avatar-frame-fx-fire .avatar-frame-fx-icon {
+  color: #ff7a1a;
+  filter: drop-shadow(0 0 5px rgba(255, 150, 0, 0.95));
 }
 
-/* ── Băng: xanh cyan-trắng, xoay chậm hơn, hào quang lạnh dịu ── */
-.avatar-frame-ice::before {
-  background: conic-gradient(from 0deg, #0ea5e9, #7dd3fc, #e0f2fe, #38bdf8, #0ea5e9);
-  animation-duration: 5s;
+/* ── Băng: viền trong lạnh dịu + bông tuyết rơi xuống ── */
+.avatar-frame-host-ice { animation: avatar-frame-rim-ice 2.4s ease-in-out infinite; }
+@keyframes avatar-frame-rim-ice {
+  0%, 100% { box-shadow: inset 0 0 0 2px rgba(125, 211, 252, 0.55), inset 0 30% 30px -10px rgba(56, 189, 248, 0.35); }
+  50%      { box-shadow: inset 0 0 0 2px rgba(224, 242, 254, 0.85), inset 0 40% 42px -6px rgba(56, 189, 248, 0.55); }
 }
-.avatar-frame-ice::after {
-  background: radial-gradient(circle, #bae6fd, #38bdf8 60%, transparent 75%);
-  animation-duration: 2.8s;
+.avatar-frame-fx-ice .avatar-frame-fx-glow {
+  background: linear-gradient(to bottom, rgba(125, 211, 252, 0.5), rgba(186, 230, 253, 0.2) 45%, transparent 75%);
+  animation: avatar-frame-glow-flicker 2.2s ease-in-out infinite;
 }
-
-/* ── Hoàng kim: vàng ánh kim sang trọng, xoay chậm rãi, hào quang rực rỡ ── */
-.avatar-frame-gold::before {
-  background: conic-gradient(from 0deg, #b45309, #fde68a, #fffbe0, #eab308, #b45309);
-  animation-duration: 6s;
-}
-.avatar-frame-gold::after {
-  background: radial-gradient(circle, #ffe28a, #eab308 60%, transparent 75%);
+.avatar-frame-fx-ice .avatar-frame-fx-icon {
+  color: #bae6fd;
+  filter: drop-shadow(0 0 4px rgba(125, 211, 252, 0.9));
+  bottom: auto;
+  top: -8%;
+  animation-name: avatar-frame-frost-fall;
   animation-duration: 2.6s;
-  opacity: 0.75;
+}
+@keyframes avatar-frame-frost-fall {
+  0%   { transform: translateX(-50%) translateY(0) rotate(0deg); opacity: 0; }
+  18%  { opacity: 1; }
+  55%  { transform: translateX(-50%) translateY(42%) rotate(90deg); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(78%) rotate(180deg); opacity: 0; }
 }
 
-/* ── Điện: tím-xanh-trắng, xoay nhanh + nhấp nháy tia điện ── */
-.avatar-frame-electric::before {
-  background: conic-gradient(from 0deg, #7c3aed, #38bdf8, #ffffff, #7c3aed, #4c1d95, #7c3aed);
-  animation-duration: 1.6s;
-  animation-name: avatar-frame-spin, avatar-frame-flicker;
-  animation-timing-function: linear, steps(1, end);
-  animation-iteration-count: infinite, infinite;
+/* ── Hoàng kim: viền trong ánh kim sang trọng + lấp lánh ── */
+.avatar-frame-host-gold { animation: avatar-frame-rim-gold 2.6s ease-in-out infinite; }
+@keyframes avatar-frame-rim-gold {
+  0%, 100% { box-shadow: inset 0 0 0 2px rgba(234, 179, 8, 0.6), inset 0 0 24px -8px rgba(253, 230, 138, 0.5); }
+  50%      { box-shadow: inset 0 0 0 2px rgba(255, 246, 200, 0.9), inset 0 0 38px -4px rgba(253, 230, 138, 0.8); }
 }
-.avatar-frame-electric::after {
-  background: radial-gradient(circle, #c4b5fd, #38bdf8 60%, transparent 75%);
-  animation-duration: 1.1s;
+.avatar-frame-fx-gold .avatar-frame-fx-glow {
+  background: radial-gradient(circle at 50% 100%, rgba(253, 230, 138, 0.55), transparent 65%);
+  animation: avatar-frame-glow-flicker 1.8s ease-in-out infinite;
 }
-@keyframes avatar-frame-flicker {
-  0%, 18%, 21%, 52%, 55%, 100% { filter: brightness(1); }
-  19%, 20%, 53%, 54% { filter: brightness(1.9); }
+.avatar-frame-fx-gold .avatar-frame-fx-icon {
+  color: #fde68a;
+  filter: drop-shadow(0 0 5px rgba(234, 179, 8, 0.95));
+  animation-name: avatar-frame-sparkle-twinkle;
+  animation-duration: 1.3s;
+}
+@keyframes avatar-frame-sparkle-twinkle {
+  0%, 100% { opacity: 0.25; transform: translateX(-50%) scale(0.75) rotate(0deg); }
+  50%      { opacity: 1; transform: translateX(-50%) scale(1.15) rotate(20deg); }
+}
+
+/* ── Điện: viền trong xanh tím + tia chớp nhấp nháy ── */
+.avatar-frame-host-electric { animation: avatar-frame-rim-electric 0.9s steps(2, end) infinite; }
+@keyframes avatar-frame-rim-electric {
+  0%, 100% { box-shadow: inset 0 0 0 2px rgba(124, 58, 237, 0.6), inset 0 0 20px -6px rgba(56, 189, 248, 0.5); }
+  50%      { box-shadow: inset 0 0 0 2px rgba(196, 181, 253, 0.9), inset 0 0 34px -3px rgba(56, 189, 248, 0.85); }
+}
+.avatar-frame-fx-electric .avatar-frame-fx-glow {
+  background: linear-gradient(to top, rgba(124, 58, 237, 0.5), rgba(56, 189, 248, 0.2) 45%, transparent 75%);
+  animation: avatar-frame-glow-flicker 0.7s steps(2, end) infinite;
+}
+.avatar-frame-fx-electric .avatar-frame-fx-icon {
+  color: #c4b5fd;
+  filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.95));
+  animation-name: avatar-frame-spark-flicker;
+  animation-duration: 0.6s;
+  animation-timing-function: steps(1, end);
+}
+@keyframes avatar-frame-spark-flicker {
+  0%, 100% { opacity: 0; transform: translateX(-50%) scale(0.9); }
+  20%      { opacity: 1; transform: translateX(-50%) scale(1.2); }
+  40%      { opacity: 0.2; }
+  60%      { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+@keyframes avatar-frame-glow-flicker {
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .avatar-frame::before, .avatar-frame::after { animation: none; }
+  .avatar-frame-host,
+  .avatar-frame-fx-icon,
+  .avatar-frame-fx-glow { animation: none; }
 }

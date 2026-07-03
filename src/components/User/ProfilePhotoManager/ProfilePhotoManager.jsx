@@ -130,13 +130,7 @@ export default function ProfilePhotoManager({ photos, onChange, avatarFrame }) {
           )
 
           return (
-            <AvatarFrame
-              key={p.id}
-              frame={i === 0 && !p.isPreview ? avatarFrame : null}
-              shape="square"
-              size="xl"
-              className="avatar-frame-block photo-tile-frame-slot"
-            >
+            <AvatarFrame key={p.id} frame={i === 0 && !p.isPreview ? avatarFrame : null} size="xl">
               {tile}
             </AvatarFrame>
           )
