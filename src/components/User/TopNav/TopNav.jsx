@@ -3,7 +3,8 @@ import { useAuth } from '../../../context/AuthContext.jsx'
 import NotificationBell from '../NotificationBell/NotificationBell.jsx'
 import ReputationBadge from '../ReputationBadge/ReputationBadge.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
-import { Heart, Flame, Calendar, Settings, Leaf, Star } from 'lucide-react'
+import { Heart, Flame, Calendar, Settings, Leaf, Star, ShieldCheck } from 'lucide-react'
+import AvatarFrame from '../AvatarFrame/AvatarFrame.jsx'
 
 const NAV_LINKS = [
   { to: '/discovery', label: 'Khám phá', Icon: Flame },
@@ -48,17 +49,24 @@ export default function TopNav() {
       <div className="topnav-right">
         {isAuthenticated ? (
           <>
+            {user?.role === 'Admin' && (
+              <Link to="/admin" className="topnav-admin-link" title="Về trang quản trị">
+                <ShieldCheck size={16} />
+              </Link>
+            )}
             <NotificationBell />
             <ReputationBadge size="sm" showLabel={false} />
-            <div
-              className="topnav-avatar"
-              style={avatar ? { backgroundImage: `url(${avatar})` } : {}}
-              onClick={() => navigate('/profile')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter') navigate('/profile') }}
-              aria-label="Hồ sơ"
-            />
+            <AvatarFrame frame={user?.avatarFrame} size="sm">
+              <div
+                className="topnav-avatar"
+                style={avatar ? { backgroundImage: `url(${avatar})` } : {}}
+                onClick={() => navigate('/profile')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter') navigate('/profile') }}
+                aria-label="Hồ sơ"
+              />
+            </AvatarFrame>
           </>
         ) : (
           <>

@@ -7,6 +7,7 @@ import { HeartIcon, StarIcon, CrownIcon, SparkleIcon } from '../../../components
 import HeroFX from '../../../components/User/HeroFX/HeroFX.jsx'
 import { motion } from 'framer-motion'
 import ProfileDetailModal from '../../../components/User/ProfileDetailModal/ProfileDetailModal.jsx'
+import AdminBadge from '../../../components/User/AdminBadge/AdminBadge.jsx'
 import './LikedMe.css'
 
 export default function LikedMe() {
@@ -122,6 +123,7 @@ export default function LikedMe() {
                   <div className="liked-card-grad" />
                   <div className="liked-card-name">
                     {locked ? 'Ẩn danh' : u.displayName}{!locked && u.age ? `, ${u.age}` : ''}
+                    {!locked && u.isAdmin && <AdminBadge size="sm" />}
                   </div>
                 </div>
 

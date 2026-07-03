@@ -6,6 +6,7 @@ import { matchesService, chatService } from '../../../api'
 import { Bell, CheckCheck, Heart, MessageCircle, Calendar, Star, Gift } from 'lucide-react'
 import { cn } from '../../../lib/utils'
 import Modal from '../Modal/Modal.jsx'
+import AdminBadge from '../AdminBadge/AdminBadge.jsx'
 import './NotificationBell.css'
 
 // Icon + màu theo loại thông báo (đúng giá trị backend: Match / Message / SuperLike / PlanGranted)
@@ -161,6 +162,7 @@ export default function NotificationBell() {
       <Modal open={!!giftItem} onClose={closeGift} labelledBy="gift-modal-title">
         <div className="gift-modal">
           <div className="gift-modal-icon">🎁</div>
+          <div className="gift-modal-from"><AdminBadge /></div>
           <h2 id="gift-modal-title" className="gift-modal-title">{giftItem?.title || 'Quà tặng từ SameMess'}</h2>
           <p className="gift-modal-body">{giftItem?.body}</p>
           <button type="button" className="btn btn-primary" onClick={closeGift}>Trải nghiệm ngay</button>

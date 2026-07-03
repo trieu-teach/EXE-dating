@@ -44,9 +44,6 @@ import Landing from './pages/User/Landing/Landing.jsx'
 import BanGate from './components/User/BanGate/BanGate.jsx'
 
 function PublicOrShell({ children, variant }) {
-  const { user } = useAuth()
-  // Admin không dùng app người dùng — đẩy thẳng về dashboard
-  if (user?.role === 'Admin') return <Navigate to="/admin" replace />
   return <AppShell variant={variant}>{children}</AppShell>
 }
 

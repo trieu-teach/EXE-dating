@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { resolveImageUrl } from '../../../utils/format.js'
 import { MoreIcon } from '../../ui/CustomIcons.jsx'
+import AdminBadge from '../AdminBadge/AdminBadge.jsx'
+import AvatarFrame from '../AvatarFrame/AvatarFrame.jsx'
 
 export default function ChatThreadToolbar({ conversation, plant, onBack, onAvatarClick, onBlock }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -17,17 +19,22 @@ export default function ChatThreadToolbar({ conversation, plant, onBack, onAvata
       <button type="button" className="chat-toolbar-back" onClick={onBack} aria-label="Quay lại">
         ←
       </button>
-      <div
-        className="chat-toolbar-avatar"
-        style={avatar ? { backgroundImage: `url(${avatar})` } : undefined}
-        onClick={() => onAvatarClick?.()}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter') onAvatarClick?.() }}
-        aria-label={`Mở hồ sơ của ${other}`}
-      />
+      <AvatarFrame frame={conversation?.otherAvatarFrame} size="md">
+        <div
+          className="chat-toolbar-avatar"
+          style={avatar ? { backgroundImage: `url(${avatar})` } : undefined}
+          onClick={() => onAvatarClick?.()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter') onAvatarClick?.() }}
+          aria-label={`Mở hồ sơ của ${other}`}
+        />
+      </AvatarFrame>
       <div className="chat-toolbar-info">
-        <div className="chat-toolbar-name">{other}</div>
+        <div className="chat-toolbar-name">
+          {other}
+          {conversation?.otherIsAdmin && <AdminBadge size="sm" />}
+        </div>
         <div className="chat-toolbar-status">
           {online ? (
             <><span className="chat-toolbar-dot" /> Đang hoạt động</>

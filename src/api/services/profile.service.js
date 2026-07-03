@@ -64,4 +64,8 @@ export const profileService = {
   verification() {
     return get(API_ENDPOINTS.profile.verification)
   },
+
+  setAvatarFrame(frame) {
+    return put(API_ENDPOINTS.profile.avatarFrame, { frame })
+  },
 }

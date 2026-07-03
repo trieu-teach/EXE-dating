@@ -1,0 +1,93 @@
+/* ── Khung hiệu ứng avatar kiểu game — vòng xoay + hào quang, đổi màu theo theme ── */
+.avatar-frame {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  border-radius: 50%;
+  isolation: isolate;
+}
+.avatar-frame > :first-child { position: relative; z-index: 2; }
+
+.avatar-frame::before,
+.avatar-frame::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.avatar-frame::before {
+  z-index: 1;
+  box-sizing: border-box;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: avatar-frame-spin linear infinite;
+}
+.avatar-frame::after {
+  z-index: 0;
+  filter: blur(7px);
+  opacity: 0.6;
+  animation: avatar-frame-pulse ease-in-out infinite;
+}
+
+/* Kích thước: bề dày viền + khoảng nhô ra tỉ lệ theo avatar nhỏ/vừa/lớn */
+.avatar-frame-sm::before { inset: -5px; padding: 2px; animation-duration: 3.2s; }
+.avatar-frame-sm::after  { inset: -5px; animation-duration: 2s; }
+.avatar-frame-md::before { inset: -7px; padding: 3px; animation-duration: 3.6s; }
+.avatar-frame-md::after  { inset: -7px; animation-duration: 2.2s; }
+.avatar-frame-lg::before { inset: -10px; padding: 4px; animation-duration: 4.2s; }
+.avatar-frame-lg::after  { inset: -10px; animation-duration: 2.4s; }
+
+@keyframes avatar-frame-spin { to { transform: rotate(360deg); } }
+@keyframes avatar-frame-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.08); }
+}
+
+/* ── Lửa: cam-đỏ-vàng, xoay vừa, hào quang ấm rực ── */
+.avatar-frame-fire::before {
+  background: conic-gradient(from 0deg, #ff3d00, #ffb300, #fff2b8, #ff3d00, #7a0d0d, #ff3d00);
+}
+.avatar-frame-fire::after { background: radial-gradient(circle, #ff7a00, #ff3d00 60%, transparent 75%); }
+
+/* ── Băng: xanh cyan-trắng, xoay chậm hơn, hào quang lạnh dịu ── */
+.avatar-frame-ice::before {
+  background: conic-gradient(from 0deg, #0ea5e9, #7dd3fc, #e0f2fe, #38bdf8, #0ea5e9);
+  animation-duration: 5s;
+}
+.avatar-frame-ice::after {
+  background: radial-gradient(circle, #bae6fd, #38bdf8 60%, transparent 75%);
+  animation-duration: 2.8s;
+}
+
+/* ── Hoàng kim: vàng ánh kim sang trọng, xoay chậm rãi, hào quang rực rỡ ── */
+.avatar-frame-gold::before {
+  background: conic-gradient(from 0deg, #b45309, #fde68a, #fffbe0, #eab308, #b45309);
+  animation-duration: 6s;
+}
+.avatar-frame-gold::after {
+  background: radial-gradient(circle, #ffe28a, #eab308 60%, transparent 75%);
+  animation-duration: 2.6s;
+  opacity: 0.75;
+}
+
+/* ── Điện: tím-xanh-trắng, xoay nhanh + nhấp nháy tia điện ── */
+.avatar-frame-electric::before {
+  background: conic-gradient(from 0deg, #7c3aed, #38bdf8, #ffffff, #7c3aed, #4c1d95, #7c3aed);
+  animation-duration: 1.6s;
+  animation-name: avatar-frame-spin, avatar-frame-flicker;
+  animation-timing-function: linear, steps(1, end);
+  animation-iteration-count: infinite, infinite;
+}
+.avatar-frame-electric::after {
+  background: radial-gradient(circle, #c4b5fd, #38bdf8 60%, transparent 75%);
+  animation-duration: 1.1s;
+}
+@keyframes avatar-frame-flicker {
+  0%, 18%, 21%, 52%, 55%, 100% { filter: brightness(1); }
+  19%, 20%, 53%, 54% { filter: brightness(1.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-frame::before, .avatar-frame::after { animation: none; }
+}

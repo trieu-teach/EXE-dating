@@ -146,6 +146,7 @@ export default function AdminDashboard() {
             {n.label}
           </button>
         ))}
+        <button className="admin-nav" onClick={() => navigate('/discovery')}>↗ Vào ứng dụng</button>
         <button className="admin-nav admin-nav-exit" onClick={async () => { await logout(); navigate('/login', { replace: true }) }}>⎋ Đăng xuất</button>
       </aside>
 

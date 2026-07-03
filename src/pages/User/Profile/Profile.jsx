@@ -8,6 +8,9 @@ import ProfileInfoForm from '../../../components/User/ProfileInfoForm/ProfileInf
 import ProfilePhotoManager from '../../../components/User/ProfilePhotoManager/ProfilePhotoManager.jsx'
 import ProfilePreviewModal from '../../../components/User/ProfilePreviewModal/ProfilePreviewModal.jsx'
 import { PinIcon, EyeIcon, ShieldIcon, MessageIcon, ChevronRightIcon, StarIcon } from '../../../components/ui/CustomIcons.jsx'
+import AdminBadge from '../../../components/User/AdminBadge/AdminBadge.jsx'
+import AvatarFrame from '../../../components/User/AvatarFrame/AvatarFrame.jsx'
+import AvatarFramePicker from '../../../components/User/AvatarFrame/AvatarFramePicker.jsx'
 import { motion } from 'framer-motion'
 import { cn } from '../../../lib/utils'
 
@@ -23,20 +26,20 @@ export default function Profile() {
   const [previewOpen, setPreviewOpen] = useState(false)
 
   const targetId = userId || me?.id || me?.userId
+  const isMe = !userId || userId === me?.id || userId === me?.userId
 
   useEffect(() => {
     if (!targetId) return
     setLoading(true)
-    profileService.me()
+    const req = isMe ? profileService.me() : profileService.byId(targetId)
+    req
       .then((data) => setProfile(data))
       .catch((err) => toast.error(err?.message || 'Không tải được hồ sơ.'))
       .finally(() => setLoading(false))
-  }, [targetId, toast])
+  }, [targetId, isMe, toast])
 
   if (loading) return <div className="loading-block"><span className="spinner" /></div>
   if (!profile) return <div className="empty">Không có dữ liệu hồ sơ.</div>
-
-  const isMe = !userId || userId === me?.id || userId === me?.userId
 
   const photos = profile.photos || []
   const avatarUrl = profile.avatarUrl || photos[0]?.url
@@ -48,22 +51,25 @@ export default function Profile() {
       <div className="profile-info-card">
         {/* Header: avatar + name + action */}
         <div className="profile-header">
-          <div
-            className="profile-avatar"
-            style={avatarUrl ? { backgroundImage: `url(${resolveImageUrl(avatarUrl)})` } : undefined}
-          >
-            {!avatarUrl && (
-              <span className="profile-avatar-fallback">{displayName.charAt(0).toUpperCase()}</span>
-            )}
-            {profile.isVerified && (
-              <div className="profile-verified"><ShieldIcon size={11} /></div>
-            )}
-          </div>
+          <AvatarFrame frame={profile.avatarFrame} size="lg">
+            <div
+              className="profile-avatar"
+              style={avatarUrl ? { backgroundImage: `url(${resolveImageUrl(avatarUrl)})` } : undefined}
+            >
+              {!avatarUrl && (
+                <span className="profile-avatar-fallback">{displayName.charAt(0).toUpperCase()}</span>
+              )}
+              {profile.isVerified && (
+                <div className="profile-verified"><ShieldIcon size={11} /></div>
+              )}
+            </div>
+          </AvatarFrame>
 
           <div className="profile-header-info">
             <h1 className="profile-name">
               {displayName}
               {profile.age && <span className="profile-age">, {profile.age}</span>}
+              {profile.isAdmin && <AdminBadge />}
             </h1>
             {profile.city && (
               <div className="profile-location">
@@ -145,6 +151,28 @@ export default function Profile() {
                 setProfile(updated)
               }}
             />
+
+            {/* Khung avatar — chỉ Admin */}
+            {profile.isAdmin && (
+              <>
+                <div className="profile-section-label">Khung hiệu ứng avatar</div>
+                <AvatarFramePicker
+                  value={profile.avatarFrame}
+                  avatarUrl={avatarUrl ? resolveImageUrl(avatarUrl) : null}
+                  initial={displayName.charAt(0).toUpperCase()}
+                  onSelect={async (frame) => {
+                    try {
+                      const updated = await profileService.setAvatarFrame(frame)
+                      setProfile(updated)
+                      updateProfile(updated)
+                      toast.success(frame ? 'Đã đổi khung avatar.' : 'Đã gỡ khung avatar.')
+                    } catch (err) {
+                      toast.error(err?.message || 'Đổi khung avatar thất bại.')
+                    }
+                  }}
+                />
+              </>
+            )}
 
             {/* Xác minh */}
             <div className="profile-section-label">Xác minh</div>

@@ -43,6 +43,7 @@ export const API_ENDPOINTS = {
     verifyFace: '/api/profile/verify-face',
     verification: '/api/profile/verification',
     boost: '/api/profile/boost',
+    avatarFrame: '/api/profile/avatar-frame',
   },
   preferences: {
     get: '/api/preferences',

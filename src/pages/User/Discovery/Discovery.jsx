@@ -11,6 +11,8 @@ import {
 } from '../../../components/ui/CustomIcons.jsx'
 import SideHearts from '../../../components/ui/SideHearts.jsx'
 import MatchesSidebar from '../../../components/User/MatchesSidebar/MatchesSidebar.jsx'
+import AdminBadge from '../../../components/User/AdminBadge/AdminBadge.jsx'
+import AdminFireName from '../../../components/User/AdminBadge/AdminFireName.jsx'
 import './Discovery.css'
 
 const GOAL_LABEL = {
@@ -336,8 +338,10 @@ export default function Discovery() {
             <div className="disc-photo-gradient" />
             <div className="disc-hero-info">
               <div className="disc-hero-name">
-                {current.displayName}{current.age ? `, ${current.age}` : ''}
+                {current.isAdmin ? <AdminFireName>{current.displayName}</AdminFireName> : current.displayName}
+                {current.age ? `, ${current.age}` : ''}
                 {current.isPhotoVerified && <span className="disc-verified" title="Đã xác minh"><ShieldCheckIcon size={16} /></span>}
+                {current.isAdmin && <AdminBadge />}
               </div>
               <div className="disc-hero-meta">
                 {current.location && <span><PinIcon size={12} /> {current.location}</span>}

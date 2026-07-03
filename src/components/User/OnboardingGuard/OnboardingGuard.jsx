@@ -21,7 +21,7 @@ const ONBOARDING_PATHS = [
  * Returning users (already verified face) skip this guard entirely.
  */
 export default function OnboardingGuard({ children }) {
-  const { hasToken, bootstrapping } = useAuth()
+  const { hasToken, bootstrapping, user } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [state, setState] = useState({ checking: true, allowed: false })
@@ -29,6 +29,12 @@ export default function OnboardingGuard({ children }) {
   useEffect(() => {
     if (bootstrapping) return
     if (!hasToken) {
+      setState({ checking: false, allowed: true })
+      return
+    }
+
+    // Admin không cần hoàn tất hồ sơ — cho vào thẳng app để hỗ trợ/kiểm tra
+    if (user?.role === 'Admin') {
       setState({ checking: false, allowed: true })
       return
     }
@@ -68,7 +74,7 @@ export default function OnboardingGuard({ children }) {
     })
 
     return () => { cancelled = true }
-  }, [bootstrapping, hasToken, pathname, navigate])
+  }, [bootstrapping, hasToken, pathname, navigate, user?.role])
 
   if (state.checking) {
     return (

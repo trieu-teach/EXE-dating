@@ -1,0 +1,42 @@
+.frame-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 4px 2px 2px;
+}
+.frame-picker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+.frame-picker-item:hover { background: var(--color-surface-2); }
+.frame-picker-item:disabled { cursor: default; opacity: 0.6; }
+.frame-picker-item.is-active { background: var(--color-primary-soft, rgba(255, 79, 139, 0.1)); }
+
+.frame-picker-swatch {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--color-surface-2);
+  background-size: cover;
+  background-position: center;
+  font-weight: 700;
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+}
+
+.frame-picker-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-soft);
+}
+.frame-picker-item.is-active .frame-picker-label { color: var(--color-text); }

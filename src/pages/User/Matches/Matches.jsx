@@ -7,6 +7,8 @@ import { HeartIcon, MessageIcon, SparkleIcon, StarIcon, CrownIcon } from '../../
 import { motion, AnimatePresence } from 'framer-motion'
 import ProfileDetailModal from '../../../components/User/ProfileDetailModal/ProfileDetailModal.jsx'
 import ProfilePreviewModal from '../../../components/User/ProfilePreviewModal/ProfilePreviewModal.jsx'
+import AdminBadge from '../../../components/User/AdminBadge/AdminBadge.jsx'
+import AvatarFrame from '../../../components/User/AvatarFrame/AvatarFrame.jsx'
 import './Matches.css'
 import '../LikedMe/LikedMe.css'
 
@@ -173,6 +175,7 @@ export default function Matches() {
                           <div className="liked-card-grad" />
                           <div className="liked-card-name">
                             {locked ? 'Ẩn danh' : u.displayName}{!locked && u.age ? `, ${u.age}` : ''}
+                            {!locked && u.isAdmin && <AdminBadge size="sm" />}
                           </div>
                         </div>
                         {canAct && (
@@ -229,13 +232,18 @@ export default function Matches() {
                       <motion.div key={matchId ?? i} className="match-card"
                         initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.06 }} onClick={() => openChat(matchId)}>
-                        <button type="button" className="match-avatar" title="Xem hồ sơ"
-                          style={avatar ? { backgroundImage: `url(${avatar})` } : undefined}
-                          onClick={(e) => { e.stopPropagation(); openProfile(m.userId) }}>
-                          {!avatar && <span className="match-avatar-fallback">{(m.displayName || '?').charAt(0).toUpperCase()}</span>}
-                        </button>
+                        <AvatarFrame frame={m.avatarFrame} size="md">
+                          <button type="button" className="match-avatar" title="Xem hồ sơ"
+                            style={avatar ? { backgroundImage: `url(${avatar})` } : undefined}
+                            onClick={(e) => { e.stopPropagation(); openProfile(m.userId) }}>
+                            {!avatar && <span className="match-avatar-fallback">{(m.displayName || '?').charAt(0).toUpperCase()}</span>}
+                          </button>
+                        </AvatarFrame>
                         <div className="match-info">
-                          <div className="match-name">{m.displayName || 'Người dùng'}{m.age ? `, ${m.age}` : ''}</div>
+                          <div className="match-name">
+                            {m.displayName || 'Người dùng'}{m.age ? `, ${m.age}` : ''}
+                            {m.isAdmin && <AdminBadge size="sm" />}
+                          </div>
                           <div className="match-meta"><HeartIcon size={10} /> Match {timeAgo(m.matchedAt)}</div>
                         </div>
                         <button type="button" className="match-action" title="Nhắn tin"

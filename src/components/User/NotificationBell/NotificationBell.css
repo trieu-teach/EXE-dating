@@ -209,5 +209,6 @@
   background: linear-gradient(135deg, #f472b6, #a855f7);
   box-shadow: 0 8px 24px rgba(168, 85, 247, 0.35);
 }
+.gift-modal-from { margin-bottom: var(--space-3); }
 .gift-modal-title { margin: 0 0 var(--space-2); }
 .gift-modal-body { color: var(--color-text-soft); margin-bottom: var(--space-5); }

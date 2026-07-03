@@ -12,6 +12,8 @@ import AISuggestionPanel from '../../../components/User/AISuggestionPanel/AISugg
 import VenueMessage from '../../../components/User/VenueMessage/VenueMessage.jsx'
 import VenueDetailModal from '../../../components/User/VenueDetailModal/VenueDetailModal.jsx'
 import { Avatar } from '../../../components/ui/Avatar.jsx'
+import AdminBadge from '../../../components/User/AdminBadge/AdminBadge.jsx'
+import AvatarFrame from '../../../components/User/AvatarFrame/AvatarFrame.jsx'
 import './Chat.css'
 
 function formatMeetupTime(iso) {
@@ -343,14 +345,19 @@ export default function Chat() {
                 onClick={() => openConv(c)}
               >
                 <div className="chat-conv-avatar-wrap">
-                  <div
-                    className="chat-conv-avatar"
-                    style={c.otherAvatarUrl ? { backgroundImage: `url(${c.otherAvatarUrl})` } : undefined}
-                  />
+                  <AvatarFrame frame={c.otherAvatarFrame} size="sm">
+                    <div
+                      className="chat-conv-avatar"
+                      style={c.otherAvatarUrl ? { backgroundImage: `url(${c.otherAvatarUrl})` } : undefined}
+                    />
+                  </AvatarFrame>
                   {c.isOnline && <div className="chat-conv-avatar-dot" />}
                 </div>
                 <div className="chat-conv-body">
-                  <div className="chat-conv-name">{c.otherDisplayName || 'Match'}</div>
+                  <div className="chat-conv-name">
+                    {c.otherDisplayName || 'Match'}
+                    {c.otherIsAdmin && <AdminBadge size="sm" />}
+                  </div>
                   <div className={`chat-conv-preview${c.unreadCount > 0 ? ' is-unread' : ''}`}>
                     {c.lastMessageText || 'Bắt đầu cuộc trò chuyện…'}
                   </div>
