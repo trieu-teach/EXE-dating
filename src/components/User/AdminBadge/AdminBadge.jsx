@@ -5,7 +5,7 @@ import './AdminBadge.css'
 export default function AdminBadge({ size = 'md' }) {
   return (
     <span className={`admin-fire-badge admin-fire-badge-${size}`}>
-      <Flame size={size === 'sm' ? 11 : 13} className="admin-fire-icon" aria-hidden="true" />
+      <Flame size={size === 'sm' ? 11 : 17} className="admin-fire-icon" aria-hidden="true" />
       ADMIN
     </span>
   )
