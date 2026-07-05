@@ -13,7 +13,7 @@ import { swipesService } from '../../../api'
 import { resolveImageUrl, formatDistance } from '../../../utils/format.js'
 import { useToast } from '../../../context/ToastContext.jsx'
 import {
-  HeartIcon, XIcon, StarIcon, PinIcon, ShieldCheckIcon, TrophyIcon, FireIcon
+  HeartIcon, XIcon, PinIcon, ShieldCheckIcon, TrophyIcon, FireIcon
 } from '../../../components/ui/CustomIcons.jsx'
 import AdminBadge from '../AdminBadge/AdminBadge.jsx'
 import AdminFireName from '../AdminBadge/AdminFireName.jsx'
@@ -56,6 +56,10 @@ export default function ProfileDetailModal({ profile, open, onClose, onSwipe }) 
     } catch (err) {
       if (err?.status === 403) {
         toast.error('Tính năng bị giới hạn theo gói. Hãy nâng cấp Premium.')
+      } else if (err?.status === 409) {
+        // Đã lướt người này trước đó (vd. mở lại hồ sơ từ danh sách cũ) — coi như đã xong, đóng nhẹ nhàng
+        onClose()
+        setTimeout(() => onSwipe?.(action, null), 150)
       } else {
         toast.error(err?.message || 'Thao tác thất bại.')
       }
@@ -237,17 +241,6 @@ export default function ProfileDetailModal({ profile, open, onClose, onSwipe }) 
               aria-label="Bỏ qua"
             >
               <XIcon size={22} />
-            </motion.button>
-
-            <motion.button
-              className="pdm-action pdm-action-super"
-              onClick={() => handleSwipe('SuperLike')}
-              disabled={swiping}
-              whileHover={{ scale: 1.12 }}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Thích siêu cấp"
-            >
-              <StarIcon size={20} />
             </motion.button>
 
             <motion.button
