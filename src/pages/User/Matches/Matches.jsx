@@ -105,7 +105,12 @@ export default function Matches() {
       else if (action === 'Pass') toast.info('Đã bỏ qua.')
       else toast.success('Đã thích lại 💞')
     } catch (err) {
-      toast.error(err?.message || 'Thao tác thất bại.')
+      if (err?.status === 409) {
+        // Đã lướt người này trước đó — coi như đã xong, chỉ cần bỏ khỏi danh sách
+        setLikers((cur) => cur.filter((p) => p.userId !== u.userId))
+      } else {
+        toast.error(err?.message || 'Thao tác thất bại.')
+      }
     } finally {
       setActing(null)
     }

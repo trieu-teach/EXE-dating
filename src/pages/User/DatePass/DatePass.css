@@ -112,11 +112,14 @@
 }
 .dp-vrow-btn:hover { filter: brightness(1.05); }
 .dp-combo-card {
-  background: var(--color-surface); border: 1px solid var(--color-border);
+  background: rgba(255, 245, 249, 0.7);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 8px 24px rgba(199, 45, 112, 0.1);
   transition: transform 0.15s, box-shadow 0.15s;
 }
-.dp-combo-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+.dp-combo-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(199, 45, 112, 0.18); }
 .dp-combo-img {
   height: 120px; background-size: cover; background-position: center;
   background-color: #fff; position: relative;
