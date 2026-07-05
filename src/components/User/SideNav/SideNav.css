@@ -12,8 +12,7 @@
   gap: 18px;
   padding: 22px 18px 20px;
   background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   border-right: 1px solid rgba(255, 255, 255, 0.3);
 }
 [data-theme='dark'] .sidenav {
@@ -47,8 +46,7 @@
   padding: 12px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 .sidenav-user-row1 {

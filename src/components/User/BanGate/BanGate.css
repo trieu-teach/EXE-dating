@@ -7,7 +7,6 @@
   padding: 20px;
   background: rgba(20, 8, 16, 0.72);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 .bangate-modal {
   width: 100%;

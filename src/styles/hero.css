@@ -93,7 +93,6 @@
   letter-spacing: 0.14em !important;
   text-transform: uppercase !important;
   backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 }
 
 /* ── Tiêu đề ── */
