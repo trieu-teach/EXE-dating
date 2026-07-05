@@ -9,16 +9,16 @@ import Modal from '../Modal/Modal.jsx'
 import AdminBadge from '../AdminBadge/AdminBadge.jsx'
 import './NotificationBell.css'
 
-// Icon + màu theo loại thông báo (đúng giá trị backend: Match / Message / SuperLike / PlanGranted)
+// Icon + màu theo loại thông báo — quy về 3 tông chính: hồng (match), xanh (nhắn tin), tím (quà/thành tích)
 const TYPE_META = {
-  Match:       { Icon: Heart,         grad: 'linear-gradient(135deg, #ff7eb3, #ff2d6b)' },
-  Message:     { Icon: MessageCircle, grad: 'linear-gradient(135deg, #5eead4, #3b82f6)' },
-  SuperLike:   { Icon: Star,          grad: 'linear-gradient(135deg, #c084fc, #9333ea)' },
-  Event:       { Icon: Calendar,      grad: 'linear-gradient(135deg, #fbbf24, #f59e0b)' },
-  Reputation:  { Icon: Star,          grad: 'linear-gradient(135deg, #34d399, #16a34a)' },
-  PlanGranted: { Icon: Gift,          grad: 'linear-gradient(135deg, #f472b6, #a855f7)' },
+  Match:       { Icon: Heart,         grad: 'linear-gradient(135deg, #ff8fb5, #ff4f8b)' },
+  SuperLike:   { Icon: Star,          grad: 'linear-gradient(135deg, #ff8fb5, #ff4f8b)' },
+  Message:     { Icon: MessageCircle, grad: 'linear-gradient(135deg, #93c5fd, #60a5fa)' },
+  Event:       { Icon: Calendar,      grad: 'linear-gradient(135deg, #d8b4fe, #a855f7)' },
+  Reputation:  { Icon: Star,          grad: 'linear-gradient(135deg, #d8b4fe, #a855f7)' },
+  PlanGranted: { Icon: Gift,          grad: 'linear-gradient(135deg, #d8b4fe, #a855f7)' },
 }
-const TYPE_FALLBACK = { Icon: Bell, grad: 'linear-gradient(135deg, #ff9ec4, #b14bff)' }
+const TYPE_FALLBACK = { Icon: Bell, grad: 'linear-gradient(135deg, #ff8fb5, #a855f7)' }
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false)
@@ -95,9 +95,7 @@ export default function NotificationBell() {
         onClick={() => setOpen((o) => !o)}
       >
         <Bell size={18} />
-        {unreadCount > 0 && (
-          <span className="notif-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>
-        )}
+        {unreadCount > 0 && <span className="notif-badge" aria-label={`${unreadCount} thông báo chưa đọc`} />}
       </button>
 
       {open && (

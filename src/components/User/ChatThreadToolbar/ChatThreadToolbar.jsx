@@ -1,18 +1,14 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { resolveImageUrl } from '../../../utils/format.js'
 import { MoreIcon } from '../../ui/CustomIcons.jsx'
 import AdminBadge from '../AdminBadge/AdminBadge.jsx'
 import AvatarFrame from '../AvatarFrame/AvatarFrame.jsx'
 
-export default function ChatThreadToolbar({ conversation, plant, onBack, onAvatarClick, onBlock }) {
+export default function ChatThreadToolbar({ conversation, onBack, onAvatarClick, onBlock }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const other = conversation?.otherDisplayName || conversation?.displayName || 'Đoạn chat'
   const avatar = resolveImageUrl(conversation?.otherAvatarUrl || conversation?.avatarUrl)
   const online = Boolean(conversation?.isOnline)
-  const matchId = conversation?.matchId
-  const level = plant ? Math.min(7, Math.max(1, Number(plant.level) || 1)) : null
-  const streak = Number(plant?.streakCount ?? 0)
 
   return (
     <header className="chat-toolbar">
@@ -45,19 +41,6 @@ export default function ChatThreadToolbar({ conversation, plant, onBack, onAvata
       </div>
 
       <div className="chat-toolbar-actions">
-        {/* Chip Cây tình yêu gọn — kiểu streak Snapchat */}
-        {level != null && matchId && (
-          <Link
-            to={`/love-tree?matchId=${matchId}`}
-            className="chat-toolbar-tree"
-            title="Xem Cây tình yêu"
-          >
-            <span className="chat-toolbar-tree-emoji">🌳</span>
-            <span className="chat-toolbar-tree-lv">Cấp {level}</span>
-            {streak > 0 && <span className="chat-toolbar-tree-streak">🔥{streak}</span>}
-          </Link>
-        )}
-
         {conversation?.otherUserId && (
           <div className="chat-toolbar-menu">
             <button
@@ -82,16 +65,6 @@ export default function ChatThreadToolbar({ conversation, plant, onBack, onAvata
                   >
                     Xem hồ sơ
                   </button>
-                  {matchId && (
-                    <Link
-                      to={`/love-tree?matchId=${matchId}`}
-                      className="chat-toolbar-menu-item"
-                      role="menuitem"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      Cây tình yêu
-                    </Link>
-                  )}
                   <button
                     type="button"
                     className="chat-toolbar-menu-item is-danger"

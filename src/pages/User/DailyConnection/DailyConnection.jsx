@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { gamificationService, connectionRemindersService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { MATERIALS, MATERIAL_META, TASK_TYPE_META, TASK_TYPE_ORDER } from '../../../constants/gamification.js'
-import { SparkleIcon, HeartIcon, TrophyIcon } from '../../../components/ui/CustomIcons.jsx'
+import { SparkleIcon, HeartIcon } from '../../../components/ui/CustomIcons.jsx'
 import './DailyConnection.css'
 
 // Reset theo UTC: daily 00:00 UTC (07:00 VN), weekly Thứ 2 00:00 UTC, achievement không reset
@@ -28,13 +29,25 @@ function fmtDur(ms) {
   return `${m} phút`
 }
 
+// Suy ra điểm đến hợp lý cho nút "Làm ngay" dựa trên nội dung nhiệm vụ
+// (backend chưa trả sẵn deeplink cho từng nhiệm vụ).
+function taskActionRoute(t) {
+  const text = `${t.title || ''} ${t.description || ''}`.toLowerCase()
+  if (text.includes('tin nhắn') || text.includes('chat') || text.includes('nhắn')) return '/chat'
+  if (text.includes('cây') || text.includes('tưới')) return '/love-tree'
+  if (text.includes('match') || text.includes('quẹt') || text.includes('thích')) return '/discovery'
+  return '/discovery'
+}
+
 export default function DailyConnection() {
+  const navigate = useNavigate()
   const toast = useToast()
   const [tasks, setTasks] = useState([])
   const [inventory, setInventory] = useState([])
   const [reminders, setReminders] = useState([])
   const [loading, setLoading] = useState(true)
   const [now, setNow] = useState(() => new Date())
+  const [activeType, setActiveType] = useState('Daily')
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30000)
@@ -42,9 +55,9 @@ export default function DailyConnection() {
   }, [])
 
   const resetInfo = {
-    Daily: `🔄 Làm mới sau ${fmtDur(nextDailyResetMs(now))} · mỗi ngày lúc 07:00`,
-    Weekly: `🔄 Làm mới sau ${fmtDur(nextWeeklyResetMs(now))} · đầu tuần (Thứ 2)`,
-    Achievement: '🏆 Mốc cố định — không làm mới',
+    Daily: `Làm mới sau ${fmtDur(nextDailyResetMs(now))} · mỗi ngày lúc 07:00`,
+    Weekly: `Làm mới sau ${fmtDur(nextWeeklyResetMs(now))} · đầu tuần (Thứ 2)`,
+    Achievement: 'Mốc cố định — không làm mới',
   }
 
   const load = useCallback(async () => {
@@ -65,7 +78,8 @@ export default function DailyConnection() {
     }
   }, [toast])
 
-  useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps  (chỉ tải 1 lần, tránh reload khi re-render)
+  // Chỉ tải 1 lần, tránh reload khi re-render.
+  useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const [claiming, setClaiming] = useState(null) // code nhiệm vụ đang nhận
   const [flyers, setFlyers] = useState([])       // nguyên liệu đang bay vào kho
@@ -146,30 +160,113 @@ export default function DailyConnection() {
     return groups
   }, [tasks])
 
+  const availableTypes = TASK_TYPE_ORDER.filter((type) => tasksByType[type]?.length)
+
   if (loading) return <div className="loading-block"><span className="spinner" /></div>
 
-  const doneCount = tasks.filter((t) => t.completed).length
-  const dailyPct = tasks.length ? Math.round((doneCount / tasks.length) * 100) : 0
+  const activeTasks = tasksByType[activeType] || []
 
   return (
     <div className="daily-page">
-      {/* ── Header sạch + accent thương hiệu ── */}
-      <header className="dc-header">
-        <span className="dc-glow" aria-hidden />
-        <span className="dc-eyebrow"><TrophyIcon size={12} /> Hằng ngày</span>
-        <h1 className="dc-title">Nhiệm vụ <span>&amp; Phần thưởng</span></h1>
-        <p className="dc-subtitle">Hoàn thành nhiệm vụ để nhận nguyên liệu chăm sóc Cây tình yêu.</p>
+      {/* ── Hero ── */}
+      <div className="dc-hero-row">
+        <div className="dc-hero-left">
+          <header className="dc-header">
+            <h1 className="dc-title">Nhiệm vụ <HeartIcon size={38} /></h1>
+            <p className="dc-subtitle">Hoàn thành thử thách để nhận tài nguyên nuôi cây tình yêu.</p>
+          </header>
 
-        {tasks.length > 0 && (
-          <div className="dc-progress">
-            <div className="dc-progress-head">
-              <span><TrophyIcon size={13} /> Nhiệm vụ hôm nay</span>
-              <span className="dc-progress-count">{doneCount}/{tasks.length}</span>
+          {/* ── Tab loại nhiệm vụ ── */}
+          {availableTypes.length > 0 && (
+            <div className="dc-tabs" role="tablist">
+              {availableTypes.map((type) => {
+                const meta = TASK_TYPE_META[type]
+                return (
+                  <button key={type} type="button" role="tab" aria-selected={activeType === type}
+                    className={`dc-tab${activeType === type ? ' is-active' : ''}`}
+                    onClick={() => setActiveType(type)}>
+                    <span>{meta.emoji}</span> {meta.label}
+                  </button>
+                )
+              })}
             </div>
-            <div className="daily-bar"><div className="daily-bar-fill" style={{ width: `${dailyPct}%` }} /></div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Lưới nhiệm vụ ── */}
+      {activeTasks.length > 0 && (
+        <section className="daily-section">
+          {resetInfo[activeType] && <p className="dc-reset-info">{resetInfo[activeType]}</p>}
+          <div className="dc-task-grid">
+            {activeTasks.map((t) => {
+              const mat = MATERIAL_META[t.rewardMaterial]
+              const target = t.target || 1
+              const prog = Math.min(t.progress ?? 0, target)
+              const pct = Math.round((prog / target) * 100)
+              const status = t.claimed
+                ? 'claimed'
+                : t.completed
+                  ? 'ready'
+                  : prog > 0
+                    ? 'progress'
+                    : 'todo'
+              const statusLabel = {
+                claimed: 'Đã nhận',
+                ready: 'Hoàn thành',
+                progress: 'Đang làm',
+                todo: 'Chưa bắt đầu',
+              }[status]
+
+              return (
+                <div key={t.code || t.id} className={`dc-task-card is-${status}`}>
+                  <div className="dc-task-card-top">
+                    <span className="dc-task-card-icon" style={mat ? { background: mat.bg, color: mat.color } : undefined}>
+                      {mat?.emoji || '🎯'}
+                    </span>
+                    <span className={`dc-task-card-status is-${status}`}>{statusLabel}</span>
+                  </div>
+
+                  <h3 className="dc-task-card-title">{t.title || t.description}</h3>
+                  {t.title && t.description && <p className="dc-task-card-desc">{t.description}</p>}
+
+                  <div className="dc-task-card-progress">
+                    <div className="dc-task-card-progress-head">
+                      <span>Tiến độ</span>
+                      <span>{prog}/{target}</span>
+                    </div>
+                    <div className="dc-task-progress-bar">
+                      <div className="dc-task-progress-fill" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+
+                  {mat && (
+                    <div className="dc-task-card-foot">
+                      <div className="dc-task-card-reward">
+                        <span className="dc-task-card-reward-label">Phần thưởng</span>
+                        <span className="dc-task-card-reward-value">+{t.rewardQty ?? 1} {mat.emoji}</span>
+                      </div>
+                      {status === 'ready' ? (
+                        <button type="button" className="dc-task-card-btn is-primary"
+                          disabled={claiming === t.code}
+                          onClick={(e) => handleClaim(t, e.currentTarget)}>
+                          {claiming === t.code ? <span className="spinner" /> : <>Nhận thưởng <HeartIcon size={13} /></>}
+                        </button>
+                      ) : status === 'claimed' ? (
+                        <button type="button" className="dc-task-card-btn is-claimed" disabled>Đã nhận ✓</button>
+                      ) : (
+                        <button type="button" className="dc-task-card-btn is-outline" onClick={() => navigate(taskActionRoute(t))}>
+                          Làm ngay
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
-        )}
-      </header>
+        </section>
+      )}
 
       {/* ── Kho nguyên liệu ── */}
       <section className="daily-section">
@@ -190,79 +287,6 @@ export default function DailyConnection() {
         </div>
       </section>
 
-      {/* ── Nhiệm vụ thưởng nguyên liệu ── */}
-      {tasks.length > 0 && (
-        <section className="daily-section">
-          <h2 className="daily-section-title">Nhiệm vụ thưởng nguyên liệu</h2>
-          {TASK_TYPE_ORDER.filter((type) => tasksByType[type]?.length).map((type) => {
-            const meta = TASK_TYPE_META[type]
-            return (
-              <div key={type} className="task-group">
-                <div className="task-group-head">
-                  <div className="task-group-label" style={{ background: meta.accent }}>
-                    <span>{meta.emoji}</span> {meta.label}
-                  </div>
-                  {resetInfo[type] && <span className="task-group-reset">{resetInfo[type]}</span>}
-                </div>
-                <div className="task-list">
-                  {tasksByType[type].map((t) => {
-                    const mat = MATERIAL_META[t.rewardMaterial]
-                    const target = t.target || 1
-                    const prog = Math.min(t.progress ?? 0, target)
-                    const pct = Math.round((prog / target) * 100)
-                    return (
-                      <div key={t.code || t.id} className={`task-row${t.completed ? ' is-done' : ''}${t.claimed ? ' is-claimed' : ''}`}>
-                        <span className={`task-ico${t.claimed ? ' is-claimed' : t.completed ? ' is-ready' : ''}`}
-                          style={mat && !t.claimed && !t.completed ? { background: mat.bg, color: mat.color } : undefined}>
-                          {t.claimed ? '✓' : t.completed ? '✓' : (mat?.emoji || '🎯')}
-                        </span>
-                        <div className="task-row-main">
-                          <div className="task-row-title">
-                            {t.description || t.title}
-                            {t.completed && <span className="task-check">✓</span>}
-                          </div>
-                          <div className="task-progress">
-                            <div className="task-progress-bar">
-                              <div className="task-progress-fill" style={{ width: `${pct}%` }} />
-                            </div>
-                            <span className="task-progress-text">{prog}/{target}</span>
-                          </div>
-                        </div>
-                        {mat && (
-                          t.claimed ? (
-                            <div className="task-reward task-reward-claimed" title="Đã nhận thưởng">
-                              <span>{mat.emoji}</span>
-                              <span className="task-reward-qty">Đã nhận ✓</span>
-                            </div>
-                          ) : t.completed ? (
-                            <button
-                              type="button"
-                              className="task-claim-btn"
-                              disabled={claiming === t.code}
-                              onClick={(e) => handleClaim(t, e.currentTarget)}
-                              title={`Nhận ${mat.label} ×${t.rewardQty}`}
-                            >
-                              {claiming === t.code
-                                ? <span className="spinner" />
-                                : <>Nhận <span>{mat.emoji}</span> ×{t.rewardQty ?? 1}</>}
-                            </button>
-                          ) : (
-                            <div className="task-reward task-reward-locked" style={{ background: mat.bg, color: mat.color }} title={`Phần thưởng: ${mat.label} ×${t.rewardQty}`}>
-                              <span>{mat.emoji}</span>
-                              <span className="task-reward-qty">×{t.rewardQty ?? 1}</span>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          })}
-        </section>
-      )}
-
       {/* ── Lời nhắc kết nối ── */}
       {reminders.length > 0 && (
         <section className="daily-section">
@@ -270,13 +294,30 @@ export default function DailyConnection() {
           <div className="reminder-list">
             {reminders.map((r, i) => (
               <div key={r.matchId || r.id || i} className="reminder-item">
-                <HeartIcon size={14} />
+                <HeartIcon size={17} />
                 <span>{r.message || r.title || r.body}</span>
               </div>
             ))}
           </div>
         </section>
       )}
+
+      {/* ── Banner cây tình yêu ── */}
+      <div className="dc-banner">
+        <div className="dc-banner-tree" aria-hidden="true">
+          <SparkleIcon size={36} />
+          <HeartIcon size={64} />
+        </div>
+        <div className="dc-banner-text">
+          <h3>Cây tình yêu sẽ lớn mạnh hơn mỗi ngày</h3>
+          <p>Càng hoàn thành nhiều nhiệm vụ, bạn càng nhận được nhiều phần thưởng giá trị!</p>
+        </div>
+        <div className="dc-banner-hearts" aria-hidden="true">
+          <HeartIcon size={26} className="dc-banner-heart dc-banner-heart-1" />
+          <HeartIcon size={19} className="dc-banner-heart dc-banner-heart-2" />
+          <HeartIcon size={14} className="dc-banner-heart dc-banner-heart-3" />
+        </div>
+      </div>
 
       {/* Lớp nguyên liệu bay vào kho */}
       {flyers.length > 0 && (

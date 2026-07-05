@@ -1,360 +1,275 @@
-/* ===== Daily / Hằng ngày — modern, friendly ===== */
+/* ═══════════════════════════════════════════════════════════════════════
+   Nhiệm vụ — theme sáng gốc của app (trắng/hồng nhạt), giống Lượt thích/
+   Match/Cây tình yêu. Giữ nguyên bố cục (hero, tab, lưới card) — chỉ đổi
+   bảng màu từ dark-luxury trước đó về đúng tông chung của app.
+   ═══════════════════════════════════════════════════════════════════════ */
 .daily-page {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 20px 20px 56px;
+  position: relative;
+  max-width: 1340px;
+  margin: -24px auto 0;
+  padding: 28px 24px 64px;
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 12px;
+}
+/* Ảnh nền trang trí — full-bleed hết chiều ngang lẫn hết chiều cao trang */
+.daily-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: url('/assets/br-1.png') center top / cover no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+.daily-page > * { position: relative; z-index: 1; }
+
+/* ── Hero row ── */
+.dc-hero-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+}
+.dc-hero-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.dc-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: clamp(2.3rem, 4.5vw, 3.1rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #1a1a1a;
+  margin: 0;
+}
+.dc-title svg { color: #ff4d8d; }
+.dc-subtitle { margin: 12px 0 0; font-size: 1.15rem; color: #666; max-width: 560px; }
+
+/* ── Tabs ── */
+.dc-tabs {
+  display: inline-flex;
+  gap: 10px;
+  padding: 7px;
+  width: fit-content;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-radius: 20px;
+}
+.dc-tab {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 26px;
+  border: none;
+  border-radius: 15px;
+  background: none;
+  color: #777;
+  font-weight: 700;
+  font-size: 1.05rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.dc-tab.is-active {
+  background: linear-gradient(135deg, #ff6b9e, #ff4d8d);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(255, 77, 141, 0.35);
 }
 
-/* ── Hero ── */
-.daily-hero {
-  border-radius: 24px;
-  padding: 26px 26px 22px;
-  background: linear-gradient(135deg, #ff7eb3 0%, #ff4f8b 45%, #c9184a 100%);
-  color: #fff;
-  box-shadow: 0 14px 36px rgba(255, 79, 139, 0.32);
+.dc-reset-info { margin: 0 0 4px; font-size: 0.95rem; color: #9ca3af; }
+
+/* ── Section titles ── */
+.daily-section { display: flex; flex-direction: column; gap: 10px; }
+.daily-section-title {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 1.35rem; font-weight: 800; color: #1a1a1a; margin: 0 0 10px;
+}
+.daily-section-title::before {
+  content: ''; width: 5px; height: 22px; border-radius: 99px;
+  background: linear-gradient(180deg, #ff4d8d, #b14bff);
+}
+
+/* ── Task grid & cards ──
+   Lưu ý: mọi class đều tiền tố "dc-task-" (không phải "task-") để KHÔNG
+   trùng với .task-card/.task-card-reward... định nghĩa sẵn trong
+   src/styles/tasks.css (nạp toàn cục ở main.jsx cho trang /tasks cũ). */
+.dc-task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+.dc-task-card {
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  border-radius: 26px;
+  background: #fff;
+  border: 1px solid #f0e6ec;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.055);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-.daily-hero::after {
+.dc-task-card::before {
   content: '';
   position: absolute;
-  top: -40px; right: -30px;
-  width: 180px; height: 180px;
-  background: radial-gradient(circle, rgba(255,255,255,0.25), transparent 70%);
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ff6b9e, #ff4d8d);
+  opacity: 0;
+  transition: opacity 0.2s;
 }
-.daily-hero-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  position: relative;
-  z-index: 1;
+.dc-task-card.is-ready::before,
+.dc-task-card.is-claimed::before { opacity: 1; }
+.dc-task-card.is-progress::before { opacity: 1; background: linear-gradient(90deg, #ffb35c, #f59e0b); }
+.dc-task-card.is-todo::before { opacity: 1; background: linear-gradient(90deg, #c9a3ff, #b14bff); }
+.dc-task-card:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(255, 77, 141, 0.12); }
+.dc-task-card.is-ready { border-color: rgba(255, 77, 141, 0.35); }
+.dc-task-card.is-claimed { opacity: 0.65; }
+
+.dc-task-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
+.dc-task-card-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  background: #ffe5ed;
 }
-.daily-hero-eyebrow {
+.dc-task-card-status {
+  flex-shrink: 0;
+  font-size: 0.82rem; font-weight: 800;
+  padding: 7px 15px; border-radius: 999px;
+  white-space: nowrap;
+}
+.dc-task-card-status.is-ready { background: linear-gradient(135deg, #ff6b9e, #ff4d8d); color: #fff; }
+.dc-task-card-status.is-claimed { background: #f1f1f1; color: #999; }
+.dc-task-card-status.is-progress { background: rgba(245, 158, 11, 0.14); color: #b5730a; }
+.dc-task-card-status.is-todo { background: rgba(177, 75, 255, 0.12); color: #8b3dd1; }
+
+.dc-task-card-title { font-size: 1.28rem; font-weight: 800; color: #1a1a1a; margin: 0; line-height: 1.3; }
+.dc-task-card-desc { font-size: 1rem; color: #888; margin: 8px 0 0; line-height: 1.5; }
+
+.dc-task-card-progress { margin-top: 24px; }
+.dc-task-card-progress-head {
+  display: flex; justify-content: space-between;
+  font-size: 0.9rem; font-weight: 700; color: #999; margin-bottom: 9px;
+}
+.dc-task-progress-bar { height: 10px; border-radius: 99px; background: #f3eef1; overflow: hidden; }
+.dc-task-progress-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, #ff6b9e, #ff4d8d);
+  transition: width 0.4s ease;
+}
+.dc-task-card.is-progress .dc-task-progress-fill { background: linear-gradient(90deg, #ffb35c, #f59e0b); }
+.dc-task-card.is-todo .dc-task-progress-fill { background: #e2dde0; }
+
+.dc-task-card-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-top: 26px; padding-top: 20px;
+  border-top: 1px solid #f2eaee;
+}
+.dc-task-card-reward { display: flex; flex-direction: column; gap: 6px; }
+.dc-task-card-reward-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #b3aab0; }
+.dc-task-card-reward-value {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  opacity: 0.9;
-}
-.daily-hero-title {
-  font-size: 1.7rem;
+  width: fit-content;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 1.05rem;
   font-weight: 800;
-  margin: 6px 0 4px;
-  line-height: 1.15;
+  color: #ff4d8d;
+  background: #ffe5ed;
 }
-.daily-hero-sub {
-  font-size: 13.5px;
-  opacity: 0.92;
-  max-width: 420px;
-  line-height: 1.5;
-}
-.daily-xp-badge {
+
+.dc-task-card-btn {
   flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 78px; height: 78px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(6px);
-  border: 2px solid rgba(255, 255, 255, 0.35);
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 13px 22px; border-radius: 999px;
+  font-size: 1rem; font-weight: 800; font-family: inherit;
+  cursor: pointer; border: none;
+  transition: transform 0.15s, filter 0.15s;
 }
-.daily-xp-value { font-size: 24px; font-weight: 800; line-height: 1; }
-.daily-xp-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; opacity: 0.85; }
-
-.daily-hero-progress { position: relative; z-index: 1; margin-top: 20px; }
-.daily-hero-progress-head {
-  display: flex; justify-content: space-between;
-  font-size: 12.5px; font-weight: 600; margin-bottom: 7px; opacity: 0.95;
+.dc-task-card-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.dc-task-card-btn.is-primary {
+  background: linear-gradient(135deg, #ff6b9e, #ff4d8d); color: #fff;
+  box-shadow: 0 6px 16px rgba(255, 77, 141, 0.35);
 }
-.daily-bar {
-  height: 9px; border-radius: 99px;
-  background: rgba(255, 255, 255, 0.28);
-  overflow: hidden;
+.dc-task-card-btn.is-outline {
+  background: #fff; color: #555;
+  border: 1.5px solid #eee;
 }
-.daily-bar-fill {
-  height: 100%; border-radius: 99px;
-  background: #fff;
-  transition: width 0.5s ease;
-}
-
-/* ── Section ── */
-.daily-section { display: flex; flex-direction: column; gap: 12px; }
-.daily-section-head { display: flex; align-items: center; justify-content: space-between; }
-.daily-section-title { font-size: 1.05rem; font-weight: 800; color: var(--color-text, #1a1a2e); margin: 0; }
-
-.daily-claim-all {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 12.5px; font-weight: 700;
-  color: #fff; background: linear-gradient(135deg, #ff4f8b, #c9184a);
-  border: none; border-radius: 99px; padding: 7px 14px; cursor: pointer;
-  box-shadow: 0 4px 12px rgba(255, 79, 139, 0.3);
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.daily-claim-all:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(255, 79, 139, 0.4); }
-.daily-claim-all:disabled { opacity: 0.5; cursor: default; }
+.dc-task-card-btn.is-claimed { background: #f1f1f1; color: #aaa; cursor: default; }
+.dc-task-card-btn .spinner { width: 14px; height: 14px; }
 
 /* ── Material inventory ── */
-.material-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.material-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .material-chip {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px; border-radius: 18px;
-  border: 1px solid rgba(0,0,0,0.04);
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 22px; border-radius: 22px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s, box-shadow 0.15s;
 }
+.material-chip:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.09); }
 .material-emoji {
-  font-size: 28px;
-  line-height: 1;
-  display: inline-block;
-  animation: material-bob 2.8s ease-in-out infinite;
-}
-@keyframes material-bob {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-5px) rotate(-6deg); }
-}
-.material-chip:nth-child(1) .material-emoji { animation-delay: 0s; animation-duration: 2.6s; }
-.material-chip:nth-child(2) .material-emoji { animation-delay: 0.4s; animation-duration: 3.1s; }
-.material-chip:nth-child(3) .material-emoji { animation-delay: 0.8s; animation-duration: 2.9s; }
-.material-info { display: flex; flex-direction: column; }
-.material-qty { font-size: 22px; font-weight: 800; line-height: 1.1; }
-.material-name { font-size: 12px; font-weight: 600; color: var(--color-text-soft, #6b7280); }
-
-/* ── Daily quests (XP) ── */
-.quest-grid { display: flex; flex-direction: column; gap: 10px; }
-.quest-card {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 16px; border-radius: 16px;
-  background: var(--color-surface, #fff);
-  border: 1px solid var(--color-border, #f0e6ec);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-  transition: border-color 0.2s, transform 0.15s;
-}
-.quest-card:hover { transform: translateY(-1px); border-color: rgba(255, 79, 139, 0.4); }
-.quest-card.is-done { opacity: 0.62; }
-.quest-card-main { flex: 1; min-width: 0; }
-.quest-card-title { font-weight: 700; font-size: 14.5px; color: var(--color-text, #1a1a2e); }
-.quest-card-desc { font-size: 12.5px; color: var(--color-text-soft, #6b7280); margin-top: 2px; }
-.quest-card-side { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.quest-xp {
-  font-size: 12px; font-weight: 800; color: #c9184a;
-  background: rgba(255, 79, 139, 0.12); padding: 4px 9px; border-radius: 99px;
-}
-.quest-claim {
-  font-size: 13px; font-weight: 700; color: #fff;
-  background: linear-gradient(135deg, #ff4f8b, #c9184a);
-  border: none; border-radius: 99px; padding: 7px 16px; cursor: pointer;
-  transition: transform 0.15s;
-}
-.quest-claim:hover:not(:disabled) { transform: scale(1.04); }
-.quest-claim:disabled { opacity: 0.5; cursor: default; }
-.quest-done {
-  width: 28px; height: 28px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: #16a34a; color: #fff; font-weight: 800; font-size: 14px;
-}
-
-/* ── Material tasks (grouped) ── */
-.task-group { display: flex; flex-direction: column; gap: 8px; }
-.task-group-head {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-}
-.task-group-label {
-  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
-  font-size: 12px; font-weight: 700; color: var(--color-text, #1a1a2e);
-  padding: 5px 12px; border-radius: 99px;
-}
-.task-group-reset { font-size: 11.5px; font-weight: 600; color: var(--color-text-muted, #9ca3af); }
-.task-list { display: flex; flex-direction: column; gap: 8px; }
-.task-row {
-  display: flex; align-items: center; gap: 14px;
-  padding: 12px 16px; border-radius: 14px;
-  background: var(--color-surface, #fff);
-  border: 1px solid var(--color-border, #f0e6ec);
-}
-.task-row.is-claimed { opacity: 0.6; }
-.task-row-main { flex: 1; min-width: 0; }
-.task-row-title {
-  font-weight: 600; font-size: 13.5px; color: var(--color-text, #1a1a2e);
-  display: flex; align-items: center; gap: 6px;
-}
-.task-check { color: #16a34a; font-weight: 800; }
-.task-progress { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-.task-progress-bar {
-  flex: 1; height: 6px; border-radius: 99px;
-  background: var(--color-surface-2, #f3eef1); overflow: hidden;
-}
-.task-progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #ff7eb3, #ff4f8b); transition: width 0.4s; }
-.task-progress-text { font-size: 11.5px; font-weight: 600; color: var(--color-text-soft, #6b7280); min-width: 34px; text-align: right; }
-.task-reward {
-  flex-shrink: 0; display: flex; align-items: center; gap: 3px;
-  font-size: 15px; font-weight: 800;
-  padding: 7px 11px; border-radius: 12px;
-}
-.task-reward-qty { font-size: 13px; }
-.task-reward > span:first-child { display: inline-block; animation: material-bob 2.7s ease-in-out infinite; }
-
-/* Phần thưởng chưa hoàn thành — mờ đi (xem trước) */
-.task-reward-locked { opacity: 0.55; }
-
-/* Đã nhận */
-.task-reward-claimed {
-  flex-shrink: 0; display: flex; align-items: center; gap: 5px;
-  font-size: 0.82rem; font-weight: 800;
-  padding: 7px 12px; border-radius: 12px;
-  background: rgba(22, 163, 74, 0.12); color: #16a34a;
-}
-
-/* Nút Nhận — nổi bật, có nhịp đập nhẹ để mời bấm */
-.task-claim-btn {
+  width: 58px; height: 58px; border-radius: 16px;
+  display: grid; place-items: center; font-size: 32px;
   flex-shrink: 0;
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 0.85rem; font-weight: 800; font-family: inherit;
-  color: #fff; cursor: pointer; border: none;
-  padding: 9px 16px; border-radius: 999px;
-  background: linear-gradient(135deg, #ff4f8b, #b14bff);
-  box-shadow: 0 6px 16px rgba(255, 79, 139, 0.4);
-  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
-  animation: claim-pulse 1.8s ease-in-out infinite;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
-.task-claim-btn:hover { transform: translateY(-2px); filter: brightness(1.05); box-shadow: 0 10px 24px rgba(255, 79, 139, 0.5); }
-.task-claim-btn:disabled { opacity: 0.7; cursor: default; animation: none; }
-.task-claim-btn > span { display: inline-block; }
-@keyframes claim-pulse {
-  0%, 100% { box-shadow: 0 6px 16px rgba(255, 79, 139, 0.4); }
-  50% { box-shadow: 0 6px 22px rgba(255, 79, 139, 0.65); }
-}
+.material-info { display: flex; flex-direction: column; }
+.material-qty { font-size: 1.8rem; font-weight: 900; line-height: 1.1; }
+.material-name { font-size: 0.92rem; font-weight: 600; color: #888; }
 
 /* ── Reminders ── */
-.reminder-list { display: flex; flex-direction: column; gap: 8px; }
+.reminder-list { display: flex; flex-direction: column; gap: 12px; }
 .reminder-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 12px 16px; border-radius: 14px;
-  background: rgba(255, 79, 139, 0.06);
-  border: 1px solid rgba(255, 79, 139, 0.14);
-  font-size: 13.5px; color: var(--color-text, #1a1a2e);
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 22px; border-radius: 18px;
+  background: #fff0f5;
+  border: 1px solid rgba(255, 77, 141, 0.14);
+  font-size: 1.02rem; color: #444;
 }
-.reminder-item svg { color: #ff4f8b; flex-shrink: 0; }
+.reminder-item svg { color: #ff4d8d; flex-shrink: 0; }
 
-/* ── Dark theme ── */
-[data-theme='dark'] .quest-card,
-[data-theme='dark'] .task-row {
-  background: var(--color-surface, #1c1722);
-  border-color: var(--color-border-strong, #2e2636);
+/* ── Bottom banner ── */
+.dc-banner {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 28px 34px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #fff0f5, #f6eeff);
+  border: 1px solid rgba(255, 77, 141, 0.14);
 }
-[data-theme='dark'] .quest-card-title,
-[data-theme='dark'] .task-row-title,
-[data-theme='dark'] .daily-section-title { color: #f5f0f5; }
-
-@media (max-width: 520px) {
-  .daily-hero-title { font-size: 1.4rem; }
-  .material-row { gap: 8px; }
-  .material-chip { flex-direction: column; text-align: center; gap: 6px; padding: 12px 8px; }
+.dc-banner-tree {
+  flex-shrink: 0;
+  width: 86px; height: 86px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  background: #ffe5ed;
+  color: #ff4d8d;
 }
+.dc-banner-tree svg:first-child { position: absolute; top: 4px; right: 8px; }
+.dc-banner-text { flex: 1; min-width: 0; }
+.dc-banner-text h3 { margin: 0; font-size: 1.3rem; font-weight: 800; color: #1a1a1a; }
+.dc-banner-text p { margin: 8px 0 0; font-size: 1.02rem; color: #777; }
+.dc-banner-hearts { position: relative; width: 108px; height: 84px; flex-shrink: 0; color: #ff8fb5; }
+.dc-banner-heart { position: absolute; }
+.dc-banner-heart-1 { right: 0; bottom: 0; }
+.dc-banner-heart-2 { right: 40px; top: 4px; opacity: 0.7; }
+.dc-banner-heart-3 { right: 68px; bottom: 22px; opacity: 0.5; }
 
-/* ════════ Header sạch + accent thương hiệu (kiểu Hinge) ════════ */
-.dc-header { position: relative; padding: 8px 4px 0; }
-.dc-glow {
-  position: absolute; top: -34px; right: 0; width: 250px; height: 250px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,79,139,0.18) 0%, rgba(177,75,255,0.10) 45%, transparent 70%);
-  pointer-events: none; z-index: 0; filter: blur(4px);
-}
-.dc-header > *:not(.dc-glow) { position: relative; z-index: 1; }
-.dc-eyebrow {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 13px; border-radius: 999px;
-  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #fff;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  box-shadow: 0 4px 14px rgba(255,79,139,0.32); margin-bottom: 12px;
-  animation: dc-rise 0.5s ease-out both;
-}
-.dc-eyebrow svg { transform-origin: center; animation: dc-beat 1.8s ease-in-out infinite; }
-.dc-title {
-  font-size: clamp(2.1rem, 6vw, 3rem); font-weight: 900; letter-spacing: -0.035em;
-  line-height: 1.05; color: var(--color-text); margin: 0;
-  animation: dc-rise 0.6s cubic-bezier(0.2,0.9,0.3,1) both;
-}
-.dc-title span {
-  background: linear-gradient(100deg, #ff4f8b 0%, #b14bff 35%, #ff7eb3 55%, #b14bff 75%, #ff4f8b 100%);
-  background-size: 220% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  animation: dc-flow 5s linear infinite;
-}
-.dc-subtitle { font-size: 0.92rem; color: var(--color-text-soft); margin: 7px 0 0; animation: dc-rise 0.7s ease-out both; }
-
-/* Tiến độ hôm nay — thẻ sạch */
-.dc-progress {
-  margin-top: 18px; max-width: 460px;
-  padding: 14px 16px; border-radius: 16px;
-  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-2) 100%);
-  border: 1px solid var(--color-border); box-shadow: var(--shadow-sm);
-}
-.dc-progress-head {
-  display: flex; align-items: center; justify-content: space-between;
-  font-size: 0.84rem; font-weight: 700; color: var(--color-text); margin-bottom: 9px;
-}
-.dc-progress-head span:first-child { display: inline-flex; align-items: center; gap: 6px; }
-.dc-progress-head svg { color: var(--color-primary); }
-.dc-progress-count {
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-}
-
-@keyframes dc-flow { to { background-position: 220% center; } }
-@keyframes dc-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes dc-beat { 0%,55%,100% { transform: scale(1); } 12% { transform: scale(1.28); } 24% { transform: scale(1); } 36% { transform: scale(1.18); } }
-@media (prefers-reduced-motion: reduce) {
-  .dc-title, .dc-title span, .dc-eyebrow, .dc-eyebrow svg, .dc-subtitle { animation: none; }
-}
-
-/* ════════════════ REDESIGN trang Hằng ngày (override) ════════════════ */
-/* FIX thanh tiến độ "Nhiệm vụ hôm nay" (trước trắng trên nền sáng -> tàng hình) */
-.dc-progress .daily-bar { height: 10px; background: var(--color-surface-2); border: 1px solid var(--color-border); }
-.dc-progress .daily-bar-fill { background: linear-gradient(90deg, #ff7eb3, #ff4f8b 55%, #b14bff); box-shadow: 0 0 10px rgba(255,79,139,0.45); }
-
-/* Tiêu đề mục — gạch nhấn gradient */
-.daily-section-title { display: flex; align-items: center; gap: 9px; font-size: 1.1rem; font-weight: 900; letter-spacing: -0.01em; }
-.daily-section-title::before { content: ''; width: 4px; height: 18px; border-radius: 99px; background: linear-gradient(180deg, #ff4f8b, #b14bff); }
-
-/* Kho nguyên liệu */
-.material-row { gap: 14px; }
-.material-chip { border: 1px solid rgba(255,255,255,0.6); box-shadow: 0 6px 18px rgba(0,0,0,0.05); transition: transform 0.15s, box-shadow 0.15s; }
-.material-chip:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(0,0,0,0.08); }
-.material-emoji { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: rgba(255,255,255,0.7); font-size: 26px; box-shadow: 0 3px 8px rgba(0,0,0,0.06); }
-.material-qty { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.02em; }
-.material-name { font-size: 0.78rem; font-weight: 700; }
-
-/* Task: thẻ thân thiện có icon */
-.task-list { gap: 10px; }
-.task-row { gap: 13px; padding: 13px 14px; border-radius: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.04); transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
-.task-row:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(255,79,139,0.1); }
-.task-row.is-done:not(.is-claimed) { border-color: rgba(22,163,74,0.35); background: linear-gradient(135deg, var(--color-surface), rgba(22,163,74,0.05)); }
-.task-row.is-claimed { opacity: 0.7; }
-.task-ico { flex-shrink: 0; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 22px; font-weight: 900; }
-.task-ico.is-ready { background: rgba(22,163,74,0.14); color: #16a34a; }
-.task-ico.is-claimed { background: #16a34a; color: #fff; }
-.task-row-title { font-size: 0.92rem; font-weight: 800; }
-.task-progress { margin-top: 8px; }
-.task-progress-bar { height: 8px; background: var(--color-surface-2); }
-.task-progress-fill { background: linear-gradient(90deg, #ff7eb3, #ff4f8b); box-shadow: 0 0 8px rgba(255,79,139,0.3); }
-.task-row.is-done .task-progress-fill { background: linear-gradient(90deg, #4ade80, #16a34a); box-shadow: 0 0 8px rgba(22,163,74,0.3); }
-.task-progress-text { font-size: 0.74rem; font-weight: 700; }
-.task-group { gap: 10px; margin-top: 4px; }
-.task-group-label { font-size: 0.78rem; font-weight: 800; padding: 6px 13px; }
-
-/* Reminders */
-.reminder-list { gap: 10px; }
-.reminder-item { padding: 14px 16px; border-radius: 16px; background: linear-gradient(135deg, rgba(255,79,139,0.07), rgba(177,75,255,0.07)); border: 1px solid rgba(255,79,139,0.16); box-shadow: 0 3px 10px rgba(255,79,139,0.05); font-size: 0.88rem; font-weight: 600; transition: transform 0.15s; }
-.reminder-item:hover { transform: translateX(3px); }
-.reminder-item svg { width: 30px; height: 30px; padding: 7px; border-radius: 10px; background: rgba(255,79,139,0.12); box-sizing: border-box; }
-
-/* ════════ Hiệu ứng nguyên liệu bay vào kho ════════ */
+/* ── Nguyên liệu bay vào kho ── */
 .dc-flyers { position: fixed; inset: 0; z-index: 1200; pointer-events: none; }
 .dc-flyer {
   position: fixed;
@@ -372,7 +287,6 @@
   100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.45); opacity: 0; }
 }
 
-/* Ô kho nảy lên khi nhận nguyên liệu */
 .material-chip.is-bump { animation: dc-bump 0.5s cubic-bezier(0.2, 1.4, 0.4, 1); }
 @keyframes dc-bump {
   0% { transform: scale(1); }
@@ -389,4 +303,23 @@
 @media (prefers-reduced-motion: reduce) {
   .dc-flyer { animation-duration: 0.01ms !important; }
   .material-chip.is-bump { animation: none; }
+  .dc-task-card { transition: none; }
 }
+
+@media (max-width: 720px) {
+  .daily-page { padding: 20px 16px 48px; }
+  .material-row { grid-template-columns: 1fr; }
+  .dc-banner { flex-direction: column; text-align: center; }
+}
+
+/* ── Dark theme (theo toggle chung của app) ── */
+[data-theme='dark'] .dc-title { color: #fff; }
+[data-theme='dark'] .dc-tabs { background: #2c2c2e; }
+[data-theme='dark'] .dc-tab { color: #ccc; }
+[data-theme='dark'] .daily-section-title { color: #fff; }
+[data-theme='dark'] .dc-task-card,
+[data-theme='dark'] .material-chip { background: #2c2c2e; border-color: #3a3a3c; }
+[data-theme='dark'] .dc-task-card-title { color: #fff; }
+[data-theme='dark'] .dc-task-card-btn.is-outline { background: #2c2c2e; color: #ddd; border-color: #444; }
+[data-theme='dark'] .dc-banner { background: linear-gradient(135deg, rgba(255,77,141,0.12), rgba(177,75,255,0.1)); }
+[data-theme='dark'] .dc-banner-text h3 { color: #fff; }

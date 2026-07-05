@@ -4,9 +4,10 @@ import { swipesService, subscriptionService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
 import { HeartIcon, StarIcon, CrownIcon, SparkleIcon } from '../../../components/ui/CustomIcons.jsx'
-import HeroFX from '../../../components/User/HeroFX/HeroFX.jsx'
+import GlassHeartHero from '../../../components/User/GlassHeartHero/GlassHeartHero.jsx'
 import { motion } from 'framer-motion'
 import ProfileDetailModal from '../../../components/User/ProfileDetailModal/ProfileDetailModal.jsx'
+import MatchCelebration from '../../../components/User/MatchCelebration/MatchCelebration.jsx'
 import AdminBadge from '../../../components/User/AdminBadge/AdminBadge.jsx'
 import './LikedMe.css'
 
@@ -18,6 +19,7 @@ export default function LikedMe() {
   const [acting, setActing] = useState(null)
   const [isGold, setIsGold] = useState(false)
   const [detail, setDetail] = useState(null)
+  const [celebrate, setCelebrate] = useState(null) // popup "Đã ghép đôi!"
 
   const load = async () => {
     setLoading(true)
@@ -47,7 +49,7 @@ export default function LikedMe() {
     try {
       const res = await swipesService.swipe({ targetUserId: u.userId, action })
       setPeople((cur) => cur.filter((p) => p.userId !== u.userId))
-      if (res?.isMatch) toast.success(`Match với ${u.displayName}! 🎉`)
+      if (res?.isMatch) setCelebrate({ other: u, matchId: res.matchId })
       else if (action === 'Pass') toast.info('Đã bỏ qua.')
       else toast.success('Đã thích lại 💞')
     } catch (err) {
@@ -63,7 +65,7 @@ export default function LikedMe() {
     setDetail(null)
     if (!u) return
     setPeople((cur) => cur.filter((p) => p.userId !== u.userId))
-    if (res?.isMatch) toast.success(`Match với ${u.displayName}! 🎉`)
+    if (res?.isMatch) setCelebrate({ other: u, matchId: res.matchId })
     else if (action === 'Pass') toast.info('Đã bỏ qua.')
     else toast.success('Đã thích lại 💞')
   }
@@ -72,26 +74,35 @@ export default function LikedMe() {
 
   return (
     <div className="liked-root">
-      <div className="liked-hero">
-        <div className="liked-hero-eyebrow"><HeartIcon size={12} /> Lượt thích</div>
-        <h1>Ai đã thích bạn</h1>
-        <p className="liked-hero-sub">
-          {people.length} người đã thích bạn.{' '}
-          {isGold ? 'Thích lại để tạo match ngay!' : 'Nâng cấp Gold để xem rõ và thích lại.'}
-        </p>
-        <HeroFX emojis={['💖', '💕', '😍', '✨', '💗', '👍', '💝', '🥰']} />
-        <span className="hero-deco" aria-hidden>💖</span>
-      </div>
-
-      {!isGold && people.length > 0 && (
-        <button type="button" className="liked-gold-banner" onClick={() => navigate('/premium')}>
-          <CrownIcon size={20} />
-          <div>
-            <strong>Mở khóa ảnh rõ nét với Gold</strong>
-            <span>Xem chính xác ai đã thích bạn (kèm ảnh không che).</span>
+      <div className="liked-header-section">
+        <div className="liked-header-content">
+          <div className="liked-header-icon">
+            <HeartIcon size={28} />
           </div>
-        </button>
-      )}
+          <h1>Có {people.length} người thích bạn</h1>
+          <p className="liked-subtitle">
+            Ai đó đã dừng lại ở hồ sơ của bạn.<br />
+            Có thể đây là khởi đầu của một điều thú vị.
+          </p>
+
+          <div className="liked-tabs">
+            <button className="liked-tab active">
+              <HeartIcon size={16} /> Xem lượt thích
+            </button>
+            <button className="liked-tab">
+              Đã match
+            </button>
+          </div>
+
+          <div className="liked-stats">
+            <div className="stat-badge"><HeartIcon size={14} color="#ff4d8d" /> 2 lượt thích</div>
+            <div className="stat-badge"><span style={{color: '#ff4d8d', fontWeight: 'bold'}}>✓</span> 8 match</div>
+            <div className="stat-badge"><CrownIcon size={14} /> Thành viên Gold</div>
+          </div>
+        </div>
+
+        <GlassHeartHero />
+      </div>
 
       {people.length === 0 ? (
         <div className="liked-empty">
@@ -100,48 +111,100 @@ export default function LikedMe() {
           <button className="btn btn-primary" onClick={() => navigate('/discovery')}>Khám phá ngay</button>
         </div>
       ) : (
-        <div className="liked-grid">
-          {people.map((u, i) => {
-            const url = resolveImageUrl(u.photos?.[0]?.url)
-            const locked = !isGold // Free & Plus: luôn khóa (mờ + không tương tác)
-            return (
-              <motion.div key={u.userId} className="liked-card"
-                initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
-                <div className={`liked-card-photo${!locked ? ' is-clickable' : ''}`}
-                  onClick={() => { if (!locked) setDetail(u) }}
-                  role={!locked ? 'button' : undefined}>
-                  <div className={`liked-card-bg${locked ? ' is-locked' : ''}`}
-                    style={url ? { backgroundImage: `url(${url})` } : undefined} />
-                  {!url && <span className="liked-card-initial">{(u.displayName || '?').charAt(0).toUpperCase()}</span>}
-                  {u.isSuperLike && <span className="liked-card-super"><StarIcon size={11} /> Siêu thích</span>}
+        <>
+          <div className="liked-list-header">
+            <div>
+              <h2><SparkleIcon size={18} color="#ff4d8d" /> Những người đã thích bạn</h2>
+              <p>Hãy chọn một người bạn muốn tìm hiểu hơn</p>
+            </div>
+            <div className="liked-sort">
+              <select>
+                <option>Sắp xếp: Mới nhất</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="liked-grid-v2">
+            {people.map((u, i) => {
+              const url = resolveImageUrl(u.photos?.[0]?.url)
+              const locked = !isGold // Free & Plus: luôn khóa (mờ + không tương tác)
+              
+              // Mock data for UI presentation based on Image 2
+              const distance = u.distance || Math.floor(Math.random() * 10) + 1;
+              const isOnline = u.isOnline ?? (i % 2 === 0);
+              const statusText = isOnline ? "Online" : `Hoạt động ${Math.floor(Math.random() * 30) + 1} phút trước`;
+              const badgeType = i === 1 ? 'new' : (isOnline ? 'online' : 'active');
+              
+              return (
+                <motion.div key={u.userId} className="liked-card-v2"
+                  initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
+                  
+                  <div className={`liked-card-v2-bg${locked ? ' is-locked' : ''}`}
+                      style={url ? { backgroundImage: `url(${url})` } : undefined} />
+                  
+                  <div className="liked-card-v2-overlay" />
+                  
+                  <div className="liked-card-v2-top">
+                    {badgeType === 'online' && <div className="badge-status online"><span className="dot"></span>Online</div>}
+                    {badgeType === 'new' && <div className="badge-status new"><span className="diamond">✦</span>Mới</div>}
+                    {badgeType === 'active' && <div className="badge-status active"><span className="dot"></span>Hoạt động</div>}
+                    
+                    <div className="badge-heart">
+                      <HeartIcon size={16} />
+                    </div>
+                  </div>
+
+                  <div className="liked-card-v2-bottom">
+                    <div className="liked-card-v2-name">
+                      {locked ? 'Ẩn danh' : u.displayName}{!locked && u.age ? `, ${u.age}` : ''}
+                      {!locked && u.isAdmin && <AdminBadge size="sm" />}
+                    </div>
+                    
+                    <div className="liked-card-v2-meta">
+                      {distance} km • {statusText}
+                    </div>
+
+                    {!locked && (
+                      <div className="liked-card-v2-tags">
+                        <span className="tag">☕ Coffee</span>
+                        <span className="tag">✈️ Travel</span>
+                        <span className="tag">🎵 Music</span>
+                      </div>
+                    )}
+
+                    {!locked && (
+                      <div className="liked-card-v2-actions">
+                        <button className="btn-view-profile" onClick={() => setDetail(u)}>
+                          Xem hồ sơ
+                        </button>
+                        <button className="btn-like-back" disabled={acting === u.userId} onClick={() => act(u, 'Like')}>
+                          <HeartIcon size={14} /> Thích lại
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  
                   {locked && (
                     <button type="button" className="liked-card-lock" onClick={() => navigate('/premium')}>
-                      <CrownIcon size={18} />
+                      <CrownIcon size={32} />
                       <span>Mở khóa với Gold</span>
                     </button>
                   )}
-                  <div className="liked-card-grad" />
-                  <div className="liked-card-name">
-                    {locked ? 'Ẩn danh' : u.displayName}{!locked && u.age ? `, ${u.age}` : ''}
-                    {!locked && u.isAdmin && <AdminBadge size="sm" />}
-                  </div>
-                </div>
 
-                {/* Chỉ Gold mới được thích/bỏ qua lại */}
-                {isGold && (
-                  <div className="liked-card-actions">
-                    <button type="button" className="liked-act liked-act-pass" disabled={acting === u.userId}
-                      onClick={() => act(u, 'Pass')} aria-label="Bỏ qua">✕</button>
-                    <button type="button" className="liked-act liked-act-like" disabled={acting === u.userId}
-                      onClick={() => act(u, 'Like')} aria-label="Thích lại">
-                      <HeartIcon size={20} />
-                    </button>
-                  </div>
-                )}
-              </motion.div>
-            )
-          })}
-        </div>
+                </motion.div>
+              )
+            })}
+          </div>
+
+          <div className="liked-bottom-banner">
+            <div className="banner-icon"><SparkleIcon size={24} /></div>
+            <div className="banner-content">
+              <strong>Tăng cơ hội nhận thêm lượt thích</strong>
+              <span>Hồ sơ đã hoàn thiện 67% — hoàn thiện nốt để thu hút nhiều người phù hợp hơn.</span>
+            </div>
+            <button className="btn-complete-profile">Hoàn thiện hồ sơ ➔</button>
+          </div>
+        </>
       )}
 
       {/* Gold: xem hồ sơ đầy đủ */}
@@ -151,6 +214,7 @@ export default function LikedMe() {
         onClose={() => setDetail(null)}
         onSwipe={onDetailSwipe}
       />
+      <MatchCelebration match={celebrate} onClose={() => setCelebrate(null)} />
     </div>
   )
 }

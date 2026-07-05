@@ -103,12 +103,12 @@ export default function App() {
             {/* Main app — bắt buộc đã hoàn tất onboarding */}
             <Route path="/" element={<Root />} />
             <Route path="/discovery" element={<Onboarded><PublicOrShell variant="full"><Discovery /></PublicOrShell></Onboarded>} />
-            <Route path="/matches" element={<Onboarded><PublicOrShell><Matches /></PublicOrShell></Onboarded>} />
+            <Route path="/matches" element={<Onboarded><PublicOrShell variant="full"><Matches /></PublicOrShell></Onboarded>} />
             <Route path="/chat" element={<Onboarded><PublicOrShell variant="full"><Chat /></PublicOrShell></Onboarded>} />
             <Route path="/chat/:conversationId" element={<Onboarded><PublicOrShell variant="full"><Chat /></PublicOrShell></Onboarded>} />
-            <Route path="/profile" element={<Onboarded><PublicOrShell><Profile /></PublicOrShell></Onboarded>} />
+            <Route path="/profile" element={<Onboarded><PublicOrShell variant="full"><Profile /></PublicOrShell></Onboarded>} />
             <Route path="/profile/:userId" element={<Onboarded><PublicOrShell><Profile /></PublicOrShell></Onboarded>} />
-            <Route path="/reputation" element={<Onboarded><PublicOrShell><Reputation /></PublicOrShell></Onboarded>} />
+            <Route path="/reputation" element={<Onboarded><PublicOrShell variant="full"><Reputation /></PublicOrShell></Onboarded>} />
             <Route path="/liked-me" element={<Onboarded><PublicOrShell><LikedMe /></PublicOrShell></Onboarded>} />
             <Route path="/date-pass" element={<Onboarded><PublicOrShell variant="full"><DatePass /></PublicOrShell></Onboarded>} />
             <Route path="/admin" element={<AuthOnly><AdminDashboard /></AuthOnly>} />
@@ -116,7 +116,7 @@ export default function App() {
             <Route path="/love-tree/:matchId" element={<Onboarded><PublicOrShell variant="full"><LoveTree /></PublicOrShell></Onboarded>} />
             <Route path="/tasks" element={<Onboarded><PublicOrShell><Tasks /></PublicOrShell></Onboarded>} />
             <Route path="/meet-up/:partnerId" element={<Onboarded><PublicOrShell><MeetUpPlan /></PublicOrShell></Onboarded>} />
-            <Route path="/daily-connection" element={<Onboarded><PublicOrShell><DailyConnection /></PublicOrShell></Onboarded>} />
+            <Route path="/daily-connection" element={<Onboarded><PublicOrShell variant="full"><DailyConnection /></PublicOrShell></Onboarded>} />
             <Route path="/premium" element={<Onboarded><PublicOrShell variant="full"><Premium /></PublicOrShell></Onboarded>} />
             <Route path="/account-verification" element={<Onboarded><PublicOrShell><AccountVerification /></PublicOrShell></Onboarded>} />
 

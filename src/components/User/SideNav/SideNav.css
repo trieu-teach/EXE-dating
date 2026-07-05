@@ -1,0 +1,204 @@
+/* ── SideNav — sidebar điều hướng bên trái thay cho header ngang ── */
+.sidenav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  width: 292px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px 18px 20px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+[data-theme='dark'] .sidenav {
+  background: rgba(20, 14, 24, 0.28);
+  border-right-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Brand */
+.sidenav-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 2px 6px;
+  text-decoration: none;
+}
+.sidenav-brand:hover { text-decoration: none; }
+.sidenav-brand-text {
+  font-weight: 900;
+  font-size: 2.3rem;
+  letter-spacing: -0.02em;
+  color: #c2125c;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* Khối người dùng — bố cục 2 dòng: (avatar+tên+chuông) rồi (badge gói) ─── */
+.sidenav-user {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+.sidenav-user-row1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidenav-avatar {
+  display: block;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background-color: var(--color-surface-2, #f3eef1);
+  background-size: cover;
+  background-position: center;
+  border: 2px solid var(--color-border, #eee0ea);
+  flex-shrink: 0;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.sidenav-avatar:hover { border-color: var(--color-primary, #ff4f8b); transform: scale(1.05); }
+.sidenav-user-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e0357f;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.sidenav-user-row2 {
+  padding-left: 56px; /* thẳng hàng với tên, không thẳng hàng với avatar */
+}
+.sidenav-user-plan {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 215, 0, 0.2);
+  color: #8a6d00;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.sidenav-user-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+/* Dropdown thông báo mở về phía nội dung (bên phải sidebar) thay vì tràn ra ngoài màn */
+.sidenav .notif-dropdown {
+  left: -8px;
+  right: auto;
+  transform-origin: top left;
+}
+
+/* Danh sách điều hướng — mỗi tab là 1 khung kính trong suốt hoàn toàn (outline glass) */
+.sidenav-links {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+}
+.sidenav-link {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 15px;
+  border-radius: 16px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #4a2e3d;
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+.sidenav-link svg {
+  flex-shrink: 0;
+}
+.sidenav-link:hover {
+  color: #d6336c;
+  text-decoration: none;
+}
+.sidenav-link.active {
+  color: #d6336c;
+  font-weight: 600;
+}
+
+/* CTA nâng cấp */
+.sidenav-upgrade {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #ff4f8b, #e63472);
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(255, 79, 139, 0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+}
+.sidenav-upgrade:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(255, 79, 139, 0.45);
+  text-decoration: none;
+  color: #fff;
+}
+
+/* Chân sidebar */
+.sidenav-foot {
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+[data-theme='dark'] .sidenav-foot { border-top-color: rgba(255, 255, 255, 0.08); }
+
+/* ── Màn hẹp: thu thành thanh icon ── */
+@media (max-width: 1023px) {
+  .sidenav { width: 68px; padding: 14px 8px; gap: 12px; align-items: center; }
+  .sidenav-brand { padding: 0; }
+  .sidenav-brand-text,
+  .sidenav-link-label,
+  .sidenav-user-name,
+  .sidenav-user-row2 { display: none; }
+  .sidenav-user {
+    padding: 8px 6px;
+    gap: 8px;
+    width: 100%;
+  }
+  .sidenav-user-row1 { flex-direction: column; }
+  .sidenav-user-actions { flex-direction: column; }
+  .sidenav-link { justify-content: center; padding: 11px 0; width: 100%; }
+  .sidenav-upgrade { padding: 11px 0; width: 100%; }
+  .sidenav-foot { width: 100%; }
+  .sidenav .notif-dropdown { left: 52px; top: -6px; }
+}

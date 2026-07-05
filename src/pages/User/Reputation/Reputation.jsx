@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Lock } from 'lucide-react'
 import { reputationService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
-import { ShieldCheckIcon, SparkleIcon, ChevronRightIcon } from '../../../components/ui/CustomIcons.jsx'
+import { ShieldCheckIcon, SparkleIcon, ChevronRightIcon, UserIcon } from '../../../components/ui/CustomIcons.jsx'
 import './Reputation.css'
 
 const EVENT_META = {
@@ -56,6 +57,9 @@ export default function Reputation() {
   const score = Math.max(0, Math.min(100, data.score ?? 0))
   const color = tierColor(data.tier)
   const tierEmoji = tierEmojiOf(data.tier)
+  const hasTips = data.howToImprove?.length > 0
+  const hasEvents = data.recentEvents?.length > 0
+  const pairTipsEvents = hasTips && hasEvents
 
   return (
     <div className="rep-root">
@@ -68,8 +72,7 @@ export default function Reputation() {
             {score}<span className="rep-score-max">/100</span>
           </div>
           <div className="rep-tier-pill" style={{ '--tc': color }}>
-            <span className="rep-tier-pill-emoji">{tierEmoji}</span>
-            {data.tierLabel || data.tier}
+            {data.tierLabel || <><span className="rep-tier-pill-emoji">{tierEmoji}</span>{data.tier}</>}
           </div>
         </div>
 
@@ -100,14 +103,25 @@ export default function Reputation() {
       )}
 
       {/* What is it */}
-      <section className="rep-section">
-        <h2 className="rep-section-title">Điểm uy tín là gì?</h2>
-        <p className="rep-text">
-          Mỗi người bắt đầu ở <strong>50 điểm</strong>. Điểm tăng khi bạn xác minh, hoàn thiện hồ sơ và
-          kết nối tích cực; giảm khi có hành vi khiến người khác khó chịu. Người khác <strong>chỉ thấy “mức”</strong>
-          {' '}(Mới / Bình thường / Tốt / Cao) trên thẻ Khám phá — <strong>không thấy con số</strong> của bạn.
-          Mức càng cao, hồ sơ càng được ưu tiên hiển thị.
-        </p>
+      <section className="rep-section rep-section-row rep-col-half">
+        <div className="rep-section-main">
+          <h2 className="rep-section-title">Điểm uy tín là gì?</h2>
+          <p className="rep-text">
+            Mỗi người bắt đầu ở <strong>50 điểm</strong>. Điểm tăng khi bạn xác minh, hoàn thiện hồ sơ và
+            kết nối tích cực; giảm khi có hành vi khiến người khác khó chịu. Người khác <strong>chỉ thấy “mức”</strong>
+            {' '}(Mới / Bình thường / Tốt / Cao) trên thẻ Khám phá — <strong>không thấy con số</strong> của bạn.
+            Mức càng cao, hồ sơ càng được ưu tiên hiển thị.
+          </p>
+        </div>
+        <div className="rep-section-art" aria-hidden="true">
+          <div className="rep-clipboard">
+            <span className="rep-clipboard-clip" />
+            <UserIcon size={26} />
+            <span className="rep-clipboard-badge"><ShieldCheckIcon size={13} /></span>
+          </div>
+          <span className="rep-section-art-sparkle rep-section-art-sparkle-1">✦</span>
+          <span className="rep-section-art-sparkle rep-section-art-sparkle-2">✦</span>
+        </div>
       </section>
 
       {/* Tiers */}
@@ -115,20 +129,19 @@ export default function Reputation() {
         <h2 className="rep-section-title">Các mức uy tín</h2>
         <div className="rep-tiers">
           {TIERS.map((t) => (
-            <div key={t.key} className={`rep-tier-row${t.key === data.tier ? ' is-current' : ''}`}>
-              <span className="rep-tier-emoji">{t.emoji}</span>
-              <div className="rep-tier-info">
-                <div className="rep-tier-name" style={{ color: t.color }}>{t.label} <span className="rep-tier-range">{t.range}</span></div>
-                <div className="rep-tier-desc">{t.desc}</div>
-              </div>
+            <div key={t.key} className={`rep-tier-card${t.key === data.tier ? ' is-current' : ''}`} style={{ '--tc': t.color }}>
               {t.key === data.tier && <span className="rep-tier-you">Bạn</span>}
+              <span className="rep-tier-emoji">{t.emoji}</span>
+              <div className="rep-tier-name" style={{ color: t.color }}>{t.label}</div>
+              <span className="rep-tier-range">{t.range}</span>
+              <div className="rep-tier-desc">{t.desc}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* How it changes */}
-      <section className="rep-section">
+      <section className="rep-section rep-col-half">
         <h2 className="rep-section-title">Cách điểm thay đổi</h2>
         <div className="rep-rules">
           <div className="rep-rules-col">
@@ -154,8 +167,8 @@ export default function Reputation() {
       </section>
 
       {/* Tips */}
-      {data.howToImprove?.length > 0 && (
-        <section className="rep-section">
+      {hasTips && (
+        <section className={`rep-section${pairTipsEvents ? ' rep-col-half' : ''}`}>
           <h2 className="rep-section-title">Gợi ý cải thiện</h2>
           <ul className="rep-tips">
             {data.howToImprove.map((tip, i) => <li key={i}>{tip}</li>)}
@@ -164,8 +177,8 @@ export default function Reputation() {
       )}
 
       {/* Recent events */}
-      {data.recentEvents?.length > 0 && (
-        <section className="rep-section">
+      {hasEvents && (
+        <section className={`rep-section${pairTipsEvents ? ' rep-col-half' : ''}`}>
           <h2 className="rep-section-title">Hoạt động gần đây</h2>
           <div className="rep-events">
             {data.recentEvents.map((e, i) => {
@@ -185,6 +198,11 @@ export default function Reputation() {
           </div>
         </section>
       )}
+
+      <div className="rep-footnote">
+        <Lock size={14} />
+        Điểm uy tín giúp xây dựng môi trường hẹn hò an toàn, lành mạnh và đáng tin cậy cho tất cả mọi người.
+      </div>
     </div>
   )
 }

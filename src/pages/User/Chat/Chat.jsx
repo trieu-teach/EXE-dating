@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { SearchIcon, SendIcon, Sparkles2Icon, HeartChatIcon, Check2Icon, LightbulbIcon, XSmallIcon, ArrowUpIcon } from '../../../components/ui/CustomIcons.jsx'
-import { chatService, plantsService, connectionRemindersService, meetupService, venuesService, profileService, blocksService, matchesService } from '../../../api'
+import { SearchIcon, SendIcon, Sparkles2Icon, HeartChatIcon, Check2Icon, ArrowUpIcon } from '../../../components/ui/CustomIcons.jsx'
+import { chatService, plantsService, meetupService, venuesService, profileService, blocksService, matchesService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { useAuth } from '../../../context/AuthContext.jsx'
 import { timeAgo, resolveImageUrl, formatDistance } from '../../../utils/format.js'
@@ -72,7 +72,6 @@ export default function Chat() {
   const [sending, setSending] = useState(false)
   const [plant, setPlant] = useState(null)
   const [watering, setWatering] = useState(false)
-  const [nudges, setNudges] = useState([])
   const [detailVenue, setDetailVenue] = useState(null)
   const [detailOpen, setDetailOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -117,7 +116,6 @@ export default function Chat() {
     setThreadLoading(true)
     setMessages([])
     setPlant(null)
-    setNudges([])
 
     chatService.messages(conversation.id, { limit: 50 })
       .then((list) => { if (!cancelled) setMessages(Array.isArray(list) ? list : (list?.items ?? [])) })
@@ -129,9 +127,6 @@ export default function Chat() {
     if (conversation?.matchId) {
       plantsService.get(conversation.matchId)
         .then((p) => { if (!cancelled) setPlant(p) })
-        .catch(() => {})
-      connectionRemindersService.nudges(conversation.id)
-        .then((n) => { if (!cancelled) setNudges(Array.isArray(n?.items) ? n.items : (Array.isArray(n) ? n : [])) })
         .catch(() => {})
     }
 
@@ -256,13 +251,6 @@ export default function Chat() {
     } finally {
       setProposing(false)
     }
-  }
-
-  const handleDismissNudge = async (nudgeId) => {
-    try {
-      await connectionRemindersService.dismissNudge(conversation.id, nudgeId)
-      setNudges((cur) => cur.filter((n) => (n.id || n.code) !== nudgeId))
-    } catch {}
   }
 
   const openVenueDetail = (venue) => {
@@ -457,19 +445,6 @@ export default function Chat() {
 
                 <div ref={messagesEnd} />
               </div>
-
-              {nudges.length > 0 && (
-                <div className="chat-nudge-bar">
-                  {nudges.slice(0, 2).map((n) => (
-                    <div key={n.id || n.code} className="chat-nudge">
-                      <span><LightbulbIcon size={14} /> {n.title || n.body || n.code}</span>
-                      <button type="button" className="chat-nudge-dismiss" onClick={() => handleDismissNudge(n.id || n.code)} aria-label="Bỏ qua">
-                        <XSmallIcon size={14} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
 
               <VenueDetailModal venue={detailVenue} open={detailOpen} onClose={() => setDetailOpen(false)} onPropose={(v) => openPropose(v)} />
 

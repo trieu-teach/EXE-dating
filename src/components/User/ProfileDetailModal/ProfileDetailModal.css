@@ -297,7 +297,8 @@
 }
 
 .pdm-bio {
-  background: var(--color-surface-2, #f2f2f7);
+  background: #fff;
+  border: 1px solid var(--color-border, #eee0ea);
   border-radius: 14px;
   padding: 14px 16px;
 }
@@ -359,33 +360,32 @@
 
 /* Pass */
 .pdm-action-pass {
-  width: 58px;
-  height: 58px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: var(--color-surface, #ffffff);
-  color: var(--color-text-muted, #8e8e93);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 5px rgba(0, 0, 0, 0.07);
-  border: 1.5px solid var(--color-border, rgba(0, 0, 0, 0.08));
+  background: linear-gradient(135deg, #ff8a8a, #ef4444);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.45);
 }
 
 /* Super */
 .pdm-action-super {
-  width: 52px;
-  height: 52px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-accent, #b14bff), #9333ea);
+  background: linear-gradient(135deg, #5fd0ff, #2563eb);
   color: #ffffff;
-  box-shadow: 0 0 28px rgba(177, 75, 255, 0.55), 0 6px 20px rgba(177, 75, 255, 0.4);
+  box-shadow: 0 6px 18px rgba(56, 189, 248, 0.45);
 }
 
 /* Like */
 .pdm-action-like {
-  width: 66px;
-  height: 66px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-primary, #ff4f8b), #ff2d6b);
   color: #ffffff;
-  box-shadow: 0 0 32px rgba(255, 79, 139, 0.6), 0 8px 28px rgba(255, 79, 139, 0.5);
+  box-shadow: 0 6px 18px rgba(255, 79, 139, 0.5);
 }
 
 /* ── Dark Mode ────────────────────────────────────────────── */
@@ -438,4 +438,46 @@
   .pdm-photo-wrap {
     border-radius: 28px 28px 0 0;
   }
+}
+
+/* ── Chip thông tin cơ bản (thay các hàng kẻ ngang cũ) ── */
+.pdm-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.pdm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--color-surface-2, #f6eef3);
+  border: 1px solid var(--color-border, #eee0ea);
+  color: var(--color-text, #23151d);
+  border-radius: 999px;
+  padding: 8px 15px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.pdm-chip-goal {
+  background: rgba(255, 79, 139, 0.1);
+  border-color: rgba(255, 79, 139, 0.35);
+  color: var(--color-primary, #ff4f8b);
+}
+.pdm-bio-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-text-soft, #8e8e93);
+  margin-bottom: 6px;
+}
+
+/* Lời nhắn khi hồ sơ chưa có giới thiệu */
+.pdm-bio-empty {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  font-style: italic;
+  color: var(--color-text-soft, #8e8e93);
 }

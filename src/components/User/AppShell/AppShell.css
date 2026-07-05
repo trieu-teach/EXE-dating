@@ -12,13 +12,12 @@
   flex: 1;
   display: flex;
   justify-content: center;
-  padding: 72px 0 0;
+  padding: 24px 0 0;
+  margin-left: 292px;            /* chừa chỗ cho SideNav cố định bên trái */
 }
 
-@media (min-width: 768px) {
-  .app-shell-body {
-    padding: 72px 0 0;
-  }
+@media (max-width: 1023px) {
+  .app-shell-body { margin-left: 68px; }
 }
 
 /* Default: content constrained */
@@ -32,13 +31,6 @@
 /* Full-width variant: no max-width, let children decide */
 .app-shell-main.full {
   max-width: 100%;
-}
-
-/* Desktop */
-@media (min-width: 768px) {
-  .app-shell-body {
-    padding: 72px 0 0;
-  }
 }
 
 /* ── TopNav ─────────────────────────────────────────────── */

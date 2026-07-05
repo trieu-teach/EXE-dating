@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { profileService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { useAuth } from '../../../context/AuthContext.jsx'
@@ -7,7 +8,7 @@ import { resolveImageUrl, formatDate } from '../../../utils/format.js'
 import ProfileInfoForm from '../../../components/User/ProfileInfoForm/ProfileInfoForm.jsx'
 import ProfilePhotoManager from '../../../components/User/ProfilePhotoManager/ProfilePhotoManager.jsx'
 import ProfilePreviewModal from '../../../components/User/ProfilePreviewModal/ProfilePreviewModal.jsx'
-import { PinIcon, EyeIcon, ShieldIcon, MessageIcon, ChevronRightIcon, StarIcon } from '../../../components/ui/CustomIcons.jsx'
+import { PinIcon, EyeIcon, ShieldIcon, MessageIcon, ChevronRightIcon, StarIcon, HeartIcon } from '../../../components/ui/CustomIcons.jsx'
 import AdminBadge from '../../../components/User/AdminBadge/AdminBadge.jsx'
 import AvatarFrame from '../../../components/User/AvatarFrame/AvatarFrame.jsx'
 import AvatarFramePicker from '../../../components/User/AvatarFrame/AvatarFramePicker.jsx'
@@ -47,6 +48,17 @@ export default function Profile() {
 
   return (
     <div className="profile-root">
+      {isMe && (
+        <div className="profile-topbar">
+          <button type="button" className="profile-back-btn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={16} /> Quay lại
+          </button>
+        </div>
+      )}
+
+      <span className="profile-bg-heart profile-bg-heart-1" aria-hidden="true"><HeartIcon size={40} /></span>
+      <span className="profile-bg-heart profile-bg-heart-2" aria-hidden="true"><HeartIcon size={22} /></span>
+
       {/* Info card */}
       <div className="profile-info-card">
         {/* Header: avatar + name + action */}
@@ -66,11 +78,19 @@ export default function Profile() {
           </AvatarFrame>
 
           <div className="profile-header-info">
-            <h1 className="profile-name">
-              {displayName}
-              {profile.age && <span className="profile-age">, {profile.age}</span>}
-              {profile.isAdmin && <AdminBadge />}
-            </h1>
+            <div className="profile-name-row">
+              <h1 className="profile-name">
+                {displayName}
+                {profile.age && <span className="profile-age">, {profile.age}</span>}
+                {profile.isAdmin && <AdminBadge />}
+              </h1>
+              {isMe && (
+                <button type="button" className="profile-edit-btn" onClick={() => setPreviewOpen(true)} title="Xem trước hồ sơ">
+                  <EyeIcon size={15} />
+                  Xem trước
+                </button>
+              )}
+            </div>
             {profile.city && (
               <div className="profile-location">
                 <PinIcon size={13} />
@@ -79,12 +99,7 @@ export default function Profile() {
             )}
           </div>
 
-          {isMe ? (
-            <button className="profile-edit-btn" onClick={() => setPreviewOpen(true)} title="Xem trước hồ sơ">
-              <EyeIcon size={15} />
-              Xem trước
-            </button>
-          ) : (
+          {!isMe && (
             <button className="profile-msg-btn" onClick={() => navigate('/matches')}>
               <MessageIcon size={15} />
               Nhắn tin
@@ -175,24 +190,33 @@ export default function Profile() {
               </>
             )}
 
-            {/* Xác minh */}
-            <div className="profile-section-label">Xác minh</div>
-            <button type="button" className="profile-row" onClick={() => navigate('/account-verification')}>
-              <span className="profile-row-label">
-                <ShieldIcon size={17} />
-                {profile.isVerified ? 'Tài khoản đã xác minh' : 'Xác minh tài khoản'}
-              </span>
-              {profile.isVerified
-                ? <span className="profile-verify-badge">Đã xác minh</span>
-                : <ChevronRightIcon size={16} className="profile-row-chevron" />}
-            </button>
-
-            {/* Uy tín */}
-            <div className="profile-section-label">Uy tín</div>
-            <button type="button" className="profile-row" onClick={() => navigate('/reputation')}>
-              <span className="profile-row-label"><StarIcon size={16} /> Xem điểm uy tín của tôi</span>
-              <ChevronRightIcon size={16} className="profile-row-chevron" />
-            </button>
+            {/* Xác minh + Uy tín — 2 cột */}
+            <div className="profile-row-grid">
+              <div>
+                <div className="profile-section-label">Xác minh</div>
+                <button type="button" className="profile-row" onClick={() => navigate('/account-verification')}>
+                  <span className="profile-row-icon is-blue"><ShieldIcon size={17} /></span>
+                  <span className="profile-row-text">
+                    <strong>{profile.isVerified ? 'Tài khoản đã xác minh' : 'Xác minh tài khoản'}</strong>
+                    <span>Tăng độ tin cậy và bảo vệ tài khoản</span>
+                  </span>
+                  {profile.isVerified
+                    ? <span className="profile-verify-badge">Đã xác minh</span>
+                    : <ChevronRightIcon size={16} className="profile-row-chevron" />}
+                </button>
+              </div>
+              <div>
+                <div className="profile-section-label">Uy tín</div>
+                <button type="button" className="profile-row" onClick={() => navigate('/reputation')}>
+                  <span className="profile-row-icon is-pink"><StarIcon size={16} /></span>
+                  <span className="profile-row-text">
+                    <strong>Xem điểm uy tín của tôi</strong>
+                    <span>Theo dõi và cải thiện uy tín</span>
+                  </span>
+                  <ChevronRightIcon size={16} className="profile-row-chevron" />
+                </button>
+              </div>
+            </div>
 
             {/* Thông tin */}
             <div className="profile-section-label">Thông tin của tôi</div>

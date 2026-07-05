@@ -1,0 +1,53 @@
+/* ── Glass Heart Hero — premium 3D-glass illustration ─────────────── */
+
+.ghh-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  height: 400px;
+  flex: 0 0 42%;
+  pointer-events: none;
+  user-select: none;
+  overflow: visible;
+}
+
+/* Main heart image — glow and orbit ring are already baked into the asset */
+.ghh-image {
+  position: absolute;
+  top: 50%;
+  left: 66%;
+  width: 122%;
+  max-width: none;
+  transform: translate(-50%, -50%);
+  animation: ghh-float-main 7s ease-in-out infinite;
+  z-index: 2;
+}
+
+/* Small floating hearts around the main heart — give it depth */
+.ghh-mini {
+  position: absolute;
+  z-index: 1;
+  opacity: var(--o, 0.5);
+  filter: blur(var(--b, 0px));
+  animation: ghh-float-mini var(--dur, 7s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes ghh-float-main {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+  50%      { transform: translate(-50%, -50%) translateY(-14px); }
+}
+@keyframes ghh-float-mini {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50%      { transform: translateY(-12px) translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ghh-image, .ghh-mini {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .ghh-wrap { display: none; }
+}

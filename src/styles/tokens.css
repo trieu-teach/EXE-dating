@@ -70,7 +70,7 @@
   --transition-base: 200ms ease;
   --transition-slow: 320ms ease;
 
-  --header-height: 64px;
+  --header-height: 0px; /* header ngang đã thay bằng SideNav */
   --content-max-width: 1100px;
 }
 

@@ -28,13 +28,12 @@ const BADGE_LABELS = {
 }
 
 const GOAL_LABELS = {
-  date: 'Hẹn hò nghiêm túc',
-  chat: 'Trò chuyện',
-  fun: 'Vui vẻ',
-  friendship: 'Kết bạn',
-  long_term: 'Mối quan hệ dài hạn',
-  short_term: 'Quan hệ ngắn hạn',
+  LongTerm: 'Mối quan hệ lâu dài',
+  ShortTerm: 'Mối quan hệ ngắn hạn',
+  Friendship: 'Kết bạn',
+  Casual: 'Hẹn hò thoải mái',
 }
+const GENDER_LABELS = { Male: 'Nam', Female: 'Nữ', Other: 'Khác' }
 
 export default function ProfileDetailModal({ profile, open, onClose, onSwipe }) {
   const toast = useToast()
@@ -196,38 +195,26 @@ export default function ProfileDetailModal({ profile, open, onClose, onSwipe }) 
               )}
             </div>
 
-            {/* Dating goal */}
-            {profile.datingGoal && (
-              <div className="pdm-goal">
-                <span className="pdm-goal-label">Mục tiêu hẹn hò:</span>
-                <span className="pdm-goal-value">
-                  {GOAL_LABELS[profile.datingGoal] ?? profile.datingGoal}
-                </span>
+            {/* Thông tin cơ bản — chip đồng bộ với thẻ Discovery */}
+            {(profile.datingGoal || profile.height || profile.gender) && (
+              <div className="pdm-chips">
+                {profile.datingGoal && (
+                  <span className="pdm-chip pdm-chip-goal">💘 {GOAL_LABELS[profile.datingGoal] ?? profile.datingGoal}</span>
+                )}
+                {profile.height && <span className="pdm-chip">📏 {profile.height} cm</span>}
+                {profile.gender && (
+                  <span className="pdm-chip">{profile.gender === 'Female' ? '👩' : profile.gender === 'Male' ? '👨' : '🧑'} {GENDER_LABELS[profile.gender] ?? profile.gender}</span>
+                )}
               </div>
             )}
 
-            {/* Height */}
-            {profile.height && (
-              <div className="pdm-row">
-                <span className="pdm-row-label">Chiều cao</span>
-                <span className="pdm-row-value">{profile.height} cm</span>
-              </div>
-            )}
-
-            {/* Gender */}
-            {profile.gender && (
-              <div className="pdm-row">
-                <span className="pdm-row-label">Giới tính</span>
-                <span className="pdm-row-value">{profile.gender}</span>
-              </div>
-            )}
-
-            {/* Bio */}
-            {profile.bio && (
-              <div className="pdm-bio">
-                <p>{profile.bio}</p>
-              </div>
-            )}
+            {/* Bio — hồ sơ trống thì có lời nhắn thân thiện thay vì bỏ trống */}
+            <div className="pdm-bio">
+              <div className="pdm-bio-label">Giới thiệu</div>
+              {profile.bio
+                ? <p>{profile.bio}</p>
+                : <p className="pdm-bio-empty">{profile.displayName || 'Người ấy'} chưa viết giới thiệu — hãy bắt chuyện để hiểu họ hơn nhé 💬</p>}
+            </div>
 
             {/* Interests */}
             {profile.interests?.length > 0 && (

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -32,7 +33,7 @@
   --shadow-lg: 0 24px 60px rgba(255, 79, 139, 0.12);
   --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
   --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 56px;
-  --header-height: 64px;
+  --header-height: 0px; /* header ngang đã thay bằng SideNav */
   --content-max-width: 680px;
 }
 

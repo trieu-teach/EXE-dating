@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: linear-gradient(135deg, #fff0f8 0%, #fce4ec 30%, #f3e5f5 60%, #ede7f6 100%);
+  background: url('/assets/br-16-bg.png') center / cover no-repeat fixed;
   position: relative;
   overflow: hidden;
 }
@@ -164,7 +164,7 @@
 
 /* Dark mode */
 [data-theme='dark'] .auth-page {
-  background: linear-gradient(135deg, #1a0d14 0%, #15091a 30%, #1a0d20 60%, #1a0d18 100%);
+  background: url('/assets/br-16-bg.png') center / cover no-repeat fixed;
 }
 [data-theme='dark'] .auth-card {
   background: rgba(30, 16, 32, 0.9);

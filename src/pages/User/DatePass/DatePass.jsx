@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { datePassService, subscriptionService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
-import { HeartIcon, SparkleIcon, CheckIcon } from '../../../components/ui/CustomIcons.jsx'
+import { HeartIcon, CheckIcon } from '../../../components/ui/CustomIcons.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import './DatePass.css'
 
@@ -125,7 +125,6 @@ export default function DatePass() {
       {/* Header sạch + accent thương hiệu */}
       <header className="dc-header">
         <span className="dc-glow" aria-hidden />
-        <span className="dc-eyebrow"><SparkleIcon size={12} /> Ưu đãi hẹn hò</span>
         <h1 className="dc-title">Combo cho <span>buổi hẹn</span></h1>
         <p className="dc-subtitle">Đặt combo ưu đãi tại quán đối tác — nhận voucher qua email, ra quán chỉ cần đưa mã QR.</p>
       </header>

@@ -1,5 +1,15 @@
 /* ══════════ Date Pass — combo ưu đãi hẹn hò ══════════ */
-.dp-root { max-width: 1120px; margin: 0 auto; padding: 18px 20px 64px; }
+.dp-root { position: relative; max-width: 1120px; min-height: 100vh; margin: -24px auto 0; padding: 42px 20px 64px; }
+/* Ảnh nền trang trí — full-bleed hết chiều ngang lẫn hết chiều cao trang */
+.dp-root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: url('/assets/br-10.png') center top / cover no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+.dp-root > * { position: relative; z-index: 1; }
 
 /* Hero banner */
 .dp-hero {
@@ -26,25 +36,40 @@
 }
 
 /* Tabs */
-.dp-tabs { display: flex; gap: 8px; max-width: 520px; margin: 0 auto 8px; }
-.dp-tab {
-  flex: 1; padding: 11px; border-radius: 12px; border: 1.5px solid var(--color-border);
-  background: var(--color-surface); color: var(--color-text-soft);
-  font-family: inherit; font-size: 0.88rem; font-weight: 800; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  transition: all 0.15s;
+.dp-tabs {
+  display: inline-flex; gap: 6px; width: fit-content; max-width: 100%;
+  margin: 0 auto 8px; padding: 6px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 6px 20px rgba(199, 45, 112, 0.14);
 }
+.dp-tab {
+  flex: none; min-width: 160px; padding: 12px 22px; border-radius: 13px; border: none;
+  background: none; color: #a34b6b;
+  font-family: inherit; font-size: 0.95rem; font-weight: 800; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all 0.2s;
+}
+.dp-tab:hover:not(.is-active) { background: rgba(255, 255, 255, 0.6); color: #e91e63; }
 .dp-tab.is-active {
-  color: #fff; border-color: transparent;
+  color: #fff;
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  box-shadow: 0 6px 18px rgba(255, 79, 139, 0.3);
+  box-shadow: 0 6px 18px rgba(255, 79, 139, 0.38);
+  transform: translateY(-1px);
 }
 .dp-tab-count {
   min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
-  background: var(--color-surface-2); color: var(--color-primary);
+  background: rgba(233, 30, 99, 0.12); color: #e91e63;
   font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center;
 }
 .dp-tab.is-active .dp-tab-count { background: rgba(255,255,255,0.25); color: #fff; }
+
+@media (max-width: 480px) {
+  .dp-tabs { display: flex; }
+  .dp-tab { flex: 1; min-width: 0; }
+}
 
 .dp-body { margin-top: 18px; }
 .dp-empty { text-align: center; padding: 48px 16px; color: var(--color-text-muted); display: flex; flex-direction: column; align-items: center; gap: 14px; }

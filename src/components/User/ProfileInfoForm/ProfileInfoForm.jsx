@@ -110,12 +110,14 @@ export default function ProfileInfoForm({ initial, onSaved, accordion = false })
 
   return (
     <form onSubmit={handleSubmit} className="pinfo-form">
-      <Section id="about" title="Giới thiệu">
-        <div className="pinfo-grid">{aboutFields}</div>
-      </Section>
-      <Section id="basics" title="Thông tin cơ bản">
-        <div className="pinfo-grid">{basicFields}</div>
-      </Section>
+      <div className="pinfo-row">
+        <Section id="basics" title="Thông tin cơ bản">
+          <div className="pinfo-grid">{basicFields}</div>
+        </Section>
+        <Section id="about" title="Giới thiệu">
+          <div className="pinfo-grid">{aboutFields}</div>
+        </Section>
+      </div>
       <button type="submit" className="btn btn-primary btn-block" disabled={saving}>
         {saving ? <span className="spinner" /> : 'Lưu thông tin'}
       </button>

@@ -153,7 +153,6 @@ export default function Premium() {
       {/* ── Hero ── */}
       <div className="premium-hero">
         <div className="premium-hero-content">
-          <div className="premium-hero-icon"><CrownIcon size={30} /></div>
           <h1 className="premium-hero-title">SameMess <span>Premium</span></h1>
           <p className="premium-hero-subtitle">
             Mở khoá trải nghiệm không giới hạn — kết nối nhanh hơn, nổi bật hơn, match nhiều hơn.
@@ -165,7 +164,6 @@ export default function Premium() {
         {/* ── Đang dùng gói trả phí ── */}
         {currentCode !== 'Free' && (
           <div className="premium-current">
-            <CrownIcon size={18} />
             <div className="premium-current-info">
               <div className="premium-current-plan">Gói {currentCode} đang hoạt động</div>
               <div className="premium-current-exp">
@@ -182,7 +180,6 @@ export default function Premium() {
             {cards.map((p, i) => {
               const isPopular = p.code === 'Plus'
               const isCurrent = p.code === currentCode
-              const Icon = p.icon
               return (
                 <motion.div
                   key={p.code}
@@ -197,9 +194,6 @@ export default function Premium() {
                   )}
                   {isCurrent && <div className="premium-plan-current-tag">Đang dùng</div>}
 
-                  <div className="premium-plan-icon" style={{ background: p.gradient }}>
-                    <Icon size={20} />
-                  </div>
                   <div className="premium-plan-name">{p.name}</div>
                   <div className="premium-plan-tagline" style={{ color: p.accent }}>{p.tagline}</div>
 
