@@ -23,7 +23,7 @@
 .vch-brand {
   margin: 0 -22px 18px;
   padding: 18px 22px;
-  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  background: linear-gradient(135deg, #ff4f8b, #e91e63);
   color: #fff;
   display: flex;
   align-items: baseline;
@@ -48,7 +48,7 @@
 }
 .vch-status-icon { font-size: 15px; }
 .vch-status.is-paid { background: #dcfce7; color: #15803d; }
-.vch-status.is-redeemed { background: #ede9fe; color: #6d28d9; }
+.vch-status.is-redeemed { background: #ede9fe; color: #e91e63; }
 .vch-status.is-pending { background: #fef3c7; color: #b45309; }
 .vch-status.is-cancelled { background: #fee2e2; color: #b91c1c; }
 
@@ -59,7 +59,7 @@
   font-size: 30px;
   font-weight: 900;
   margin: 14px 0;
-  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  background: linear-gradient(135deg, #ff4f8b, #e91e63);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -109,7 +109,7 @@
 .vch-redeem-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(22, 163, 74, 0.38); }
 .vch-redeem-btn:active { transform: translateY(0); }
 
-.vch-done { margin-top: 18px; text-align: center; font-weight: 700; color: #6d28d9; }
+.vch-done { margin-top: 18px; text-align: center; font-weight: 700; color: #e91e63; }
 .vch-note { margin-top: 18px; text-align: center; color: #9ca3af; font-size: 14px; }
 
 .vch-footer { font-size: 12px; color: #9b8aa8; }

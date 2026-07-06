@@ -42,7 +42,7 @@
   background: linear-gradient(165deg, #fff3f9 0%, #fbeeff 55%, #f3ecff 100%);
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 22px;
-  box-shadow: 0 24px 60px rgba(177, 75, 255, 0.22), 0 8px 22px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 24px 60px rgba(233, 30, 99, 0.22), 0 8px 22px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   z-index: 100;
   transform-origin: top right;
@@ -210,8 +210,8 @@
   border-radius: 50%;
   display: grid; place-items: center;
   font-size: 2rem;
-  background: linear-gradient(135deg, #f472b6, #a855f7);
-  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.35);
+  background: linear-gradient(135deg, #f472b6, #ec4899);
+  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.35);
 }
 .gift-modal-from { margin-bottom: var(--space-3); }
 .gift-modal-title { margin: 0 0 var(--space-2); }

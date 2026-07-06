@@ -103,7 +103,7 @@ export const MatchHeartIcon = ({ size = 64, className = '' }) => (
     <defs>
       <linearGradient id="matchHeartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M32 56S10 40 10 24a12 12 0 0 1 22 0 12 12 0 0 1 22 0c0 16-22 32-22 32z" />
@@ -123,7 +123,7 @@ export const SparkleIcon = ({ size = 28, className = '' }) => (
     <defs>
       <linearGradient id="sparkleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M12 2L13.5 9.5L21 12L13.5 14.5L12 22L10.5 14.5L3 12L10.5 9.5L12 2Z" />
@@ -143,7 +143,7 @@ export const LeafIcon = ({ size = 28, className = '' }) => (
     <defs>
       <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M17 8C8 10 5.9 16.17 3.82 19.34C3.35 20.2 4.06 21 5 21c3.12 0 5.5-1.56 7-4 1.5 2.44 3.88 4 7 4 1.19 0 2.27-.3 3.22-.81" />
@@ -166,7 +166,7 @@ export const PinIcon = ({ size = 14, className = '' }) => (
     <defs>
       <linearGradient id="pinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -191,7 +191,7 @@ export const UsersIcon = ({ size = 16, className = '' }) => (
     <defs>
       <linearGradient id="usersGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -274,7 +274,7 @@ export const ZapIcon = ({ size = 18, className = '' }) => (
     <defs>
       <linearGradient id="zapGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
@@ -298,7 +298,7 @@ export const SearchIcon = ({ size = 20, className = '' }) => (
     <defs>
       <linearGradient id="searchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <circle cx="11" cy="11" r="8" />
@@ -319,7 +319,7 @@ export const SendIcon = ({ size = 18, className = '' }) => (
     <defs>
       <linearGradient id="sendGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <line x1="22" y1="2" x2="11" y2="13" stroke="url(#sendGrad)" strokeWidth="2" strokeLinecap="round" />
@@ -344,7 +344,7 @@ export const CalendarIcon = ({ size = 16, className = '' }) => (
     <defs>
       <linearGradient id="calGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -367,7 +367,7 @@ export const PhoneIcon = ({ size = 18, className = '' }) => (
     <defs>
       <linearGradient id="phoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 9a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
@@ -387,7 +387,7 @@ export const BellIcon = ({ size = 18, className = '' }) => (
     <defs>
       <linearGradient id="bellGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -412,7 +412,7 @@ export const SettingsIcon = ({ size = 18, className = '' }) => (
     <defs>
       <linearGradient id="settingsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <circle cx="12" cy="12" r="3" />
@@ -437,7 +437,7 @@ export const EyeIcon = ({ size = 18, className = '' }) => (
     <defs>
       <linearGradient id="eyeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
@@ -488,7 +488,7 @@ export const RefreshIcon = ({ size = 16, className = '' }) => (
     <defs>
       <linearGradient id="refreshGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <polyline points="23 4 23 10 17 10" />
@@ -533,7 +533,7 @@ export const CompassIcon = ({ size = 18, className = '' }) => (
     <defs>
       <linearGradient id="compassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <circle cx="12" cy="12" r="10" />
@@ -558,7 +558,7 @@ export const SmartphoneIcon = ({ size = 18, className = '' }) => (
     <defs>
       <linearGradient id="smartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
@@ -583,7 +583,7 @@ export const KeyIcon = ({ size = 18, className = '' }) => (
     <defs>
       <linearGradient id="keyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
@@ -652,7 +652,7 @@ export const EditIcon = ({ size = 15, className = '' }) => (
     <defs>
       <linearGradient id="editGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M12 20h9" />
@@ -717,7 +717,7 @@ export const UserIcon = ({ size = 16, className = '' }) => (
     <defs>
       <linearGradient id="userGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -757,7 +757,7 @@ export const PhoneSmallIcon = ({ size = 18, className = '' }) => (
     <defs>
       <linearGradient id="phoneSmallGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 9a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
@@ -856,7 +856,7 @@ export const HeartBrokenIcon = ({ size = 40, className = '' }) => (
     <defs>
       <linearGradient id="heartBrokenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -901,7 +901,7 @@ export const Sparkles2Icon = ({ size = 40, className = '' }) => (
     <defs>
       <linearGradient id="sparkles2Grad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M12 2L13.5 9.5L21 12L13.5 14.5L12 22L10.5 14.5L3 12L10.5 9.5L12 2Z" />
@@ -981,7 +981,7 @@ export const HeartChatIcon = ({ size = 40, className = '' }) => (
     <defs>
       <linearGradient id="heartChatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -1001,7 +1001,7 @@ export const Tree2Icon = ({ size = 16, className = '' }) => (
     <defs>
       <linearGradient id="tree2Grad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <polygon points="12 2 4 10 20 10" />
@@ -1042,7 +1042,7 @@ export const DuoIcon = ({ size = 14, className = '' }) => (
     <defs>
       <linearGradient id="duoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#ff4f8b" />
-        <stop offset="100%" stopColor="#b14bff" />
+        <stop offset="100%" stopColor="#e91e63" />
       </linearGradient>
     </defs>
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" transform="scale(0.85) translate(2,2)" />

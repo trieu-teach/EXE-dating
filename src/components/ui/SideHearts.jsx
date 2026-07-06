@@ -27,7 +27,7 @@ const THEMES = {
 }
 
 // Màu thương hiệu đặc (không dùng gradient tham chiếu chéo để chắc chắn lên màu)
-const COLORS = { pink: '#ff4f8b', purple: '#b14bff', mix: '#d657c6' }
+const COLORS = { pink: '#ff4f8b', purple: '#e91e63', mix: '#d657c6' }
 
 const LEFT = [
   { layer: 'far', top: 22, left: 40, size: 300, grad: 'pink' },

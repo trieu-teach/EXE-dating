@@ -76,10 +76,13 @@ export default function LikedMe() {
     <div className="liked-root">
       <div className="liked-header-section">
         <div className="liked-header-content">
-          <div className="liked-header-icon">
-            <HeartIcon size={28} />
+          <div className="lm-hdr ph-header">
+            <span className="lm-hdr-glow ph-glow" aria-hidden />
+            <h1 className="ph-title lm-hdr-title">
+              <span className="ph-script lm-hdr-script">Có</span>{' '}
+              <span className="ph-accent lm-hdr-accent">{people.length} người thích bạn <HeartIcon size={22} className="ph-icon ph-beat lm-hdr-icon" /></span>
+            </h1>
           </div>
-          <h1>Có {people.length} người thích bạn</h1>
           <p className="liked-subtitle">
             Ai đó đã dừng lại ở hồ sơ của bạn.<br />
             Có thể đây là khởi đầu của một điều thú vị.

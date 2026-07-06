@@ -21,9 +21,9 @@ export default {
           900: '#e8002d',
         },
         accent: {
-          400: '#c87dff',
-          500: '#b14bff',
-          600: '#9a30ff',
+          400: '#f472b6',
+          500: '#ec4899',
+          600: '#db2777',
         },
       },
       borderRadius: {
@@ -36,7 +36,7 @@ export default {
         'card': '0 4px 16px rgba(0, 0, 0, 0.08)',
         'lift': '0 8px 32px rgba(0, 0, 0, 0.12)',
         'glow-pink': '0 4px 24px rgba(255, 79, 139, 0.25)',
-        'glow-purple': '0 4px 24px rgba(177, 75, 255, 0.25)',
+        'glow-purple': '0 4px 24px rgba(236, 72, 153, 0.25)',
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease',

@@ -7,6 +7,33 @@
   gap: 0;
 }
 
+/* Tiêu đề nghệ thuật — bản điềm tĩnh hơn cho trang tiện ích: cùng cỡ chữ lớn
+   nhưng không có hiệu ứng lấp lánh/nhấp nháy, tông màu dịu hơn, không thẻ nền. */
+.sh-hdr { padding: 20px 4px 8px; margin-bottom: 4px; }
+.sh-hdr-glow {
+  inset: -24px;
+  --ph-glow: radial-gradient(circle, rgba(255, 140, 120, 0.16), transparent 70%);
+}
+.sh-hdr-title { font-size: clamp(2rem, 5.5vw, 2.9rem); gap: 8px; }
+.sh-hdr-script {
+  --ph-script-grad: linear-gradient(100deg, #c9860a 0%, #e0a934 50%, #c9860a 100%);
+  --ph-script-shadow: 0 1px 4px rgba(180, 130, 20, 0.2);
+  animation: none;
+}
+.sh-hdr-accent {
+  --ph-accent-grad: linear-gradient(100deg, #b3506e 0%, #c96a4a 100%);
+  --ph-accent-shadow: 0 1px 3px rgba(150, 80, 90, 0.18);
+  animation: none;
+}
+.sh-hdr-icon { --ph-icon-color: #c96a4a; --ph-icon-glow: 0 1px 3px rgba(150, 80, 90, 0.25); }
+[data-theme='dark'] .sh-hdr-accent {
+  --ph-accent-grad: linear-gradient(100deg, #ffb37a 0%, #ff8fae 100%);
+}
+[data-theme='dark'] .sh-hdr-script {
+  --ph-script-grad: linear-gradient(100deg, #e0a934 0%, #ffd76f 100%);
+}
+[data-theme='dark'] .sh-hdr-icon { --ph-icon-color: #ffb37a; }
+
 /* ── User Avatar Header ─────────────────────────────────────── */
 .settings-avatar-header {
   position: relative;
@@ -22,7 +49,7 @@
   width: 360px;
   height: 360px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(177, 75, 255, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(233, 30, 99, 0.2) 0%, transparent 70%);
   pointer-events: none;
 }
 .settings-avatar-header::after {
@@ -225,7 +252,7 @@
   background: linear-gradient(160deg, #0a0610 0%, #110820 50%, #180d28 100%);
 }
 [data-theme='dark'] .settings-avatar-header::before {
-  background: radial-gradient(circle, rgba(177, 75, 255, 0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(233, 30, 99, 0.18) 0%, transparent 70%);
 }
 [data-theme='dark'] .settings-avatar-header::after {
   background: radial-gradient(circle, rgba(255, 79, 139, 0.12) 0%, transparent 70%);

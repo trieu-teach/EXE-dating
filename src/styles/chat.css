@@ -198,7 +198,7 @@
 .chat-bond-bar {
   margin: 0 var(--space-4);
   padding: var(--space-3) var(--space-4);
-  background: linear-gradient(135deg, rgba(255, 79, 139, 0.08), rgba(177, 75, 255, 0.08));
+  background: linear-gradient(135deg, rgba(255, 79, 139, 0.08), rgba(233, 30, 99, 0.08));
   border: 1px solid rgba(255, 79, 139, 0.2);
   border-radius: var(--radius-lg);
   display: flex;
@@ -252,9 +252,12 @@
   gap: 4px;
   padding: 5px 12px;
   border-radius: var(--radius-pill);
-  background: var(--color-primary);
+  background: linear-gradient(90deg, rgba(247, 147, 30, 0.6) 0%, rgba(236, 72, 153, 0.6) 100%);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
   color: var(--color-primary-ink);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   font-family: inherit;
   font-size: 0.78rem;
   font-weight: 700;
@@ -302,7 +305,7 @@
   margin: 0 var(--space-4);
   padding: var(--space-3);
   background: var(--color-surface);
-  border: 1px dashed rgba(177, 75, 255, 0.35);
+  border: 1px dashed rgba(233, 30, 99, 0.35);
   border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
@@ -334,8 +337,8 @@
   line-height: 1.4;
 }
 .chat-ai-suggestion:hover {
-  background: rgba(177, 75, 255, 0.08);
-  border-color: rgba(177, 75, 255, 0.35);
+  background: rgba(233, 30, 99, 0.08);
+  border-color: rgba(233, 30, 99, 0.35);
 }
 
 /* ── Input bar ──────────────────────────────────── */
@@ -370,9 +373,12 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: linear-gradient(90deg, rgba(247, 147, 30, 0.6) 0%, rgba(236, 72, 153, 0.6) 100%);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
   color: var(--color-primary-ink);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   display: grid;
   place-items: center;
   cursor: pointer;

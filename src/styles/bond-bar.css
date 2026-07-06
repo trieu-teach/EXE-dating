@@ -4,7 +4,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  background: linear-gradient(135deg, rgba(255, 79, 139, 0.06), rgba(177, 75, 255, 0.05));
+  background: linear-gradient(135deg, rgba(255, 79, 139, 0.06), rgba(233, 30, 99, 0.05));
   border: 1.5px solid rgba(255, 79, 139, 0.2);
   border-radius: var(--radius-xl);
 }

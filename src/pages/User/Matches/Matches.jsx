@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { matchesService, chatService, swipesService, subscriptionService, profileService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
-import { HeartIcon, StarIcon, CrownIcon } from '../../../components/ui/CustomIcons.jsx'
+import { HeartIcon, StarIcon, CrownIcon, MatchHeartIcon } from '../../../components/ui/CustomIcons.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import ProfileDetailModal from '../../../components/User/ProfileDetailModal/ProfileDetailModal.jsx'
 import MatchCelebration from '../../../components/User/MatchCelebration/MatchCelebration.jsx'
@@ -41,6 +41,31 @@ const MATCH_FILTERS = [
   { key: 'new', label: 'Mới match' },
   { key: 'replied', label: 'Đã nhắn' },
 ]
+
+/** Banner "hoàn thiện hồ sơ" cuối trang — dùng chung cho tab Lượt thích & Match. */
+function CompletionBanner({ completion, onAction }) {
+  const done = completion != null && completion >= 100
+  return (
+    <div className="liked-bottom-banner" style={{ marginTop: '20px' }}>
+      <div className="banner-content">
+        <strong>{done ? 'Bạn đã sẵn sàng' : 'Tăng cơ hội nhận thêm lượt thích'}</strong>
+        <span>
+          {done
+            ? 'Hồ sơ của bạn đã hoàn chỉnh. Tiếp tục khám phá để gặp thêm người phù hợp.'
+            : `Hồ sơ đã hoàn thiện ${completion}% — hoàn thiện nốt để thu hút nhiều người phù hợp hơn.`}
+        </span>
+        {!done && completion != null && (
+          <div className="banner-progress">
+            <div className="banner-progress-fill" style={{ width: `${completion}%` }} />
+          </div>
+        )}
+      </div>
+      <button type="button" className="btn-complete-profile" onClick={onAction}>
+        {done ? 'Khám phá ➔' : 'Hoàn thiện hồ sơ ➔'}
+      </button>
+    </div>
+  )
+}
 
 export default function Matches() {
   const navigate = useNavigate()
@@ -321,13 +346,18 @@ export default function Matches() {
 
             <section className="liked-header-section">
               <div className="liked-header-content">
-                <h1>
-                  {likers.length === 0
-                    ? 'Chưa có lượt thích mới'
-                    : likers.length === 1
-                      ? 'Có người thích bạn'
-                      : `Có ${likers.length} người thích bạn`}
-                </h1>
+                <div className="lm-hdr ph-header">
+                  <span className="lm-hdr-glow ph-glow" aria-hidden />
+                  <h1 className="ph-title lm-hdr-title">
+                    {likers.length === 0 ? (
+                      <><span className="ph-script lm-hdr-script">Chưa</span> <span className="ph-accent lm-hdr-accent">có lượt thích mới <HeartIcon size={22} className="ph-icon lm-hdr-icon" /></span></>
+                    ) : likers.length === 1 ? (
+                      <><span className="ph-script lm-hdr-script">Có</span> <span className="ph-accent lm-hdr-accent">người thích bạn <HeartIcon size={22} className="ph-icon ph-beat lm-hdr-icon" /></span></>
+                    ) : (
+                      <><span className="ph-script lm-hdr-script">Có</span> <span className="ph-accent lm-hdr-accent">{likers.length} người thích bạn <HeartIcon size={22} className="ph-icon ph-beat lm-hdr-icon" /></span></>
+                    )}
+                  </h1>
+                </div>
                 <p className="liked-subtitle">
                   {likers.length > 0
                     ? <>Ai đó đã dừng lại ở hồ sơ của bạn.<br />Có thể đây là khởi đầu của một điều thú vị.</>
@@ -354,7 +384,7 @@ export default function Matches() {
             </section>
 
             {/* Lưới người đã thích — 3 cột đều như mẫu */}
-            {likers.length > 0 && (
+            {likers.length > 0 ? (
               <section className="lc-sec" ref={gridRef}>
                 <div className="lc-sec-head">
                   <div>
@@ -373,23 +403,19 @@ export default function Matches() {
                   {sortedLikers.map((u, i) => renderLikerCard(u, i))}
                 </div>
               </section>
+            ) : (
+              <div className="liked-empty-suggest">
+                <h3>Đừng ngại toả sáng!</h3>
+                <p>Vuốt thêm vài hồ sơ ở Khám phá — biết đâu người tiếp theo bạn thích cũng đang thích bạn.</p>
+                <button type="button" className="liked-empty-suggest-cta" onClick={() => navigate('/discovery')}>
+                  Khám phá ngay ➔
+                </button>
+              </div>
             )}
 
             {/* Chỉ dẫn cuối trang — banner kính ngang, dựa trên mức hoàn thiện hồ sơ thật */}
-            <div className="liked-bottom-banner" style={{ marginTop: '20px' }}>
-              <div className="banner-content">
-                <strong>{completion != null && completion < 100 ? 'Tăng cơ hội nhận thêm lượt thích' : 'Bạn đã sẵn sàng'}</strong>
-                <span>
-                  {completion != null && completion < 100
-                    ? `Hồ sơ đã hoàn thiện ${completion}% — hoàn thiện nốt để thu hút nhiều người phù hợp hơn.`
-                    : 'Hồ sơ của bạn đã hoàn chỉnh. Tiếp tục khám phá để gặp thêm người phù hợp.'}
-                </span>
-              </div>
-              <button type="button" className="btn-complete-profile"
-                onClick={() => navigate(completion != null && completion < 100 ? '/profile' : '/discovery')}>
-                {completion != null && completion < 100 ? 'Hoàn thiện hồ sơ ➔' : 'Khám phá ➔'}
-              </button>
-            </div>
+            <CompletionBanner completion={completion}
+              onAction={() => navigate(completion != null && completion < 100 ? '/profile' : '/discovery')} />
           </motion.div>
         ) : (
           <motion.div key="matches"
@@ -397,7 +423,12 @@ export default function Matches() {
 
             <section className="liked-header-section">
               <div className="liked-header-content">
-                <h1>Match của bạn</h1>
+                <div className="lm-hdr ph-header">
+                  <span className="lm-hdr-glow ph-glow" aria-hidden />
+                  <h1 className="ph-title lm-hdr-title">
+                    <span className="ph-script lm-hdr-script">Match</span> <span className="ph-accent lm-hdr-accent">của bạn <MatchHeartIcon size={26} className="ph-icon lm-hdr-icon" /></span>
+                  </h1>
+                </div>
                 <p className="liked-subtitle">
                   Mỗi lời chào nhỏ có thể là khởi đầu<br />của điều gì đó thật đẹp.
                 </p>
@@ -462,20 +493,8 @@ export default function Matches() {
               </>
             )}
 
-            <div className="liked-bottom-banner" style={{ marginTop: '20px' }}>
-              <div className="banner-content">
-                <strong>{completion != null && completion < 100 ? 'Tăng cơ hội nhận thêm lượt thích' : 'Bạn đã sẵn sàng'}</strong>
-                <span>
-                  {completion != null && completion < 100
-                    ? `Hồ sơ đã hoàn thiện ${completion}% — hoàn thiện nốt để thu hút nhiều người phù hợp hơn.`
-                    : 'Hồ sơ của bạn đã hoàn chỉnh. Tiếp tục khám phá để gặp thêm người phù hợp.'}
-                </span>
-              </div>
-              <button type="button" className="btn-complete-profile"
-                onClick={() => navigate(completion != null && completion < 100 ? '/profile' : '/discovery')}>
-                {completion != null && completion < 100 ? 'Hoàn thiện hồ sơ ➔' : 'Khám phá ➔'}
-              </button>
-            </div>
+            <CompletionBanner completion={completion}
+              onAction={() => navigate(completion != null && completion < 100 ? '/profile' : '/discovery')} />
           </motion.div>
         )}
       </AnimatePresence>

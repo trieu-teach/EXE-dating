@@ -27,7 +27,7 @@
   width: 600px;
   height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(177, 75, 255, 0.18) 0%, rgba(255, 79, 139, 0.08) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(233, 30, 99, 0.18) 0%, rgba(255, 79, 139, 0.08) 40%, transparent 70%);
   pointer-events: none;
 }
 
@@ -60,13 +60,13 @@
   box-shadow:
     0 0 0 1px rgba(255, 79, 139, 0.3),
     0 12px 40px rgba(255, 79, 139, 0.4),
-    0 0 80px rgba(177, 75, 255, 0.2);
+    0 0 80px rgba(233, 30, 99, 0.2);
   animation: pulse-glow 3s ease-in-out infinite;
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 1px rgba(255, 79, 139, 0.3), 0 12px 40px rgba(255, 79, 139, 0.4), 0 0 80px rgba(177, 75, 255, 0.2); }
-  50% { box-shadow: 0 0 0 1px rgba(255, 79, 139, 0.5), 0 12px 48px rgba(255, 79, 139, 0.55), 0 0 100px rgba(177, 75, 255, 0.35); }
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255, 79, 139, 0.3), 0 12px 40px rgba(255, 79, 139, 0.4), 0 0 80px rgba(233, 30, 99, 0.2); }
+  50% { box-shadow: 0 0 0 1px rgba(255, 79, 139, 0.5), 0 12px 48px rgba(255, 79, 139, 0.55), 0 0 100px rgba(233, 30, 99, 0.35); }
 }
 
 .premium-hero-title {
@@ -78,11 +78,11 @@
   line-height: 1.05;
 }
 
-.premium-hero-title span {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.pm-hdr-script { --ph-script-shadow: 0 2px 10px rgba(245, 166, 35, 0.45); }
+.pm-hdr-icon { --ph-icon-color: #ffd76f; --ph-icon-glow: 0 0 6px rgba(245, 166, 35, 0.65); }
+.pm-hdr-brand {
+  background: linear-gradient(90deg, #F7931E 0%, #EC4899 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
 
 .premium-hero-subtitle {
@@ -135,7 +135,7 @@
   gap: 14px;
   padding: 16px 20px;
   margin: 0 16px;
-  background: linear-gradient(135deg, rgba(255, 79, 139, 0.12), rgba(177, 75, 255, 0.1));
+  background: linear-gradient(135deg, rgba(255, 79, 139, 0.12), rgba(233, 30, 99, 0.1));
   border: 1.5px solid rgba(255, 79, 139, 0.25);
   border-radius: 18px;
   color: var(--color-primary);
@@ -184,14 +184,14 @@
 
 .premium-feature-card:hover {
   background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(177, 75, 255, 0.3);
+  border-color: rgba(233, 30, 99, 0.3);
 }
 
 .premium-feature-icon {
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(255, 79, 139, 0.2), rgba(177, 75, 255, 0.2));
+  background: linear-gradient(135deg, rgba(255, 79, 139, 0.2), rgba(233, 30, 99, 0.2));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -252,7 +252,7 @@
 
 .premium-plan-card.popular {
   border-color: var(--color-primary);
-  background: linear-gradient(135deg, rgba(255, 79, 139, 0.08), rgba(177, 75, 255, 0.06));
+  background: linear-gradient(135deg, rgba(255, 79, 139, 0.08), rgba(233, 30, 99, 0.06));
   box-shadow:
     0 0 0 1px rgba(255, 79, 139, 0.2),
     0 8px 40px rgba(255, 79, 139, 0.15);
@@ -284,7 +284,10 @@
 }
 
 .premium-plan-card.is-current {
-  border-color: rgba(245, 166, 35, 0.5);
+  border-color: transparent;
+  box-shadow:
+    0 0 0 1.5px rgba(245, 166, 35, 0.6),
+    0 8px 40px rgba(245, 166, 35, 0.25);
 }
 
 .premium-plan-icon {
@@ -327,7 +330,7 @@
 }
 
 .premium-plan-blurb {
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.45);
   line-height: 1.5;
   margin: 0;
@@ -377,7 +380,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 0.85rem;
+  font-size: 0.98rem;
   color: rgba(255, 255, 255, 0.65);
   line-height: 1.4;
 }
@@ -398,11 +401,14 @@
   border-radius: 14px;
   font-size: 0.9rem;
   font-weight: 700;
-  border: none;
   cursor: pointer;
   transition: all 0.2s;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background: linear-gradient(90deg, rgba(247, 147, 30, 0.6) 0%, rgba(236, 72, 153, 0.6) 100%);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   box-shadow: 0 4px 20px rgba(255, 79, 139, 0.3);
   letter-spacing: 0.01em;
 }
@@ -560,14 +566,14 @@
   content: '';
   position: fixed;
   inset: 0;
-  background: url('/assets/br-8.png') center top / cover no-repeat;
+  background: url('/assets/br-pre.png') center top / cover no-repeat;
   pointer-events: none;
   z-index: 0;
 }
 .premium-root > * { position: relative; z-index: 1; }
 
 /* Bố cục desktop: nội dung canh giữa rộng rãi */
-.premium-content { max-width: 1080px; margin: 0 auto; width: 100%; padding-bottom: 64px; }
+.premium-content { max-width: 1320px; margin: 0 auto; width: 100%; padding-bottom: 64px; }
 
 /* ── Hero: dùng chung ảnh nền của trang, bỏ hết lớp màu/aurora cũ ── */
 .premium-hero { padding: 60px 24px 56px; background: none; }
@@ -592,15 +598,16 @@
 
 /* ── Đang dùng ── */
 .premium-current {
-  background: rgba(20, 2, 16, 0.5);
-  backdrop-filter: blur(14px);
-  border: 1.5px solid rgba(245,166,35,0.55);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  border: 1px solid rgba(245,166,35,0.4);
 }
 .premium-current-exp { color: rgba(255,255,255,0.75); }
 
 /* ── Lưới gói: 3 cột desktop, thẻ phổ biến nổi lên ── */
 .premium-plans-section-title { color: rgba(255,255,255,0.9); font-size: 0.78rem; text-shadow: 0 1px 6px rgba(0,0,0,0.2); }
-.premium-plans-grid { gap: 18px; }
+.premium-plans-grid { gap: 26px; }
 @media (min-width: 880px) {
   .premium-plans-grid { grid-template-columns: repeat(3, 1fr); align-items: stretch; }
   .premium-plan-card.popular { transform: scale(1.04); z-index: 2; }
@@ -608,34 +615,117 @@
 }
 
 .premium-plan-card {
-  background: rgba(18, 2, 20, 0.5);
-  backdrop-filter: blur(18px);
-  border: 1.5px solid rgba(255,255,255,0.16);
-  border-radius: 24px; padding: 26px 24px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 28px; padding: 38px 32px;
+  min-height: 520px;
   box-shadow: 0 14px 36px rgba(0,0,0,0.28);
+}
+@property --pm-border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+.premium-plan-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 10px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--pm-border-angle),
+    transparent 0%,
+    transparent 62%,
+    #e63950 70%,
+    #f2994a 78%,
+    #f5c26b 86%,
+    #e0507e 94%,
+    transparent 100%
+  );
+  filter: blur(9px) saturate(1.4);
+  opacity: 0.95;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: pm-border-spin 1.9s linear infinite;
+}
+.premium-plan-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 4px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--pm-border-angle),
+    transparent 0%,
+    transparent 62%,
+    #e63950 70%,
+    #f2994a 78%,
+    #f5c26b 86%,
+    #e0507e 94%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: pm-border-spin 1.9s linear infinite;
+}
+@keyframes pm-border-spin {
+  to { --pm-border-angle: 360deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .premium-plan-card::before, .premium-plan-card::after { animation: none; }
 }
 
 /* Free — tím nhẹ */
-.premium-plan-card[data-plan="Free"] { background: linear-gradient(160deg, rgba(90,60,160,0.55), rgba(18,2,20,0.55)); }
+.premium-plan-card[data-plan="Free"] {
+  background-image:
+    linear-gradient(180deg, rgba(40,20,60,0.38) 0%, rgba(40,20,60,0.1) 35%, rgba(40,20,60,0.1) 100%),
+    url('/assets/br-free.png');
+  background-size: cover, cover;
+  background-position: center, center;
+}
 
 /* Plus (phổ biến) — hồng–tím rực, viền sáng */
 .premium-plan-card[data-plan="Plus"].popular {
-  background: linear-gradient(160deg, rgba(140,10,70,0.6), rgba(80,10,120,0.55));
+  background-image:
+    linear-gradient(180deg, rgba(60,10,40,0.4) 0%, rgba(60,10,40,0.12) 35%, rgba(60,10,40,0.12) 100%),
+    url('/assets/br-plus.png');
+  background-size: cover, cover;
+  background-position: center, center;
   border-color: transparent;
-  box-shadow: 0 0 0 1.5px rgba(255,79,139,0.7), 0 18px 50px rgba(255,79,139,0.32), 0 0 80px rgba(177,75,255,0.22);
+  box-shadow: 0 0 0 1.5px rgba(255,79,139,0.7), 0 18px 50px rgba(255,79,139,0.32), 0 0 80px rgba(233, 30, 99,0.22);
 }
 
 /* Gold — sang trọng vàng */
 .premium-plan-card[data-plan="Gold"] {
-  background: linear-gradient(160deg, rgba(120,80,10,0.5), rgba(18,2,20,0.55));
-  border-color: rgba(245,166,35,0.5);
+  background-image:
+    linear-gradient(180deg, rgba(50,30,5,0.38) 0%, rgba(50,30,5,0.1) 35%, rgba(50,30,5,0.1) 100%),
+    url('/assets/br-gold.png');
+  background-size: cover, cover;
+  background-position: center, center;
+  border-color: rgba(245,166,35,0.4);
 }
 .premium-plan-card[data-plan="Gold"]:hover { box-shadow: 0 14px 44px rgba(245,166,35,0.3); }
+/* Gold đang dùng — viền sáng/glow nổi bật như thẻ Plus phổ biến, để rõ đây là gói active */
+.premium-plan-card[data-plan="Gold"].is-current {
+  border-color: transparent;
+  box-shadow: 0 0 0 1.5px rgba(245,166,35,0.85), 0 18px 50px rgba(245,166,35,0.35), 0 0 80px rgba(255,215,111,0.25);
+}
+.premium-plan-card[data-plan="Gold"].is-current:hover {
+  box-shadow: 0 0 0 1.5px rgba(245,166,35,0.95), 0 20px 56px rgba(245,166,35,0.42), 0 0 90px rgba(255,215,111,0.3);
+}
 
 /* Tên + giá nổi bật theo màu gói */
-.premium-plan-icon { width: 52px; height: 52px; border-radius: 16px; }
-.premium-plan-name { font-size: 1.5rem; }
-.premium-plan-amount { font-size: 2.5rem; }
+.premium-plan-icon { width: 64px; height: 64px; border-radius: 18px; }
+.premium-plan-name { font-size: 1.85rem; }
+.premium-plan-amount { font-size: 3rem; }
 .premium-plan-card[data-plan="Plus"] .premium-plan-amount {
   background: linear-gradient(135deg, #ff9ec7, #ff4f8b); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
@@ -652,11 +742,16 @@
 
 /* ── Nút CTA theo gói ── */
 .premium-plan-btn {
-  margin-top: auto; padding: 14px; border-radius: 14px; font-size: 0.95rem; font-weight: 800;
+  margin-top: auto; padding: 17px; border-radius: 16px; font-size: 1.05rem; font-weight: 800;
   letter-spacing: 0.01em; transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
 }
 .premium-plan-card[data-plan="Plus"] .premium-plan-btn {
-  background: linear-gradient(135deg, #ff4f8b, #b14bff); color: #fff; border: none;
+  background: linear-gradient(90deg, rgba(247, 147, 30, 0.6) 0%, rgba(236, 72, 153, 0.6) 100%);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   box-shadow: 0 10px 28px rgba(255,79,139,0.45);
   animation: pm-cta-pulse 2.2s ease-in-out infinite;
 }
@@ -666,9 +761,22 @@
 }
 .premium-plan-btn:not(:disabled):hover { transform: translateY(-2px); filter: brightness(1.05); }
 .premium-plan-btn.is-secondary {
-  background: rgba(255,255,255,0.16); color: #fff; border: 1.5px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  color: #fff; border: 1px solid rgba(255,255,255,0.35);
 }
 .premium-plan-btn:disabled { opacity: 0.75; }
+/* Gói hiện tại — nhãn xanh lá thay vì nút xám mờ giống "Mặc định" của Free */
+.premium-plan-btn.is-current-btn {
+  gap: 6px;
+  background: rgba(74, 222, 128, 0.15);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.5);
+}
+.premium-plan-btn.is-current-btn:disabled { opacity: 1; cursor: default; }
 @keyframes pm-cta-pulse {
   0%,100% { box-shadow: 0 10px 28px rgba(255,79,139,0.45); }
   50% { box-shadow: 0 12px 36px rgba(255,79,139,0.7); }

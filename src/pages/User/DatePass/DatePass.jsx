@@ -9,6 +9,41 @@ import './DatePass.css'
 
 const vnd = (n) => (n ?? 0).toLocaleString('vi-VN') + 'đ'
 const CAT_ICON = { cafe: '☕', restaurant: '🍽️', cinema: '🎬', park: '🌳', bar: '🍸', dessert: '🍰' }
+
+// Màu chủ đạo từng thương hiệu — dùng cho dải nhấn mỏng ở mép trên banner (không phủ
+// nguyên banner nữa, để mọi banner logo dùng chung 1 nền trắng ngà đồng nhất).
+const BRAND_TINTS = [
+  { match: /cgv/i, color: '#e2231a' },
+  { match: /gong\s?cha/i, color: '#6b0f2a' },
+  { match: /haidilao/i, color: '#c8102e' },
+  { match: /highlands/i, color: '#7a2323' },
+  { match: /kfc/i, color: '#e4002b' },
+  { match: /katinat/i, color: '#173b4c' },
+  { match: /ph[uú]c\s?long/i, color: '#1c5c3b' },
+  { match: /pizza\s?4p/i, color: '#1c2b4a' },
+  { match: /starbucks/i, color: '#00704a' },
+  { match: /coffee\s?house/i, color: '#f2681c' },
+]
+function brandTint(venueName) {
+  return BRAND_TINTS.find((b) => b.match.test(venueName || ''))?.color || 'var(--color-primary)'
+}
+
+// Ảnh nền riêng theo thương hiệu (thay cho gradient placeholder) — bổ sung dần khi có ảnh.
+const BRAND_BG = [
+  { match: /cgv/i, src: '/assets/cgv.png' },
+  { match: /gong\s?cha/i, src: '/assets/gong-cha.png' },
+  { match: /haidilao/i, src: '/assets/hadilao.png' },
+  { match: /highlands/i, src: '/assets/highland.png' },
+  { match: /kfc/i, src: '/assets/kfc.png' },
+  { match: /katinat/i, src: '/assets/katinat.png' },
+  { match: /ph[uú]c\s?long/i, src: '/assets/phuclong.png' },
+  { match: /pizza\s?4p/i, src: '/assets/pizza.png' },
+  { match: /starbucks/i, src: '/assets/start.png' },
+  { match: /coffee\s?house/i, src: '/assets/house.png' },
+]
+function brandBg(venueName) {
+  return BRAND_BG.find((b) => b.match.test(venueName || ''))?.src
+}
 const STATUS = {
   Pending: { label: 'Chờ thanh toán', cls: 'is-pending' },
   Paid: { label: 'Sẵn sàng dùng', cls: 'is-paid' },
@@ -123,10 +158,10 @@ export default function DatePass() {
   return (
     <div className="dp-root">
       {/* Header sạch + accent thương hiệu */}
-      <header className="dc-header">
-        <span className="dc-glow" aria-hidden />
-        <h1 className="dc-title">Combo cho <span>buổi hẹn</span></h1>
-        <p className="dc-subtitle">Đặt combo ưu đãi tại quán đối tác — nhận voucher qua email, ra quán chỉ cần đưa mã QR.</p>
+      <header className="dp-hdr">
+        <span className="dp-hdr-glow ph-glow" aria-hidden />
+        <h1 className="dp-hdr-title ph-title"><span className="dp-hdr-script ph-script">Combo cho</span> <span className="dp-hdr-accent ph-accent">buổi hẹn <HeartIcon size={22} className="ph-icon ph-beat dp-hdr-heart" /></span></h1>
+        <p className="ph-subtitle dp-hdr-subtitle">Đặt combo ưu đãi tại quán đối tác — nhận voucher qua email, ra quán chỉ cần đưa mã QR.</p>
       </header>
 
       {/* Tabs */}
@@ -146,23 +181,41 @@ export default function DatePass() {
             <div className="dp-combo-grid">
               {venues.map((v) => {
                 const min = Math.min(...v.items.map((i) => i.salePriceVnd))
+                const tint = brandTint(v.venueName)
+                const bg = brandBg(v.venueName)
                 return (
                   <motion.div key={v.venueId} className="dp-combo-card"
                     initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                     onClick={() => setVenueModal(v)} role="button" tabIndex={0}
                     onKeyDown={(e) => (e.key === 'Enter') && setVenueModal(v)}>
-                    <div className="dp-combo-img" style={v.venueImageUrl ? { backgroundImage: `url(${resolveImageUrl(v.venueImageUrl)})` } : undefined}>
-                      <span className="dp-combo-badge dp-count-badge">{v.items.length} ưu đãi</span>
-                    </div>
-                    <div className="dp-combo-body">
-                      <div className="dp-combo-venue">{CAT_ICON[v.category] || '📍'} {v.category}</div>
-                      <div className="dp-combo-title">{v.venueName}</div>
-                      {v.venueAddress && <div className="dp-combo-desc">{v.venueAddress}</div>}
-                      <div className="dp-combo-price">
-                        <span className="dp-price-from">Từ</span>
-                        <span className="dp-price-sale">{vnd(min)}</span>
+                    <div className={`dp-combo-inner${bg ? ' has-photo' : ''}`} style={{
+                      '--brand-color': tint,
+                      ...(bg ? {
+                        backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.1) 45%, rgba(0,0,0,0.7) 100%), url(${bg})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                      } : {}),
+                    }}>
+                      <div className="dp-combo-top">
+                        <span className="dp-combo-count-badge">Giảm {v.items.length} ưu đãi</span>
+                        {!bg && v.venueImageUrl && (
+                          <span className="dp-combo-logo-chip">
+                            <span className="dp-combo-logo" style={{ backgroundImage: `url(${resolveImageUrl(v.venueImageUrl)})` }} />
+                          </span>
+                        )}
                       </div>
-                      <div className="dp-combo-cta">Xem ưu đãi →</div>
+                      <div className="dp-combo-bottom">
+                        <div className="dp-combo-venue">{CAT_ICON[v.category] || '📍'} {v.category}</div>
+                        <div className="dp-combo-title">{v.venueName}</div>
+                        {v.venueAddress && <div className="dp-combo-desc">{v.venueAddress}</div>}
+                        <div className="dp-combo-foot-row">
+                          <div className="dp-combo-price">
+                            <span className="dp-price-from">Từ</span>{' '}
+                            <span className="dp-price-sale">{vnd(min)}</span>
+                          </div>
+                          <span className="dp-combo-cta">Xem ưu đãi →</span>
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
                 )
@@ -228,7 +281,11 @@ export default function DatePass() {
             onClick={() => setVenueModal(null)}>
             <motion.div className="dp-detail" initial={{ opacity: 0, scale: 0.92, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 20 }} onClick={(e) => e.stopPropagation()}>
-              <div className="dp-detail-img" style={venueModal.venueImageUrl ? { backgroundImage: `url(${resolveImageUrl(venueModal.venueImageUrl)})` } : undefined}>
+              <div className="dp-detail-img" style={{
+                backgroundImage: brandBg(venueModal.venueName)
+                  ? `url(${brandBg(venueModal.venueName)})`
+                  : venueModal.venueImageUrl ? `url(${resolveImageUrl(venueModal.venueImageUrl)})` : undefined,
+              }}>
                 <button className="dp-detail-close" onClick={() => setVenueModal(null)} aria-label="Đóng">✕</button>
                 <div className="dp-detail-imgname">
                   <div className="dp-detail-venue-row">{CAT_ICON[venueModal.category] || '📍'} {venueModal.category}</div>

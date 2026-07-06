@@ -8,7 +8,7 @@
   --color-primary: #ff4f8b;
   --color-primary-soft: rgba(255, 79, 139, 0.12);
   --color-primary-ink: #ffffff;
-  --color-accent: #b14bff;
+  --color-accent: #e91e63;
   --color-success: #16a34a;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
@@ -149,7 +149,7 @@ ul, ol { padding-left: 1.2em; margin: 0; }
 
 /* ── Gradient text ──────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #ff4f8b 0%, #b14bff 100%);
+  background: linear-gradient(135deg, #ff4f8b 0%, #e91e63 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

@@ -11,12 +11,13 @@
   flex-direction: column;
   gap: 18px;
   padding: 22px 18px 20px;
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
   border-right: 1px solid rgba(255, 255, 255, 0.3);
 }
 [data-theme='dark'] .sidenav {
-  background: rgba(20, 14, 24, 0.28);
+  background: rgba(20, 14, 24, 0.15);
   border-right-color: rgba(255, 255, 255, 0.08);
 }
 
@@ -45,9 +46,10 @@
   gap: 6px;
   padding: 12px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 .sidenav-user-row1 {
   display: flex;

@@ -62,7 +62,10 @@ export default function Events() {
           <CalendarIcon size={12} />
           Sự kiện
         </div>
-        <h1 className="events-hero-title">Khám phá sự kiện</h1>
+        <h1 className="events-hero-title ph-title evt-hdr-title">
+          <span className="ph-script evt-hdr-script">Khám phá</span>{' '}
+          <span className="ph-accent evt-hdr-accent">sự kiện <CalendarIcon size={22} className="ph-icon ph-beat evt-hdr-icon" /></span>
+        </h1>
         <p className="events-hero-subtitle">Gặp gỡ những người cùng sở thích tại các sự kiện độc đáo</p>
         <HeroFX emojis={['🎉', '🎈', '🎊', '✨', '⭐', '🥳', '🎶', '🌟']} />
         <span className="hero-deco" aria-hidden>🎉</span>

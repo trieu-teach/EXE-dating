@@ -6,7 +6,7 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-gradient-to-r from-brand-400 to-brand-500 text-white shadow-glow-pink hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0',
+        primary: 'bg-gradient-to-r from-[#F7931E]/60 to-[#EC4899]/60 backdrop-blur-[9px] border border-white/35 text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.25)] shadow-glow-pink hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0',
         secondary: 'bg-surface-2 text-foreground border border-border hover:bg-surface hover:border-border-strong',
         ghost: 'text-foreground-muted hover:bg-surface-2 hover:text-foreground',
         danger: 'bg-danger text-white shadow-sm hover:bg-danger/90',

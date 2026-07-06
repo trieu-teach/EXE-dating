@@ -13,8 +13,12 @@
 }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-primary {
-  background: var(--color-primary);
+  background: linear-gradient(90deg, rgba(247, 147, 30, 0.6) 0%, rgba(236, 72, 153, 0.6) 100%);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: var(--color-primary-ink);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   box-shadow: var(--shadow-sm);
 }
 .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-md); }
@@ -101,24 +105,28 @@
   width: 100%;
   padding: 11px 14px;
   border-radius: var(--radius-md);
-  border: 1.5px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   font-size: 0.92rem;
   transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 .field input::placeholder,
 .field textarea::placeholder {
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.6);
 }
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
 }
 .field textarea {
+  flex: 1;
   resize: vertical;
   min-height: 84px;
   line-height: 1.5;
@@ -126,17 +134,19 @@
 .field select {
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 36px;
 }
+.field select option { color: #1a1a1a; }
 
 /* ── Photo manager ────────────────────────────────────────────── */
 .photo-mgr {
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: var(--radius-lg);
   padding: 18px 20px 20px;
   display: flex;
@@ -153,12 +163,14 @@
   display: block;
   font-size: 0.95rem;
   font-weight: 800;
-  color: var(--color-text);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 .photo-mgr-hint {
   display: block;
   font-size: 0.76rem;
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.78);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   margin-top: 3px;
 }
 .photo-mgr-grid {
@@ -276,17 +288,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px dashed var(--color-border);
-  background: var(--color-surface-2);
-  color: var(--color-text-muted);
+  border: 2px dashed rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  color: rgba(255, 255, 255, 0.85);
   font-family: inherit;
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.15s;
 }
 .photo-tile-add:hover:not(:disabled) {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
+  border-color: #fff;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
 }
 .photo-tile-add:disabled { cursor: not-allowed; opacity: 0.7; }
 .photo-tile-add-plus {

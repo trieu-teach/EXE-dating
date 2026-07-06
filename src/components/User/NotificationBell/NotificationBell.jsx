@@ -14,11 +14,11 @@ const TYPE_META = {
   Match:       { Icon: Heart,         grad: 'linear-gradient(135deg, #ff8fb5, #ff4f8b)' },
   SuperLike:   { Icon: Star,          grad: 'linear-gradient(135deg, #ff8fb5, #ff4f8b)' },
   Message:     { Icon: MessageCircle, grad: 'linear-gradient(135deg, #93c5fd, #60a5fa)' },
-  Event:       { Icon: Calendar,      grad: 'linear-gradient(135deg, #d8b4fe, #a855f7)' },
-  Reputation:  { Icon: Star,          grad: 'linear-gradient(135deg, #d8b4fe, #a855f7)' },
-  PlanGranted: { Icon: Gift,          grad: 'linear-gradient(135deg, #d8b4fe, #a855f7)' },
+  Event:       { Icon: Calendar,      grad: 'linear-gradient(135deg, #d8b4fe, #ec4899)' },
+  Reputation:  { Icon: Star,          grad: 'linear-gradient(135deg, #d8b4fe, #ec4899)' },
+  PlanGranted: { Icon: Gift,          grad: 'linear-gradient(135deg, #d8b4fe, #ec4899)' },
 }
-const TYPE_FALLBACK = { Icon: Bell, grad: 'linear-gradient(135deg, #ff8fb5, #a855f7)' }
+const TYPE_FALLBACK = { Icon: Bell, grad: 'linear-gradient(135deg, #ff8fb5, #ec4899)' }
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false)

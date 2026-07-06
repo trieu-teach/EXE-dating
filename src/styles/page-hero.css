@@ -1,0 +1,82 @@
+/* ════════════════════════════════════════════════════════════════════════
+   Page Hero Art — hệ thống tiêu đề trang dùng chung (script + bold + glow).
+   Mỗi trang import file này rồi tự định nghĩa class riêng (không đụng .ph-*)
+   để set --ph-bg / --ph-glow / --ph-accent-grad qua CSS variables, tránh
+   xung đột tên lớp giữa các trang.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* Không dùng nền thẻ/card — chỉ chữ nổi trên nền trang, có vầng sáng mờ phía sau. */
+.ph-header {
+  position: relative;
+  margin-bottom: 18px;
+}
+.ph-header > * { position: relative; z-index: 1; }
+.ph-glow {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(6px);
+  background: var(--ph-glow, radial-gradient(circle, rgba(255, 111, 97, 0.35), transparent 70%));
+}
+/* Modifier: vầng sáng lớn phủ mờ phía sau toàn bộ tiêu đề (không phải khối nền đặc) */
+.ph-glow.ph-glow-fill { inset: -20px; border-radius: 32px; }
+.ph-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 13px; border-radius: 999px;
+  font-size: 0.7rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(6px);
+  margin-bottom: 10px;
+  animation: ph-rise 0.5s ease-out both;
+}
+.ph-title {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px;
+  font-size: clamp(2.4rem, 7.5vw, 4rem); font-weight: 900; letter-spacing: -0.03em;
+  line-height: 1.08; margin: 0;
+  animation: ph-rise 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.ph-script {
+  font-family: 'Dancing Script', cursive;
+  font-weight: 700;
+  font-size: 1.55em;
+  line-height: 1;
+  display: inline-block;
+  transform: rotate(-4deg);
+  background: var(--ph-script-grad, linear-gradient(100deg, #ffe08a 0%, #ffd76f 40%, #fff6d8 60%, #ffd76f 100%));
+  background-size: 220% auto;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: ph-flow 5s linear infinite;
+  filter: drop-shadow(var(--ph-script-shadow, 0 2px 10px rgba(245, 166, 35, 0.4)));
+}
+.ph-accent {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--ph-accent-grad, linear-gradient(100deg, #ff4f8b 0%, #e91e63 35%, #ff7eb3 55%, #e91e63 75%, #ff4f8b 100%));
+  background-size: 220% auto;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: ph-flow 5s linear infinite;
+  filter: drop-shadow(var(--ph-accent-shadow, 0 2px 10px rgba(255, 79, 139, 0.4)));
+}
+.ph-icon {
+  color: var(--ph-icon-color, #ff8fb5);
+  filter: drop-shadow(var(--ph-icon-glow, 0 0 6px rgba(255, 79, 139, 0.6)));
+  flex-shrink: 0;
+}
+.ph-icon.ph-beat { animation: ph-beat 1.8s ease-in-out infinite; transform-origin: center; }
+.ph-subtitle {
+  font-size: 0.92rem; color: rgba(255, 255, 255, 0.82); margin: 8px 0 0; max-width: 560px;
+  animation: ph-rise 0.7s ease-out both;
+}
+
+@keyframes ph-flow { to { background-position: 220% center; } }
+@keyframes ph-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ph-beat {
+  0%, 55%, 100% { transform: scale(1); }
+  12% { transform: scale(1.28); }
+  24% { transform: scale(1); }
+  36% { transform: scale(1.18); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ph-title, .ph-script, .ph-accent, .ph-eyebrow, .ph-icon, .ph-subtitle { animation: none !important; }
+}

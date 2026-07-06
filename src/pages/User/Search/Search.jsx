@@ -62,7 +62,10 @@ export default function Search() {
           <SearchIcon size={20} />
         </div>
         <div>
-          <h1 className="search-hero-title">Tìm kiếm nâng cao</h1>
+          <h1 className="search-hero-title ph-title srch-hdr-title">
+            <span className="ph-script srch-hdr-script">Tìm kiếm</span>{' '}
+            <span className="ph-accent srch-hdr-accent">nâng cao <SearchIcon size={22} className="ph-icon ph-beat srch-hdr-icon" /></span>
+          </h1>
           <p className="search-hero-subtitle">Tìm người phù hợp với tiêu chí của bạn</p>
         </div>
       </div>

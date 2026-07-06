@@ -171,9 +171,10 @@ export default function DailyConnection() {
       {/* ── Hero ── */}
       <div className="dc-hero-row">
         <div className="dc-hero-left">
-          <header className="dc-header">
-            <h1 className="dc-title">Nhiệm vụ <HeartIcon size={38} /></h1>
-            <p className="dc-subtitle">Hoàn thành thử thách để nhận tài nguyên nuôi cây tình yêu.</p>
+          <header className="dc-header ph-header">
+            <span className="dc-header-glow ph-glow" aria-hidden />
+            <h1 className="dc-title ph-title"><span className="dc-title-script ph-script">Nhiệm</span> <span className="dc-title-accent ph-accent">vụ <SparkleIcon size={26} className="ph-icon ph-beat dc-title-icon" /></span></h1>
+            <p className="dc-subtitle ph-subtitle">Hoàn thành thử thách để nhận tài nguyên nuôi cây tình yêu.</p>
           </header>
 
           {/* ── Tab loại nhiệm vụ ── */}
@@ -219,7 +220,7 @@ export default function DailyConnection() {
               }[status]
 
               return (
-                <div key={t.code || t.id} className={`dc-task-card is-${status}`}>
+                <div key={t.code || t.id} className={`dc-task-card is-${status}`} data-mat={t.rewardMaterial || undefined}>
                   <div className="dc-task-card-top">
                     <span className="dc-task-card-icon" style={mat ? { background: mat.bg, color: mat.color } : undefined}>
                       {mat?.emoji || '🎯'}
@@ -274,11 +275,14 @@ export default function DailyConnection() {
         <div className="material-row">
           {MATERIALS.map((m) => {
             const meta = MATERIAL_META[m]
+            const qty = invByMaterial[m] ?? 0
             return (
-              <div key={m} data-mat={m} className={`material-chip${bumpMat === m ? ' is-bump' : ''}`} style={{ background: meta.bg }}>
+              <div key={m} data-mat={m}
+                className={`material-chip${bumpMat === m ? ' is-bump' : ''}${qty <= 0 ? ' is-empty' : ''}`}
+                style={{ background: meta.bg }}>
                 <span className="material-emoji">{meta.emoji}</span>
                 <div className="material-info">
-                  <span className="material-qty" style={{ color: meta.color }}>{invByMaterial[m] ?? 0}</span>
+                  <span className="material-qty" style={{ color: meta.color }}>{qty}</span>
                   <span className="material-name">{meta.label}</span>
                 </div>
               </div>

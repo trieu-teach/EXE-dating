@@ -5,23 +5,22 @@ import NotificationBell from '../NotificationBell/NotificationBell.jsx'
 import AvatarFrame from '../AvatarFrame/AvatarFrame.jsx'
 import { subscriptionService } from '../../../api'
 import { resolveImageUrl } from '../../../utils/format.js'
-import { Ticket } from 'lucide-react'
 import {
-  FireIcon, HeartIcon, MessageIcon, LeafIcon, StarIcon, CrownIcon,
-  UserIcon, TrophyIcon, SettingsIcon, LogOutIcon, ShieldCheckIcon,
-} from '../../ui/CustomIcons.jsx'
+  Flame, Heart, MessageCircle, Leaf, Star, Ticket,
+  Crown, User, Trophy, Settings, LogOut, ShieldCheck,
+} from 'lucide-react'
 import './SideNav.css'
 
 const NAV = [
-  { to: '/discovery', label: 'Khám phá', Icon: FireIcon },
-  { to: '/matches', label: 'Match', Icon: HeartIcon },
-  { to: '/chat', label: 'Tin nhắn', Icon: MessageIcon },
-  { to: '/love-tree', label: 'Cây tình yêu', Icon: LeafIcon },
-  { to: '/daily-connection', label: 'Hằng ngày', Icon: StarIcon },
+  { to: '/discovery', label: 'Khám phá', Icon: Flame },
+  { to: '/matches', label: 'Match', Icon: Heart },
+  { to: '/chat', label: 'Tin nhắn', Icon: MessageCircle },
+  { to: '/love-tree', label: 'Cây tình yêu', Icon: Leaf },
+  { to: '/daily-connection', label: 'Hằng ngày', Icon: Star },
   { to: '/date-pass', label: 'Ưu đãi', Icon: Ticket },
-  { to: '/premium', label: 'Premium', Icon: CrownIcon },
-  { to: '/profile', label: 'Hồ sơ', Icon: UserIcon },
-  { to: '/reputation', label: 'Uy tín', Icon: TrophyIcon },
+  { to: '/premium', label: 'Premium', Icon: Crown },
+  { to: '/profile', label: 'Hồ sơ', Icon: User },
+  { to: '/reputation', label: 'Uy tín', Icon: Trophy },
 ]
 
 const PLAN_LABEL = { Gold: 'Thành viên Gold', Plus: 'Thành viên Plus', Free: 'Gói miễn phí' }
@@ -63,7 +62,7 @@ export default function SideNav() {
         </div>
         <div className="sidenav-user-row2">
           <span className="sidenav-user-plan">
-            <CrownIcon size={12} />
+            <Crown size={12} />
             {isAdmin ? 'Quản trị viên' : (plan ? PLAN_LABEL[plan] ?? plan : '…')}
           </span>
         </div>
@@ -78,7 +77,7 @@ export default function SideNav() {
         ))}
         {isAdmin && (
           <NavLink to="/admin" className="sidenav-link">
-            <ShieldCheckIcon size={20} />
+            <ShieldCheck size={20} />
             <span className="sidenav-link-label">Trang quản trị</span>
           </NavLink>
         )}
@@ -87,18 +86,18 @@ export default function SideNav() {
       {/* CTA nâng cấp — ẩn với admin và người đã có Gold */}
       {!isAdmin && plan && plan !== 'Gold' && (
         <Link to="/premium" className="sidenav-upgrade">
-          <CrownIcon size={17} />
+          <Crown size={17} />
           <span className="sidenav-link-label">Nâng cấp Premium</span>
         </Link>
       )}
 
       <div className="sidenav-foot">
         <NavLink to="/settings" className={({ isActive }) => `sidenav-link${isActive ? ' active' : ''}`}>
-          <SettingsIcon size={20} />
+          <Settings size={20} />
           <span className="sidenav-link-label">Cài đặt</span>
         </NavLink>
         <Link to="/logout" className="sidenav-link">
-          <LogOutIcon size={20} />
+          <LogOut size={20} />
           <span className="sidenav-link-label">Đăng xuất</span>
         </Link>
       </div>

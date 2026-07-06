@@ -262,7 +262,7 @@
   font-size: 0.78rem;
   font-weight: 800;
   color: var(--color-primary);
-  background: linear-gradient(135deg, rgba(255,79,139,0.10), rgba(177,75,255,0.12));
+  background: linear-gradient(135deg, rgba(255,79,139,0.10), rgba(233, 30, 99,0.12));
   border: 1px solid rgba(255,79,139,0.22);
   text-decoration: none;
   transition: transform 0.15s, box-shadow 0.15s;
@@ -435,7 +435,7 @@
   border-top-left-radius: 18px;
 }
 .chat-msg.is-mine .chat-bubble {
-  background: linear-gradient(135deg, #ff4f8b 0%, #b14bff 100%);
+  background: linear-gradient(135deg, #ff4f8b 0%, #e91e63 100%);
   color: #ffffff;
   border: none;
   border-radius: 18px;
@@ -492,9 +492,12 @@
   gap: 4px;
   padding: 5px 14px;
   border-radius: var(--radius-sm);
-  background: var(--color-primary);
+  background: linear-gradient(90deg, rgba(247, 147, 30, 0.6) 0%, rgba(236, 72, 153, 0.6) 100%);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
   color: #ffffff;
-  border: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   font-family: inherit;
   font-size: 0.8rem;
   font-weight: 700;
@@ -624,9 +627,12 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ff4f8b 0%, #b14bff 100%);
+  background: linear-gradient(90deg, rgba(247, 147, 30, 0.6) 0%, rgba(236, 72, 153, 0.6) 100%);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
   color: #ffffff;
-  border: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -704,7 +710,7 @@
   display: grid;
   place-items: center;
   color: #fff;
-  background: linear-gradient(135deg, #ff4f8b, #b14bff);
+  background: linear-gradient(135deg, #ff4f8b, #e91e63);
   border: 3px solid var(--color-surface);
   box-shadow: 0 4px 12px rgba(255, 79, 139, 0.4);
 }
@@ -848,7 +854,7 @@
   color: #fbbf24;
 }
 
-[data-theme='dark'] .chat-meetup-accept-btn { background: var(--color-primary); }
+[data-theme='dark'] .chat-meetup-accept-btn { background: linear-gradient(90deg, rgba(247, 147, 30, 0.6) 0%, rgba(236, 72, 153, 0.6) 100%); }
 [data-theme='dark'] .chat-meetup-accept-btn:hover:not(:disabled) { opacity: 0.85; }
 [data-theme='dark'] .chat-meetup-decline-btn {
   color: var(--color-text-soft);

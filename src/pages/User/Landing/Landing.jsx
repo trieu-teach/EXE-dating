@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  SparkleIcon, TreeIcon, HeartIcon, XIcon, CheckIcon,
+  SparkleIcon, TreeIcon, HeartIcon, XIcon,
 } from '../../../components/ui/CustomIcons.jsx'
 import './Landing.css'
 
@@ -10,7 +10,6 @@ const NAV = [
   { label: 'Cách hoạt động', href: '#how' },
   { label: 'Cây tình yêu', href: '#lovetree' },
   { label: 'Ưu đãi', href: '#datepass' },
-  { label: 'An toàn', href: '#safety' },
 ]
 
 /* Ảnh người thật cho mockup swipe */
@@ -92,13 +91,17 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* ── Hero: wordmark khổng lồ lấp toàn màn ── */}
+      {/* ── Hero ── */}
       <section className="lp-hero">
         <motion.h1 className="lp-hero-wordmark"
           initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           SameMess
         </motion.h1>
+        <p className="lp-hero-tagline">Kết nối từ trái tim</p>
       </section>
+
+      {/* ── Ảnh nền cho khoảng trắng quanh 3 khối bên dưới ── */}
+      <div className="lp-mid-bg">
 
       {/* ── Cách hoạt động: mockup swipe ── */}
       <section className="lp-how" id="how">
@@ -116,7 +119,6 @@ export default function Landing() {
               </div>
             ))}
           </div>
-          <Link to="/register" className="lp-btn lp-btn-dark">Bắt đầu ngay</Link>
         </div>
 
         <motion.div
@@ -162,7 +164,6 @@ export default function Landing() {
           <span className="lp-brands-eyebrow"><TreeIcon size={13} /> Tính năng độc đáo</span>
           <h2>Cùng nhau chăm sóc Cây tình yêu 🌳</h2>
           <p>Mỗi cặp đôi sau khi match sẽ có chung một cái cây. Tưới nước mỗi ngày để cây lớn lên, lên cấp và mở khóa đặc quyền hẹn hò.</p>
-          <Link to="/register" className="lp-btn lp-btn-dark">Trồng cây ngay</Link>
         </div>
         <div className="lp-tree-grid">
           {TREE_STAGES.map((t, i) => (
@@ -182,17 +183,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── Safety ── */}
-      <section className="lp-safety" id="safety">
-        <span className="lp-brands-eyebrow"><CheckIcon size={13} /> An toàn</span>
-        <div className="lp-safety-card">
-          <div className="lp-safety-photo" style={{ backgroundImage: 'url(https://i.pravatar.cc/600?img=32)' }}>
-            <span className="lp-safety-badge"><CheckIcon size={12} /> Đã xác minh</span>
-          </div>
-        </div>
-        <h2>An toàn là ưu tiên hàng đầu</h2>
-        <p>Xác minh khuôn mặt, kiểm duyệt tin nhắn bằng AI và hệ thống uy tín giúp cộng đồng SameMess luôn lành mạnh, đáng tin.</p>
-      </section>
+
+      </div>
 
       {/* ── Voucher thương hiệu lớn ── */}
       <section className="lp-brands-section" id="datepass">

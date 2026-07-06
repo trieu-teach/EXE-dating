@@ -1,11 +1,12 @@
 /* ══════════ Date Pass — combo ưu đãi hẹn hò ══════════ */
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap');
 .dp-root { position: relative; max-width: 1120px; min-height: 100vh; margin: -24px auto 0; padding: 42px 20px 64px; }
 /* Ảnh nền trang trí — full-bleed hết chiều ngang lẫn hết chiều cao trang */
 .dp-root::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: url('/assets/br-10.png') center top / cover no-repeat;
+  background: url('/assets/br-voucher.png') center top / cover no-repeat;
   pointer-events: none;
   z-index: 0;
 }
@@ -18,7 +19,7 @@
   border-radius: 24px;
   padding: 30px 28px;
   margin-bottom: 18px;
-  background: linear-gradient(135deg, #ff7eb3 0%, #ff4f8b 45%, #b14bff 100%);
+  background: linear-gradient(135deg, #ff7eb3 0%, #ff4f8b 45%, #e91e63 100%);
   color: #fff;
   box-shadow: 0 14px 36px rgba(255, 79, 139, 0.28);
 }
@@ -40,27 +41,32 @@
   display: inline-flex; gap: 6px; width: fit-content; max-width: 100%;
   margin: 0 auto 8px; padding: 6px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 6px 20px rgba(199, 45, 112, 0.14);
 }
 .dp-tab {
   flex: none; min-width: 160px; padding: 12px 22px; border-radius: 13px; border: none;
-  background: none; color: #a34b6b;
+  background: none; color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   font-family: inherit; font-size: 0.95rem; font-weight: 800; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   transition: all 0.2s;
 }
-.dp-tab:hover:not(.is-active) { background: rgba(255, 255, 255, 0.6); color: #e91e63; }
+.dp-tab:hover:not(.is-active) { background: rgba(255, 255, 255, 0.15); color: #fff; }
 .dp-tab.is-active {
   color: #fff;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(90deg, rgba(247, 147, 30, 0.6) 0%, rgba(236, 72, 153, 0.6) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   box-shadow: 0 6px 18px rgba(255, 79, 139, 0.38);
   transform: translateY(-1px);
 }
 .dp-tab-count {
   min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
-  background: rgba(233, 30, 99, 0.12); color: #e91e63;
+  background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: #fff;
   font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center;
 }
 .dp-tab.is-active .dp-tab-count { background: rgba(255,255,255,0.25); color: #fff; }
@@ -81,72 +87,193 @@
 .dp-venue-addr { font-size: 0.78rem; color: var(--color-text-muted); }
 
 /* Combo cards */
-.dp-combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px; }
-.dp-combo-venue { font-size: 0.74rem; font-weight: 700; color: var(--color-text-muted); text-transform: capitalize; }
-.dp-count-badge { background: rgba(0,0,0,0.55) !important; backdrop-filter: blur(4px); }
-.dp-price-from { font-size: 0.78rem; color: var(--color-text-muted); }
+.dp-combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 26px; }
 
 /* Popup voucher của quán */
-.dp-detail-imgname { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 18px; color: #fff; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
-.dp-detail-imgname h2 { margin: 4px 0 2px; font-size: 1.3rem; font-weight: 900; }
-.dp-detail-venue-row { font-size: 0.78rem; font-weight: 700; opacity: 0.92; text-transform: capitalize; }
-.dp-detail-imgname .dp-detail-addr { color: rgba(255,255,255,0.85); }
+.dp-detail-imgname { position: absolute; left: 0; right: 0; bottom: 0; padding: 20px 24px; color: #fff; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
+.dp-detail-imgname h2 { margin: 5px 0 2px; font-size: 1.7rem; font-weight: 900; }
+.dp-detail-venue-row { font-size: 0.86rem; font-weight: 700; opacity: 0.92; text-transform: capitalize; }
+.dp-detail-imgname .dp-detail-addr { color: rgba(255,255,255,0.85); font-size: 0.9rem; }
 
-.dp-vlist { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 10px; }
-.dp-vlist-label { font-size: 0.78rem; font-weight: 800; color: var(--color-text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+.dp-vlist { padding: 20px 24px 26px; display: flex; flex-direction: column; gap: 12px; }
+.dp-vlist-label { font-size: 0.86rem; font-weight: 800; color: var(--color-text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
 .dp-vrow {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 14px; border: 1px solid var(--color-border); border-radius: 14px;
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px; border: 1px solid var(--color-border); border-radius: 16px;
   background: var(--color-surface);
 }
 .dp-vrow-main { flex: 1; min-width: 0; }
-.dp-vrow-title { font-weight: 800; color: var(--color-text); font-size: 0.95rem; }
-.dp-vrow-desc { font-size: 0.8rem; color: var(--color-text-soft); margin-top: 2px; }
-.dp-vrow-price { display: flex; align-items: baseline; gap: 8px; margin-top: 6px; }
-.dp-vrow-off { font-size: 0.74rem; font-weight: 800; color: #fff; background: var(--color-primary); padding: 2px 7px; border-radius: 999px; }
+.dp-vrow-title { font-weight: 800; color: var(--color-text); font-size: 1.05rem; }
+.dp-vrow-desc { font-size: 0.88rem; color: var(--color-text-soft); margin-top: 3px; }
+.dp-vrow-price { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; }
+.dp-vrow-off { font-size: 0.8rem; font-weight: 800; color: #fff; background: var(--color-primary); padding: 3px 8px; border-radius: 999px; }
 .dp-vrow-btn {
-  flex-shrink: 0; padding: 10px 18px; border: none; border-radius: 12px; cursor: pointer;
-  font-family: inherit; font-weight: 800; color: #fff;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  flex-shrink: 0; padding: 12px 22px; border: none; border-radius: 14px; cursor: pointer;
+  font-family: inherit; font-weight: 800; color: #fff; font-size: 0.95rem;
+  background: linear-gradient(90deg, rgba(247, 147, 30, 0.6) 0%, rgba(236, 72, 153, 0.6) 100%);
+  backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   box-shadow: 0 4px 14px rgba(255,79,139,0.3);
 }
 .dp-vrow-btn:hover { filter: brightness(1.05); }
+/* Card ưu đãi — ảnh nền phủ kín + overlay tối + tint thương hiệu, chữ trắng đè lên trên.
+   Ghi chú: dữ liệu quán hiện chỉ có venueImageUrl (logo thương hiệu), chưa có ảnh sản
+   phẩm/món ăn riêng — nền card dùng gradient tối pha màu thương hiệu để thay thế ảnh
+   thật; khi backend có ảnh món ăn/thức uống riêng, có thể set làm background-image ở
+   .dp-combo-inner để thay cho gradient này. */
+@property --dp-border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
 .dp-combo-card {
-  background: rgba(255, 245, 249, 0.7);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;
-  box-shadow: 0 8px 24px rgba(199, 45, 112, 0.1);
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
   transition: transform 0.15s, box-shadow 0.15s;
 }
-.dp-combo-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(199, 45, 112, 0.18); }
-.dp-combo-img {
-  height: 120px; background-size: cover; background-position: center;
-  background-color: #fff; position: relative;
+.dp-combo-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 10px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--dp-border-angle),
+    transparent 0%,
+    transparent 62%,
+    #e63950 70%,
+    #f2994a 78%,
+    #f5c26b 86%,
+    #e0507e 94%,
+    transparent 100%
+  );
+  filter: blur(9px) saturate(1.4);
+  opacity: 0.95;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: dp-border-spin 1.9s linear infinite;
 }
-.dp-combo-badge {
-  position: absolute; top: 10px; left: 10px;
-  background: linear-gradient(135deg, #ff4f8b, #ff2d6b); color: #fff;
-  font-size: 0.8rem; font-weight: 900; padding: 4px 10px; border-radius: 999px;
-  box-shadow: 0 4px 12px rgba(255,79,139,0.4);
+.dp-combo-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 4px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--dp-border-angle),
+    transparent 0%,
+    transparent 62%,
+    #e63950 70%,
+    #f2994a 78%,
+    #f5c26b 86%,
+    #e0507e 94%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: dp-border-spin 1.9s linear infinite;
 }
-.dp-combo-body { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-.dp-combo-title { font-weight: 800; font-size: 0.95rem; color: var(--color-text); }
-.dp-combo-desc { font-size: 0.8rem; color: var(--color-text-soft); line-height: 1.4; flex: 1; }
-.dp-combo-price { display: flex; align-items: baseline; gap: 8px; margin-top: 2px; }
-.dp-price-sale { font-size: 1.15rem; font-weight: 900; color: var(--color-primary); }
+.dp-combo-card:hover { transform: translateY(-3px); box-shadow: 0 18px 44px rgba(0, 0, 0, 0.3); }
+@keyframes dp-border-spin {
+  to { --dp-border-angle: 360deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dp-combo-card::before, .dp-combo-card::after { animation: none; }
+}
+
+.dp-combo-inner {
+  position: relative;
+  min-height: 320px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #fff;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.5) 55%, rgba(0, 0, 0, 0.85) 100%),
+    radial-gradient(120% 100% at 25% 0%, color-mix(in srgb, var(--brand-color, var(--color-primary)) 55%, #1b1214) 0%, #17100f 65%);
+}
+.dp-combo-inner::before {
+  /* Tint thương hiệu, opacity thấp, đè lên trên overlay tối */
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--brand-color, var(--color-primary));
+  opacity: 0.14;
+  mix-blend-mode: color;
+  pointer-events: none;
+}
+/* Card có ảnh thật — tint nhẹ hơn để ảnh hiện rõ, không bị mờ/tối */
+.dp-combo-inner.has-photo::before { opacity: 0.08; }
+
+.dp-combo-top { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.dp-combo-count-badge {
+  display: inline-flex; align-items: center;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff; font-size: 0.78rem; font-weight: 800;
+  padding: 6px 14px; border-radius: 999px;
+  backdrop-filter: blur(3px);
+}
+/* Badge logo: khung trắng cố định, bo góc vuông, căn trái, auto-fit không cắt/lệch */
+.dp-combo-logo-chip {
+  display: block;
+  width: 52px;
+  height: 52px;
+  padding: 7px;
+  border-radius: 13px;
+  background: #fff;
+  box-sizing: border-box;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
+}
+.dp-combo-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.dp-combo-bottom { position: relative; z-index: 1; }
+.dp-combo-venue { font-size: 0.8rem; font-weight: 700; color: rgba(255, 255, 255, 0.65); text-transform: capitalize; }
+.dp-combo-title { font-weight: 900; font-size: 1.32rem; color: #fff; margin-top: 4px; }
+.dp-combo-desc { font-size: 0.86rem; color: rgba(255, 255, 255, 0.55); line-height: 1.4; margin-top: 3px; }
+.dp-combo-foot-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+.dp-combo-price { display: flex; align-items: baseline; gap: 5px; }
+.dp-combo-price .dp-price-from { font-size: 0.84rem; color: rgba(255, 255, 255, 0.8); font-weight: 600; }
+.dp-combo-price .dp-price-sale { font-size: 1.28rem; font-weight: 900; color: #ff6b81; }
 .dp-price-orig { font-size: 0.82rem; color: var(--color-text-muted); text-decoration: line-through; }
-.dp-combo-card { cursor: pointer; }
-.dp-combo-cta { margin-top: 6px; font-size: 0.82rem; font-weight: 800; color: var(--color-primary); }
+.dp-combo-cta {
+  flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-size: 0.86rem; font-weight: 800;
+  padding: 10px 18px; border-radius: 999px;
+  white-space: nowrap;
+}
 
 /* Modal chi tiết combo */
 .dp-detail {
-  width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
-  background: var(--color-surface); border-radius: 22px; overflow: hidden;
+  width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto;
+  background: var(--color-surface); border-radius: 26px; overflow: hidden;
   box-shadow: 0 24px 70px rgba(0,0,0,0.45); display: flex; flex-direction: column;
 }
 .dp-detail-img {
-  height: 220px; background-size: cover; background-position: center;
+  height: 320px; background-size: cover; background-position: center;
   background-color: #fff; position: relative;
 }
 .dp-detail-badge {
@@ -156,18 +283,18 @@
   box-shadow: 0 4px 14px rgba(255,79,139,0.4);
 }
 .dp-detail-close {
-  position: absolute; top: 12px; right: 12px; width: 34px; height: 34px;
+  position: absolute; top: 14px; right: 14px; width: 38px; height: 38px;
   border: none; border-radius: 50%; cursor: pointer;
-  background: rgba(0,0,0,0.5); color: #fff; font-size: 16px; backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.5); color: #fff; font-size: 17px; backdrop-filter: blur(4px);
 }
-.dp-detail-body { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
-.dp-detail-venue { font-size: 0.85rem; font-weight: 700; color: var(--color-text-soft); }
-.dp-detail-title { font-size: 1.35rem; font-weight: 900; color: var(--color-text); margin: 0; letter-spacing: -0.02em; }
-.dp-detail-desc { font-size: 0.92rem; color: var(--color-text-soft); line-height: 1.6; margin: 0; }
-.dp-detail-addr { font-size: 0.82rem; color: var(--color-text-muted); }
+.dp-detail-body { padding: 26px; display: flex; flex-direction: column; gap: 10px; }
+.dp-detail-venue { font-size: 0.92rem; font-weight: 700; color: var(--color-text-soft); }
+.dp-detail-title { font-size: 1.7rem; font-weight: 900; color: var(--color-text); margin: 0; letter-spacing: -0.02em; }
+.dp-detail-desc { font-size: 1rem; color: var(--color-text-soft); line-height: 1.6; margin: 0; }
+.dp-detail-addr { font-size: 0.9rem; color: var(--color-text-muted); }
 .dp-detail-price { display: flex; align-items: baseline; gap: 10px; margin: 8px 0 4px; }
-.dp-detail-price .dp-price-sale { font-size: 1.5rem; }
-.dp-detail-forwho { font-size: 0.8rem; color: var(--color-text-muted); }
+.dp-detail-price .dp-price-sale { font-size: 1.8rem; }
+.dp-detail-forwho { font-size: 0.86rem; color: var(--color-text-muted); }
 
 /* Vouchers */
 .dp-voucher-list { display: flex; flex-direction: column; gap: 12px; max-width: 620px; margin: 0 auto; }
@@ -211,7 +338,7 @@
 .dp-stat-label { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 4px; font-weight: 600; }
 .dp-stat.is-gmv .dp-stat-value { color: var(--color-accent); }
 .dp-stat.is-commission {
-  background: linear-gradient(135deg, rgba(255,79,139,0.1), rgba(177,75,255,0.08));
+  background: linear-gradient(135deg, rgba(255,79,139,0.1), rgba(233, 30, 99,0.08));
   border-color: rgba(255,79,139,0.3);
 }
 .dp-stat.is-commission .dp-stat-value { color: var(--color-primary); }
@@ -259,7 +386,10 @@
 .dp-pay-btn {
   width: 100%; padding: 14px; border: none; border-radius: 14px; cursor: pointer;
   font-family: inherit; font-weight: 800; font-size: 0.95rem; color: #fff;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background: linear-gradient(90deg, rgba(247, 147, 30, 0.6) 0%, rgba(236, 72, 153, 0.6) 100%);
+  backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   box-shadow: 0 6px 20px rgba(255,79,139,0.4);
 }
 .dp-pay-btn:disabled { opacity: 0.6; }
@@ -275,37 +405,14 @@
 
 [data-theme='dark'] .dp-modal, [data-theme='dark'] .dp-combo-card, [data-theme='dark'] .dp-voucher, [data-theme='dark'] .dp-stat { background: var(--color-surface, #1c1722); }
 
-/* ════════ Header sạch + accent thương hiệu (đồng bộ toàn app) ════════ */
-.dc-header { position: relative; padding: 8px 4px 4px; }
-.dc-glow {
-  position: absolute; top: -34px; right: 0; width: 250px; height: 250px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,79,139,0.18) 0%, rgba(177,75,255,0.10) 45%, transparent 70%);
-  pointer-events: none; z-index: 0; filter: blur(4px);
+/* ════════ Header sạch + accent thương hiệu (dùng chung .ph-* từ page-hero.css) ════════ */
+.dp-hdr { position: relative; padding: 8px 4px 4px; }
+.dp-hdr-glow {
+  top: -34px; right: 0; width: 250px; height: 250px; border-radius: 50%;
+  filter: blur(4px);
+  --ph-glow: radial-gradient(circle, rgba(255,79,139,0.18) 0%, rgba(233, 30, 99,0.10) 45%, transparent 70%);
 }
-.dc-header > *:not(.dc-glow) { position: relative; z-index: 1; }
-.dc-eyebrow {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 13px; border-radius: 999px;
-  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #fff;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  box-shadow: 0 4px 14px rgba(255,79,139,0.32); margin-bottom: 12px;
-  animation: dc-rise 0.5s ease-out both;
-}
-.dc-eyebrow svg { transform-origin: center; animation: dc-beat 1.8s ease-in-out infinite; }
-.dc-title {
-  font-size: clamp(2.1rem, 6vw, 3rem); font-weight: 900; letter-spacing: -0.035em;
-  line-height: 1.05; color: var(--color-text); margin: 0;
-  animation: dc-rise 0.6s cubic-bezier(0.2,0.9,0.3,1) both;
-}
-.dc-title span {
-  background: linear-gradient(100deg, #ff4f8b 0%, #b14bff 35%, #ff7eb3 55%, #b14bff 75%, #ff4f8b 100%);
-  background-size: 220% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  animation: dc-flow 5s linear infinite;
-}
-.dc-subtitle { font-size: 0.92rem; color: var(--color-text-soft); margin: 7px 0 0; max-width: 560px; animation: dc-rise 0.7s ease-out both; }
-@keyframes dc-flow { to { background-position: 220% center; } }
-@keyframes dc-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes dc-beat { 0%,55%,100% { transform: scale(1); } 12% { transform: scale(1.28); } 24% { transform: scale(1); } 36% { transform: scale(1.18); } }
-@media (prefers-reduced-motion: reduce) {
-  .dc-title, .dc-title span, .dc-eyebrow, .dc-eyebrow svg, .dc-subtitle { animation: none; }
-}
+.dp-hdr > *:not(.dp-hdr-glow) { position: relative; z-index: 1; }
+.dp-hdr-script { --ph-script-shadow: 0 2px 10px rgba(245,166,35,0.4); }
+.dp-hdr-accent { --ph-accent-grad: linear-gradient(100deg, #ff4f8b 0%, #e91e63 35%, #ff7eb3 55%, #e91e63 75%, #ff4f8b 100%); --ph-accent-shadow: 0 2px 10px rgba(255,79,139,0.4); }
+.dp-hdr-heart { --ph-icon-color: #ff8fb5; --ph-icon-glow: 0 0 6px rgba(255,79,139,0.6); }

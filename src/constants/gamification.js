@@ -50,7 +50,7 @@ export function treeEmojiForLevel(level) {
  * Map a level to a growth color for the progress ring/fill.
  */
 export function growthColorForLevel(level) {
-  if (level >= 21) return '#b14bff'
+  if (level >= 21) return '#e91e63'
   if (level >= 11) return '#ec4899'
   if (level >= 6)  return '#16a34a'
   if (level >= 3)  return '#22c55e'

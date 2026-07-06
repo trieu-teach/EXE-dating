@@ -17,8 +17,8 @@ const PLAN_META = {
     tagline: 'Bắt đầu hành trình',
     blurb: 'Mọi thứ cần thiết để khám phá và ghép đôi mỗi ngày.',
     icon: HeartIcon,
-    accent: '#a78bfa',
-    gradient: 'linear-gradient(135deg, #a78bfa, #8b5cf6)',
+    accent: '#ec4899',
+    gradient: 'linear-gradient(135deg, #ec4899, #ec4899)',
     features: [
       '50 lượt thích mỗi ngày',
       'Ghép đôi & nhắn tin không giới hạn',
@@ -153,7 +153,7 @@ export default function Premium() {
       {/* ── Hero ── */}
       <div className="premium-hero">
         <div className="premium-hero-content">
-          <h1 className="premium-hero-title">SameMess <span>Premium</span></h1>
+          <h1 className="premium-hero-title"><span className="pm-hdr-brand">SameMess</span> <span className="ph-script pm-hdr-script">Premium</span> <CrownIcon size={26} className="ph-icon ph-beat pm-hdr-icon" /></h1>
           <p className="premium-hero-subtitle">
             Mở khoá trải nghiệm không giới hạn — kết nối nhanh hơn, nổi bật hơn, match nhiều hơn.
           </p>
@@ -167,7 +167,9 @@ export default function Premium() {
             <div className="premium-current-info">
               <div className="premium-current-plan">Gói {currentCode} đang hoạt động</div>
               <div className="premium-current-exp">
-                Hết hạn: {current?.expiresAt ? new Date(current.expiresAt).toLocaleDateString('vi-VN') : '—'}
+                {current?.expiresAt
+                  ? `Hết hạn: ${new Date(current.expiresAt).toLocaleDateString('vi-VN')}`
+                  : 'Vĩnh viễn — không giới hạn thời gian'}
               </div>
             </div>
           </div>
@@ -223,13 +225,13 @@ export default function Premium() {
 
                   <button
                     type="button"
-                    className={`premium-plan-btn${isPopular ? '' : ' is-secondary'}`}
+                    className={`premium-plan-btn${isCurrent ? ' is-current-btn' : isPopular ? '' : ' is-secondary'}`}
                     onClick={() => handleOrder(p.code)}
                     disabled={ordering === p.code || isCurrent || p.code === 'Free'}
                   >
                     {ordering === p.code
                       ? <span className="spinner" />
-                      : isCurrent ? 'Gói hiện tại' : p.code === 'Free' ? 'Mặc định' : 'Đăng ký ngay'}
+                      : isCurrent ? <><CheckIcon size={15} /> Gói hiện tại</> : p.code === 'Free' ? 'Mặc định' : 'Đăng ký ngay'}
                   </button>
                 </motion.div>
               )

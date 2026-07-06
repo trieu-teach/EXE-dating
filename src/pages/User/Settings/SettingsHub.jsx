@@ -4,7 +4,7 @@ import { useToast } from '../../../context/ToastContext.jsx'
 import {
   CompassIcon, StarIcon, ShieldIcon, SmartphoneIcon,
   KeyIcon, HeartIcon, ShieldCheckIcon, CrownIcon, LogOutIcon,
-  ChevronRightIcon, UserIcon
+  ChevronRightIcon, UserIcon, SettingsIcon
 } from '../../../components/ui/CustomIcons.jsx'
 import { motion } from 'framer-motion'
 import { cn } from '../../../lib/utils'
@@ -44,6 +44,13 @@ export default function SettingsHub() {
 
   return (
     <div className="settings-root">
+      <header className="sh-hdr ph-header">
+        <span className="sh-hdr-glow ph-glow" aria-hidden />
+        <h1 className="ph-title sh-hdr-title">
+          <span className="ph-script sh-hdr-script">Cài</span>{' '}
+          <span className="ph-accent sh-hdr-accent">đặt <SettingsIcon size={20} className="ph-icon sh-hdr-icon" /></span>
+        </h1>
+      </header>
       {/* Sections */}
       <div className="settings-sections">
         {SECTIONS.map((section, si) => (

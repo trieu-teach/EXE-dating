@@ -181,6 +181,14 @@ export default function LoveTree() {
 
   return (
     <div className="lt2-root">
+      <header className="lt-hdr ph-header">
+        <span className="lt-hdr-glow ph-glow ph-glow-fill" aria-hidden />
+        <h1 className="ph-title lt-hdr-title">
+          <span className="ph-script lt-hdr-script">Cây</span>{' '}
+          <span className="ph-accent lt-hdr-accent">tình yêu <LeafSeedlingIcon size={26} className="ph-icon ph-beat lt-hdr-icon" /></span>
+        </h1>
+        <p className="ph-subtitle lt-hdr-subtitle">Mỗi ngày chăm sóc là một bước gần nhau hơn.</p>
+      </header>
       {active ? (
         <>
           {/* ── Top row: streak card + garden (match switcher) card ── */}
@@ -265,6 +273,8 @@ export default function LoveTree() {
                 <div className="lt2-plant-sun" aria-hidden>☀️</div>
 
                 <div className="lt2-plant-img-wrap">
+                  <span className="lt2-plant-glow" aria-hidden />
+                  <span className="lt2-plant-ground" aria-hidden />
                   <img
                     src={treeImg}
                     alt={`Cây tình yêu cấp ${level} — ${treeStageName(level)}`}
@@ -336,7 +346,7 @@ export default function LoveTree() {
                       const stock = inventory?.[m] ?? 0
                       const disabled = watering || loading || !plant || stock <= 0
                       return (
-                        <button key={m} type="button" className="lt2-item-row" data-mat={m}
+                        <button key={m} type="button" className={`lt2-item-row${stock <= 0 ? ' is-out' : ''}`} data-mat={m}
                           style={{ background: meta.bg }}
                           onClick={() => handleWater(m)} disabled={disabled}
                           title={`${meta.label} · +${MATERIAL_BONUS[m]}%`} aria-label={`Tưới bằng ${meta.label}`}>
@@ -346,7 +356,7 @@ export default function LoveTree() {
                             <span className="lt2-item-bonus">+{MATERIAL_BONUS[m]}% EXP</span>
                           </span>
                           <span className={`lt2-item-stock${stock <= 0 ? ' is-empty' : ''}`}>
-                            {watering ? '…' : stock}
+                            {watering ? '…' : stock <= 0 ? 'Hết' : stock}
                           </span>
                         </button>
                       )
@@ -355,8 +365,8 @@ export default function LoveTree() {
                 )}
 
                 <div className="lt2-actions-row">
-                  <button type="button" className="lt2-action-btn" onClick={() => navigate('/daily-connection')}>
-                    <span className="lt2-action-icon lt2-action-icon-sparkle"><Sparkles size={15} /></span> Nhiệm vụ
+                  <button type="button" className="lt2-action-btn is-mission" onClick={() => navigate('/daily-connection')}>
+                    <span className="lt2-action-icon lt2-action-icon-sparkle"><Sparkles size={22} /></span> Nhiệm vụ
                   </button>
                   {isMaxed && (
                     <button type="button" className="lt2-action-btn is-primary" onClick={() => setShowcase(true)}>
@@ -418,7 +428,7 @@ export default function LoveTree() {
           {/* Confetti */}
           <div className="lt-showcase-confetti" aria-hidden>
             {Array.from({ length: 60 }).map((_, i) => {
-              const colors = ['#ff4f8b', '#b14bff', '#ffd76f', '#ff7eb3', '#7ed7ff', '#7CFC9A', '#ffffff']
+              const colors = ['#ff4f8b', '#e91e63', '#ffd76f', '#ff7eb3', '#7ed7ff', '#7CFC9A', '#ffffff']
               return (
                 <span key={i} className="lt-cf" style={{
                   left: `${(i * 17 + 3) % 100}%`,

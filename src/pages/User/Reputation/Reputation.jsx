@@ -15,11 +15,13 @@ const EVENT_META = {
   ReportUpheld: { label: 'Bị báo cáo (đã xử lý)', icon: '⛔' },
 }
 
+// Bảng màu tăng dần theo mức: xám (Mới) → vàng (Bình thường) → xanh lá (Tốt) → xanh dương đậm (Cao).
+// Dùng chung 1 nguồn màu cho cả dải trạng thái (.rep-band-seg) và 4 card mức uy tín (--tc).
 const TIERS = [
-  { key: 'New', label: 'Mới', range: '0 – 39', emoji: '⚠️', color: '#f59e0b', desc: 'Tài khoản mới hoặc cần xác minh.' },
-  { key: 'Normal', label: 'Bình thường', range: '40 – 69', emoji: '🙂', color: '#3b82f6', desc: 'Hoạt động ổn định, đáng tin cơ bản.' },
+  { key: 'New', label: 'Mới', range: '0 – 39', emoji: '⚠️', color: '#9ca3af', desc: 'Tài khoản mới hoặc cần xác minh.' },
+  { key: 'Normal', label: 'Bình thường', range: '40 – 69', emoji: '🙂', color: '#f5a623', desc: 'Hoạt động ổn định, đáng tin cơ bản.' },
   { key: 'Good', label: 'Uy tín tốt', range: '70 – 89', emoji: '✅', color: '#16a34a', desc: 'Hồ sơ đáng tin, tương tác tích cực.' },
-  { key: 'High', label: 'Uy tín cao', range: '90 – 100', emoji: '⭐', color: '#f5a623', desc: 'Thành viên mẫu mực, được ưu tiên hiển thị.' },
+  { key: 'High', label: 'Uy tín cao', range: '90 – 100', emoji: '⭐', color: '#1d4ed8', desc: 'Thành viên mẫu mực, được ưu tiên hiển thị.' },
 ]
 
 const EARN = [
@@ -35,7 +37,7 @@ const LOSE = [
 
 const SEG_W = [40, 30, 20, 10] // bề rộng % mỗi mức trên dải (0-39 · 40-69 · 70-89 · 90-100)
 const SEG_SHORT = ['Mới', 'Bình thường', 'Tốt', 'Cao'] // nhãn ngắn cho dải
-const tierColor = (tier) => (TIERS.find((t) => t.key === tier)?.color || '#3b82f6')
+const tierColor = (tier) => (TIERS.find((t) => t.key === tier)?.color || '#9ca3af')
 const tierEmojiOf = (tier) => (TIERS.find((t) => t.key === tier)?.emoji || '🙂')
 
 export default function Reputation() {
@@ -66,7 +68,10 @@ export default function Reputation() {
       {/* Hero — điểm + dải mức (kiểu app credit score) */}
       <div className="rep-hero">
         <span className="rep-hero-glow" aria-hidden />
-        <div className="rep-hero-eyebrow">Điểm uy tín của bạn</div>
+        <h1 className="ph-title rep-hdr-title">
+          <span className="ph-script rep-hdr-script">Điểm</span>{' '}
+          <span className="ph-accent rep-hdr-accent">uy tín của bạn <ShieldCheckIcon size={22} className="ph-icon rep-hdr-icon" /></span>
+        </h1>
         <div className="rep-hero-row">
           <div className="rep-score" style={{ color }}>
             {score}<span className="rep-score-max">/100</span>
