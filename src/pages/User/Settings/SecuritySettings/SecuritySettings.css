@@ -1,24 +1,32 @@
 /* ── Security settings ──────────────────────────────────────── */
-.sec-root { min-height: calc(100vh - var(--header-height)); }
+.sec-root { position: relative; min-height: calc(100vh - var(--header-height)); }
+.sec-root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: url('/assets/br-15.png') center top / cover no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+.sec-root > * {
+  position: relative;
+  z-index: 1;
+}
 
 .sec-hero {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 36px 24px 28px;
-  background: linear-gradient(160deg, #150a1a 0%, #1c0e28 55%, #251235 100%);
+  padding: 24px;
+  margin: 16px 16px 0;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
 }
-.sec-hero-icon {
-  width: 58px; height: 58px;
-  border-radius: 18px;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  box-shadow: 0 8px 24px rgba(255, 79, 139, 0.3);
-  flex-shrink: 0;
-}
-.sec-hero-title { font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: -0.02em; margin: 0; }
-.sec-hero-sub { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin: 4px 0 0; line-height: 1.5; }
+.sec-hero-title { font-size: 1.4rem; font-weight: 900; color: var(--color-text); letter-spacing: -0.02em; margin: 0; }
+.sec-hero-sub { font-size: 0.85rem; color: var(--color-text-soft); margin: 4px 0 0; line-height: 1.5; }
 
 .sec-body {
   max-width: 620px;

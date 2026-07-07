@@ -9,7 +9,6 @@ import ProfileDetailModal from '../../../components/User/ProfileDetailModal/Prof
 import MatchCelebration from '../../../components/User/MatchCelebration/MatchCelebration.jsx'
 import AdminBadge from '../../../components/User/AdminBadge/AdminBadge.jsx'
 import AvatarFrame from '../../../components/User/AvatarFrame/AvatarFrame.jsx'
-import GlassHeartHero from '../../../components/User/GlassHeartHero/GlassHeartHero.jsx'
 import './Matches.css'
 import '../LikedMe/LikedMe.css'
 
@@ -379,8 +378,6 @@ export default function Matches() {
                   <div className="stat-badge"><CrownIcon size={14} /> {isGold ? 'Thành viên Gold' : 'Gói miễn phí'}</div>
                 </div>
               </div>
-
-              <GlassHeartHero />
             </section>
 
             {/* Lưới người đã thích — 3 cột đều như mẫu */}
@@ -450,8 +447,6 @@ export default function Matches() {
                   <div className="stat-badge"><CrownIcon size={14} /> {isGold ? 'Thành viên Gold' : 'Gói miễn phí'}</div>
                 </div>
               </div>
-
-              <GlassHeartHero />
             </section>
 
             {matches.length === 0 ? (

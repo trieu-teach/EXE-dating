@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { settingsService } from '../../../../api'
 import { useToast } from '../../../../context/ToastContext.jsx'
 import { timeAgo } from '../../../../utils/format.js'
-import { ShieldCheckIcon } from '../../../../components/ui/CustomIcons.jsx'
 import '../SettingsHub.css'
 import './Devices.css'
 
@@ -46,7 +45,6 @@ export default function Devices() {
       <header className="dev-hero">
         <button type="button" className="dev-back" onClick={() => navigate('/settings/security')}>← Bảo mật</button>
         <div className="dev-hero-main">
-          <div className="dev-hero-icon"><ShieldCheckIcon size={24} /></div>
           <div>
             <h1 className="dev-hero-title">Thiết bị đã đăng nhập</h1>
             <p className="dev-hero-sub">{devices.length} phiên đang hoạt động trên tài khoản của bạn.</p>

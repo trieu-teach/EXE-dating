@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../../../context/AuthContext.jsx'
-import { ShieldIcon, KeyIcon, ShieldCheckIcon, ChevronRightIcon, LogOutIcon } from '../../../../components/ui/CustomIcons.jsx'
+import { KeyIcon, ShieldCheckIcon, ChevronRightIcon, LogOutIcon } from '../../../../components/ui/CustomIcons.jsx'
 import '../SettingsHub.css'
 import './SecuritySettings.css'
 
@@ -10,7 +10,6 @@ export default function SecuritySettings() {
   return (
     <div className="sec-root">
       <header className="sec-hero">
-        <div className="sec-hero-icon"><ShieldIcon size={26} /></div>
         <div>
           <h1 className="sec-hero-title">Bảo mật tài khoản</h1>
           <p className="sec-hero-sub">Quản lý mật khẩu và các phiên đăng nhập của bạn.</p>

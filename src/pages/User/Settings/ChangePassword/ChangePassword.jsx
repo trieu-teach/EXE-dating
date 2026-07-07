@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import { settingsService } from '../../../../api'
 import { useToast } from '../../../../context/ToastContext.jsx'
+import './ChangePassword.css'
 
 export default function ChangePassword() {
   const navigate = useNavigate()
@@ -32,7 +33,7 @@ export default function ChangePassword() {
   }
 
   return (
-    <main className="auth-page" style={{ alignItems: 'flex-start' }}>
+    <main className="auth-page cp-page" style={{ alignItems: 'flex-start' }}>
       <div className="auth-card" style={{ maxWidth: 480 }}>
         <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigate('/settings')} style={{ alignSelf: 'flex-start', marginBottom: 12 }}>
           ← Cài đặt

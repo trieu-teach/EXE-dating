@@ -70,19 +70,22 @@
 }
 
 .premium-hero-title {
-  font-size: clamp(2rem, 7vw, 3rem);
+  font-size: clamp(3.2rem, 9vw, 5.5rem);
   font-weight: 900;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
   color: #ffffff;
   margin: 0 0 16px;
-  line-height: 1.05;
+  line-height: 1.1;
 }
 
 .pm-hdr-script { --ph-script-shadow: 0 2px 10px rgba(245, 166, 35, 0.45); }
 .pm-hdr-icon { --ph-icon-color: #ffd76f; --ph-icon-glow: 0 0 6px rgba(245, 166, 35, 0.65); }
 .pm-hdr-brand {
+  font-family: 'Pacifico', cursive;
+  font-weight: 400;
   background: linear-gradient(90deg, #F7931E 0%, #EC4899 100%);
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(2px 2px 8px rgba(233, 30, 99, 0.3));
 }
 
 .premium-hero-subtitle {
@@ -566,7 +569,7 @@
   content: '';
   position: fixed;
   inset: 0;
-  background: url('/assets/br-pre.png') center top / cover no-repeat;
+  background: url('/assets/br-new17.png') center top / cover no-repeat;
   pointer-events: none;
   z-index: 0;
 }
@@ -580,16 +583,8 @@
 .premium-hero::before { display: none; }
 .premium-hero::after { display: none; }
 .premium-hero-title {
-  font-size: clamp(2.3rem, 7vw, 3.4rem);
   text-shadow: 0 2px 14px rgba(0,0,0,0.22);
 }
-.premium-hero-title span {
-  background: linear-gradient(100deg, #fff6d8, #ffe08a 45%, #fff176);
-  background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  animation: pm-flow 5s linear infinite;
-  filter: drop-shadow(0 2px 10px rgba(0,0,0,0.18));
-}
-@keyframes pm-flow { to { background-position: 200% center; } }
 .premium-hero-subtitle {
   color: rgba(255,255,255,0.94);
   max-width: 460px; font-size: 1rem;
@@ -782,11 +777,3 @@
   50% { box-shadow: 0 12px 36px rgba(255,79,139,0.7); }
 }
 
-/* ── Trust strip ── */
-.premium-trust {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 22px;
-  margin: 26px 16px 0; padding: 16px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.55);
-}
-.premium-trust span { display: inline-flex; align-items: center; gap: 6px; }

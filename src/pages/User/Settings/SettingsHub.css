@@ -1,10 +1,23 @@
 /* ── Settings Hub — Full-Width Modern Layout ─────────────────── */
 
 .settings-root {
+  position: relative;
   min-height: calc(100vh - var(--header-height));
   display: flex;
   flex-direction: column;
   gap: 0;
+}
+.settings-root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: url('/assets/br-15.png') center top / cover no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+.settings-root > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Tiêu đề nghệ thuật — bản điềm tĩnh hơn cho trang tiện ích: cùng cỡ chữ lớn
@@ -14,7 +27,7 @@
   inset: -24px;
   --ph-glow: radial-gradient(circle, rgba(255, 140, 120, 0.16), transparent 70%);
 }
-.sh-hdr-title { font-size: clamp(2rem, 5.5vw, 2.9rem); gap: 8px; }
+.sh-hdr-title { gap: 8px; }
 .sh-hdr-script {
   --ph-script-grad: linear-gradient(100deg, #c9860a 0%, #e0a934 50%, #c9860a 100%);
   --ph-script-shadow: 0 1px 4px rgba(180, 130, 20, 0.2);
@@ -135,8 +148,10 @@
 }
 
 .settings-section-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: var(--radius-lg);
   overflow: hidden;
   margin: 0 16px;

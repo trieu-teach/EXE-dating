@@ -239,13 +239,6 @@ export default function Premium() {
           </div>
         </div>
 
-        {/* ── Cam kết / trust ── */}
-        <div className="premium-trust">
-          <span>🔒 Thanh toán an toàn</span>
-          <span>↺ Huỷ bất cứ lúc nào</span>
-          <span>⚡ Kích hoạt tức thì</span>
-        </div>
-
         {import.meta.env.DEV && (
           <div className="premium-dev-card">
             <strong>Dev tools</strong>

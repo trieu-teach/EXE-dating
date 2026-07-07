@@ -19,7 +19,7 @@
   content: '';
   position: fixed;
   inset: 0;
-  background: url('/assets/br-15.png') center top / cover no-repeat;
+  background: url('/assets/br-new8.png') center top / cover no-repeat;
   pointer-events: none;
   z-index: 0;
 }
@@ -47,7 +47,7 @@
 .rep-hero > *:not(.rep-hero-glow) { position: relative; z-index: 1; }
 
 /* Tiêu đề nghệ thuật — ánh sáng trắng-vàng điềm tĩnh (không neon rực), phù hợp nền thẻ sáng */
-.rep-hdr-title { font-size: clamp(1.9rem, 4.8vw, 2.7rem); gap: 8px; margin: 0 0 10px; }
+.rep-hdr-title { gap: 8px; margin: 0 0 10px; }
 .rep-hdr-script {
   --ph-script-grad: linear-gradient(100deg, #c9860a 0%, #e8b23a 40%, #f5dfa0 60%, #e8b23a 100%);
   --ph-script-shadow: 0 1px 4px rgba(180, 130, 20, 0.22);

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { preferencesService } from '../../../../api'
 import { useToast } from '../../../../context/ToastContext.jsx'
+import './DiscoverySettings.css'
 
 export default function DiscoverySettings() {
   const navigate = useNavigate()

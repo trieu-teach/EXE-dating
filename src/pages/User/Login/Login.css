@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: url('/assets/br-31.png') center / cover no-repeat fixed;
+  background: url('/assets/br-new14.png') center / cover no-repeat fixed;
   position: relative;
   overflow: hidden;
 }
@@ -185,7 +185,7 @@
 
 /* Dark mode */
 [data-theme='dark'] .auth-page {
-  background: url('/assets/br-31.png') center / cover no-repeat fixed;
+  background: url('/assets/br-new14.png') center / cover no-repeat fixed;
 }
 [data-theme='dark'] .auth-hero p { color: #8c6b80; }
 [data-theme='dark'] .auth-divider::before,

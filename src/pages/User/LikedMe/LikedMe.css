@@ -38,14 +38,6 @@
   margin-bottom: 14px;
 }
 
-.liked-header-section h1 {
-  font-size: 3.25rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 10px 0;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
 
 /* Tiêu đề nghệ thuật — nền trang trắng nên dùng gradient chữ đậm hơn (không
    phải bản "glow trên nền tối"), không thẻ/khối nền, chỉ chữ + vầng mờ rất nhẹ. */
@@ -54,7 +46,7 @@
   inset: -16px;
   --ph-glow: radial-gradient(circle, rgba(255, 93, 143, 0.14), transparent 70%);
 }
-.lm-hdr-title { font-size: clamp(2.2rem, 6.5vw, 3.4rem); gap: 10px; margin: 0; }
+.lm-hdr-title { gap: 10px; margin: 0; }
 .lm-hdr-script {
   --ph-script-grad: linear-gradient(100deg, #c9860a 0%, #f0a71e 40%, #ffcf6b 60%, #f0a71e 100%);
   --ph-script-shadow: 0 1px 3px rgba(180, 110, 10, 0.25);
