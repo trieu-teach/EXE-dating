@@ -131,98 +131,156 @@
 .meetup-select:focus { border-color: var(--color-primary); outline: none; }
 .meetup-venues-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 18px;
 }
 @media (max-width: 600px) { .meetup-venues-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 400px) { .meetup-venues-grid { grid-template-columns: 1fr; } }
 
+@property --mv-border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
 .meetup-venue-card {
   position: relative;
-  background: var(--color-surface);
+  aspect-ratio: 4 / 5;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
   cursor: pointer;
   transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-fast);
-  display: flex;
-  flex-direction: column;
+}
+.meetup-venue-card::before,
+.meetup-venue-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--mv-border-angle),
+    transparent 0%,
+    transparent 62%,
+    #e63950 70%,
+    #f2994a 78%,
+    #f5c26b 86%,
+    #e0507e 94%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: mv-border-spin 1.9s linear infinite;
+}
+.meetup-venue-card::before {
+  padding: 10px;
+  filter: blur(9px) saturate(1.4);
+  opacity: 0.95;
+}
+.meetup-venue-card::after {
+  padding: 3px;
+}
+@keyframes mv-border-spin {
+  to { --mv-border-angle: 360deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .meetup-venue-card::before, .meetup-venue-card::after { animation: none; }
 }
 .meetup-venue-card:hover {
   border-color: var(--color-primary);
-  box-shadow: 0 6px 20px rgba(255, 79, 139, 0.15);
-  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(255, 79, 139, 0.22);
+  transform: translateY(-3px);
 }
 .meetup-venue-card.is-selected {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px rgba(255, 79, 139, 0.3);
 }
 .meetup-venue-img {
-  width: 100%;
-  aspect-ratio: 3/2;
+  position: absolute;
+  inset: 0;
   background-size: cover;
   background-position: center;
   background-color: var(--color-surface-2);
-  position: relative;
+}
+.meetup-venue-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.15) 45%, rgba(0, 0, 0, 0.85) 100%);
 }
 .meetup-venue-img-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  font-size: 40px;
 }
 .meetup-venue-check {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 22px;
-  height: 22px;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
   background: var(--color-primary);
   color: #fff;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   box-shadow: var(--shadow-sm);
 }
-.meetup-venue-info { padding: 10px; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.meetup-venue-info {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .meetup-venue-name {
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--color-text);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .meetup-venue-meta {
-  font-size: 0.75rem;
-  color: var(--color-text-soft);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   gap: 4px;
   flex-wrap: wrap;
 }
 .meetup-venue-address {
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .meetup-venue-detail-btn {
   position: absolute;
-  top: 6px;
-  left: 6px;
-  width: 26px;
-  height: 26px;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   border: none;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   display: grid;
   place-items: center;
   opacity: 0;
@@ -297,19 +355,27 @@
   border: 1px solid rgba(255, 79, 139, 0.2);
   border-radius: var(--radius-md);
 }
-.meetup-datetime, .meetup-textarea {
+.field input.meetup-datetime,
+.field textarea.meetup-textarea {
   width: 100%;
   padding: 9px 12px;
   border-radius: var(--radius-md);
   border: 1.5px solid var(--color-border);
   background: var(--color-surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   color: var(--color-text);
+  text-shadow: none;
   font-family: inherit;
   font-size: 0.88rem;
   transition: border-color var(--transition-base);
 }
-.meetup-datetime:focus, .meetup-textarea:focus { border-color: var(--color-primary); outline: none; }
-.meetup-textarea { resize: vertical; }
+.field input.meetup-datetime:focus,
+.field textarea.meetup-textarea:focus { border-color: var(--color-primary); outline: none; }
+.field textarea.meetup-textarea {
+  resize: vertical;
+}
+.field textarea.meetup-textarea::placeholder { color: var(--color-text-muted); }
 .meetup-propose-actions { display: flex; gap: 8px; }
 
 /* ── Empty state ────────────────────────────── */
@@ -334,14 +400,33 @@
   max-width: 480px;
 }
 .venue-detail-cover {
-  width: 100%;
+  position: relative;
+  width: calc(100% + 2 * var(--space-6));
+  margin: calc(-1 * var(--space-6)) calc(-1 * var(--space-6)) 0;
   aspect-ratio: 16/9;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
   background-size: cover;
   background-position: center;
   background-color: var(--color-surface-2);
+  display: flex;
+  align-items: flex-end;
+}
+.venue-detail-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.15) 45%, rgba(0, 0, 0, 0.82) 100%);
 }
 .venue-detail-header { display: flex; flex-direction: column; gap: 8px; }
+.venue-detail-header.is-overlay {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 16px;
+}
+.venue-detail-header.is-overlay .venue-detail-name { color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); }
+.venue-detail-header.is-overlay .tag { background: rgba(255, 255, 255, 0.22); color: #fff; backdrop-filter: blur(4px); }
 .venue-detail-name { margin: 0; font-size: 1.2rem; font-weight: 900; }
 .venue-detail-badges { display: flex; gap: 6px; flex-wrap: wrap; }
 .venue-detail-row {
@@ -360,10 +445,12 @@
   white-space: pre-line;
 }
 
-/* ── VenueMessage (chat card) ────────────────── */
+/* ── VenueMessage (chat card) — ảnh nền phủ kín + overlay tối, chữ trắng đè lên,
+   kích thước cố định để mọi card trong luồng chat đồng nhất, to hơn bản cũ ── */
 .venue-msg-card {
-  max-width: 270px;
-  background: var(--color-surface);
+  position: relative;
+  width: 260px;
+  height: 320px;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -375,23 +462,38 @@
   box-shadow: 0 6px 20px rgba(255, 79, 139, 0.15);
 }
 .venue-msg-card-img {
-  width: 100%;
-  height: 110px;
+  position: absolute;
+  inset: 0;
   background-size: cover;
   background-position: center;
   background-color: var(--color-surface-2);
 }
-.venue-msg-card-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
-.venue-msg-card-name { font-weight: 800; font-size: 0.88rem; }
+.venue-msg-card-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.18) 40%, rgba(0, 0, 0, 0.88) 100%);
+}
+.venue-msg-card-body {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.venue-msg-card-name { font-weight: 800; font-size: 1.05rem; color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); }
 .venue-msg-card-meta {
   display: flex; gap: 6px; flex-wrap: wrap;
-  font-size: 0.75rem; color: var(--color-text-soft); align-items: center;
+  font-size: 0.8rem; color: rgba(255, 255, 255, 0.85); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); align-items: center;
 }
-.venue-msg-category { font-weight: 700; color: var(--color-text); }
-.venue-msg-price { color: var(--color-primary); font-weight: 700; }
-.venue-msg-address { font-size: 0.75rem; color: var(--color-text-muted); }
-.venue-msg-meta   { font-size: 0.72rem; color: var(--color-text-muted); }
-.venue-msg-propose-btn { margin-top: 6px; width: 100%; font-size: 0.78rem; }
+.venue-msg-category { font-weight: 700; color: #fff; }
+.venue-msg-price { color: #ffd0e0; font-weight: 700; }
+.venue-msg-address { font-size: 0.78rem; color: rgba(255, 255, 255, 0.75); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+.venue-msg-location { font-size: 0.76rem; color: rgba(255, 255, 255, 0.7); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+.venue-msg-meta   { font-size: 0.74rem; color: rgba(255, 255, 255, 0.65); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+.venue-msg-propose-btn { margin-top: 8px; width: 100%; font-size: 0.82rem; }
 
 /* Compact chip */
 .venue-msg-compact {

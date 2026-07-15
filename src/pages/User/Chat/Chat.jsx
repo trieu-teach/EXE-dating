@@ -6,6 +6,7 @@ import { chatService, plantsService, meetupService, venuesService, profileServic
 import { useToast } from '../../../context/ToastContext.jsx'
 import { useAuth } from '../../../context/AuthContext.jsx'
 import { timeAgo, resolveImageUrl, formatDistance } from '../../../utils/format.js'
+import { brandBg } from '../../../utils/brandBg.js'
 import ChatThreadToolbar from '../../../components/User/ChatThreadToolbar/ChatThreadToolbar.jsx'
 import ProfilePreviewModal from '../../../components/User/ProfilePreviewModal/ProfilePreviewModal.jsx'
 import AISuggestionPanel from '../../../components/User/AISuggestionPanel/AISuggestionPanel.jsx'
@@ -461,12 +462,12 @@ export default function Chat() {
                       <div className="chat-propose-venue">📍 <strong>{proposeVenue.name || proposeVenue.venueName || 'Quán đã chọn'}</strong></div>
                       <div className="field">
                         <label className="field-label">Thời gian</label>
-                        <input type="datetime-local" value={proposeAt}
+                        <input type="datetime-local" className="meetup-datetime" value={proposeAt}
                           onChange={(e) => setProposeAt(e.target.value)} required />
                       </div>
                       <div className="field">
                         <label className="field-label">Lời nhắn (tuỳ chọn)</label>
-                        <textarea rows={2} value={proposeNote} maxLength={300}
+                        <textarea rows={2} className="meetup-textarea" value={proposeNote} maxLength={300}
                           onChange={(e) => setProposeNote(e.target.value)}
                           placeholder="Mình hẹn nhau ở đây nhé ☕" />
                       </div>
@@ -497,20 +498,23 @@ export default function Chat() {
                         <p className="empty" style={{ padding: 16 }}>Không tìm thấy quán nào gần đây.</p>
                       ) : (
                         <div className="chat-venue-picker-list">
-                          {pickerVenues.map((v) => (
-                            <button key={v.id} type="button" className="chat-venue-pick-item"
-                              disabled={sharingId === v.id} onClick={() => shareVenue(v)}>
-                              <div className="chat-venue-pick-img"
-                                style={v.imageUrl ? { backgroundImage: `url(${resolveImageUrl(v.imageUrl)})` } : undefined} />
-                              <div className="chat-venue-pick-info">
-                                <div className="chat-venue-pick-name">{v.name}</div>
-                                <div className="chat-venue-pick-meta">
-                                  {v.category}{v.distanceKm != null ? ` · ${formatDistance(v.distanceKm)}` : ''}
+                          {pickerVenues.map((v) => {
+                            const img = brandBg(v.name) || resolveImageUrl(v.imageUrl)
+                            return (
+                              <button key={v.id} type="button" className="chat-venue-pick-item"
+                                disabled={sharingId === v.id} onClick={() => shareVenue(v)}>
+                                <div className="chat-venue-pick-img"
+                                  style={img ? { backgroundImage: `url(${img})` } : undefined} />
+                                <div className="chat-venue-pick-info">
+                                  <div className="chat-venue-pick-name">{v.name}</div>
+                                  <div className="chat-venue-pick-meta">
+                                    {v.category}{v.distanceKm != null ? ` · ${formatDistance(v.distanceKm)}` : ''}
+                                  </div>
                                 </div>
-                              </div>
-                              {sharingId === v.id ? <span className="spinner" /> : <span className="chat-venue-pick-share">Chia sẻ</span>}
-                            </button>
-                          ))}
+                                {sharingId === v.id ? <span className="spinner chat-venue-pick-share" /> : <span className="chat-venue-pick-share">Chia sẻ</span>}
+                              </button>
+                            )
+                          })}
                         </div>
                       )}
                       <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPickerOpen(false)}>Đóng</button>

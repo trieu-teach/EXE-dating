@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { datePassService, subscriptionService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
+import { brandBg } from '../../../utils/brandBg.js'
 import { HeartIcon, CheckIcon } from '../../../components/ui/CustomIcons.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import './DatePass.css'
@@ -28,22 +29,6 @@ function brandTint(venueName) {
   return BRAND_TINTS.find((b) => b.match.test(venueName || ''))?.color || 'var(--color-primary)'
 }
 
-// Ảnh nền riêng theo thương hiệu (thay cho gradient placeholder) — bổ sung dần khi có ảnh.
-const BRAND_BG = [
-  { match: /cgv/i, src: '/assets/cgv.png' },
-  { match: /gong\s?cha/i, src: '/assets/gong-cha.png' },
-  { match: /haidilao/i, src: '/assets/hadilao.png' },
-  { match: /highlands/i, src: '/assets/highland.png' },
-  { match: /kfc/i, src: '/assets/kfc.png' },
-  { match: /katinat/i, src: '/assets/katinat.png' },
-  { match: /ph[uú]c\s?long/i, src: '/assets/phuclong.png' },
-  { match: /pizza\s?4p/i, src: '/assets/pizza.png' },
-  { match: /starbucks/i, src: '/assets/start.png' },
-  { match: /coffee\s?house/i, src: '/assets/house.png' },
-]
-function brandBg(venueName) {
-  return BRAND_BG.find((b) => b.match.test(venueName || ''))?.src
-}
 const STATUS = {
   Pending: { label: 'Chờ thanh toán', cls: 'is-pending' },
   Paid: { label: 'Sẵn sàng dùng', cls: 'is-paid' },

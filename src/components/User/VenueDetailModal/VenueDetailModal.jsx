@@ -11,6 +11,7 @@
 import { useEffect, useState } from 'react'
 import { venuesService } from '../../../api'
 import { resolveImageUrl, formatDistance } from '../../../utils/format.js'
+import { brandBg } from '../../../utils/brandBg.js'
 import { useToast } from '../../../context/ToastContext.jsx'
 import Modal from '../Modal/Modal.jsx'
 
@@ -62,35 +63,34 @@ export default function VenueDetailModal({ venue: initialVenue, venueId, open, o
   return (
     <Modal open={open} onClose={onClose} labelledBy="venue-modal-title">
       <div className="venue-detail">
-        {venue?.imageUrl && (
-          <div
-            className="venue-detail-cover"
-            style={{ backgroundImage: `url(${resolveImageUrl(venue.imageUrl)})` }}
-          />
-        )}
+        {venue && (() => {
+          const cover = brandBg(venue.name) || (venue.imageUrl && resolveImageUrl(venue.imageUrl))
+          const header = (
+            <>
+              <h2 id="venue-modal-title" className="venue-detail-name">
+                {icon} {venue.name}
+              </h2>
+              <div className="venue-detail-badges">
+                {venue.category && <span className="tag">{venue.category}</span>}
+                {venue.priceRange && <span className="tag">{price}</span>}
+                {venue.distanceKm != null && <span className="tag">{formatDistance(venue.distanceKm)}</span>}
+              </div>
+            </>
+          )
+          return cover ? (
+            <div className="venue-detail-cover" style={{ backgroundImage: `url(${cover})` }}>
+              <div className="venue-detail-header is-overlay">{header}</div>
+            </div>
+          ) : (
+            <div className="venue-detail-header">{header}</div>
+          )
+        })()}
         {loading ? (
           <div className="loading-block" style={{ padding: 24 }}>
             <span className="spinner" />
           </div>
         ) : venue ? (
           <>
-            <div className="venue-detail-header">
-              <h2 id="venue-modal-title" className="venue-detail-name">
-                {icon} {venue.name}
-              </h2>
-              <div className="venue-detail-badges">
-                {venue.category && (
-                  <span className="tag">{venue.category}</span>
-                )}
-                {venue.priceRange && (
-                  <span className="tag">{price}</span>
-                )}
-                {venue.distanceKm != null && (
-                  <span className="tag">{formatDistance(venue.distanceKm)}</span>
-                )}
-              </div>
-            </div>
-
             {venue.address && (
               <div className="venue-detail-row">
                 <span className="venue-detail-label">📍 Địa chỉ</span>

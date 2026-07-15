@@ -8,6 +8,7 @@
  *   onPropose — fn(venue) called when "Đề xuất hẹn ở đây" is clicked
  */
 import { resolveImageUrl, formatDistance } from '../../../utils/format.js'
+import { brandBg } from '../../../utils/brandBg.js'
 
 const CATEGORY_ICONS = {
   cafe: '☕',
@@ -34,7 +35,7 @@ export default function VenueMessage({
 }) {
   if (!venue) return null
 
-  const img = resolveImageUrl(venue.imageUrl || venue.venueImageUrl)
+  const img = brandBg(venue.name) || resolveImageUrl(venue.imageUrl || venue.venueImageUrl)
   const icon = CATEGORY_ICONS[venue.category] ?? '📍'
   const price = PRICE_LABELS[venue.priceRange] ?? venue.priceRange
 

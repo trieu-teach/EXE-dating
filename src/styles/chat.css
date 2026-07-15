@@ -127,9 +127,6 @@
   padding: 0 4px;
 }
 
-/* ── Venue message in chat ────────────────────────── */
-.chat-msg .venue-msg-card { max-width: 260px; }
-
 /* ── Meetup proposal in chat ──────────────────────── */
 .chat-meetup-proposal {
   width: 100%;

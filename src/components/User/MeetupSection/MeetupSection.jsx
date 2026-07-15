@@ -18,6 +18,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { venuesService, meetupService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl, formatDistance } from '../../../utils/format.js'
+import { brandBg } from '../../../utils/brandBg.js'
 import VenueDetailModal from '../VenueDetailModal/VenueDetailModal.jsx'
 
 const CATEGORY_OPTIONS = [
@@ -207,7 +208,7 @@ export default function MeetupSection({ matchId, conversationId, plant }) {
         ) : (
           <div className="meetup-venues-grid">
             {venues.map((v) => {
-              const img = resolveImageUrl(v.imageUrl)
+              const img = brandBg(v.name) || resolveImageUrl(v.imageUrl)
               return (
                 <div key={v.id} className="meetup-venue-card" onClick={() => pickVenue(v)}
                   role="button" tabIndex={0}

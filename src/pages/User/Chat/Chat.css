@@ -1006,10 +1006,11 @@
   background: var(--color-primary-soft);
 }
 
-/* ── Picker chọn quán ───────────────────────────────────────── */
+/* ── Picker chọn quán — card ảnh nền phủ kín, kích thước cố định, to,
+   đồng bộ phong cách với trang Ưu đãi ─────────────────────────────── */
 .chat-venue-picker {
   width: 100%;
-  max-width: 420px;
+  max-width: 700px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
@@ -1021,49 +1022,78 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 }
 .chat-venue-picker-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  align-items: start;
+  align-content: start;
+  gap: 14px;
+  min-height: 0;
+  flex: 1 1 auto;
   overflow-y: auto;
 }
 .chat-venue-pick-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 10px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 240px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--color-border);
+  overflow: hidden;
   cursor: pointer;
   font-family: inherit;
   text-align: left;
-  transition: border-color var(--transition-base), background var(--transition-base);
+  padding: 0;
+  margin: 0;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-fast);
 }
 .chat-venue-pick-item:hover:not(:disabled) {
   border-color: var(--color-primary);
-  background: var(--color-primary-soft);
+  box-shadow: 0 10px 26px rgba(255, 79, 139, 0.22);
+  transform: translateY(-2px);
 }
 .chat-venue-pick-item:disabled { opacity: 0.6; cursor: default; }
 .chat-venue-pick-img {
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
-  border-radius: var(--radius-md);
+  position: absolute;
+  inset: 0;
   background-size: cover;
   background-position: center;
   background-color: var(--color-surface-2);
 }
-.chat-venue-pick-info { flex: 1; min-width: 0; }
+.chat-venue-pick-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.15) 42%, rgba(0, 0, 0, 0.85) 100%);
+}
+.chat-venue-pick-info {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 1;
+  padding: 14px;
+}
 .chat-venue-pick-name {
-  font-weight: 700;
-  font-size: 0.88rem;
-  color: var(--color-text);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.chat-venue-pick-meta { font-size: 0.76rem; color: var(--color-text-soft); }
-.chat-venue-pick-share {
+.chat-venue-pick-meta {
   font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  margin-top: 2px;
+}
+.chat-venue-pick-share {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  font-size: 0.76rem;
   font-weight: 800;
-  color: var(--color-primary);
-  flex-shrink: 0;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 5px 12px;
+  border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
 }
