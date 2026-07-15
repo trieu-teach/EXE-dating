@@ -1303,8 +1303,10 @@ a.side-widget:hover {
   gap: 12px;
   overflow-x: auto;
   padding-bottom: 4px;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.side-matches-row::-webkit-scrollbar { display: none; }
 .side-match {
   display: flex;
   flex-direction: column;

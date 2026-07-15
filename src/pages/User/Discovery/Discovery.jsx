@@ -92,8 +92,8 @@ function CuratePanel({ onApplied }) {
   const pct = (v) => ((v - AGE_MIN) / (AGE_MAX - AGE_MIN)) * 100
 
   const DIST_MIN = 1
-  const DIST_MAX = 100
-  const distPct = ((prefs.maxDistanceKm - DIST_MIN) / (DIST_MAX - DIST_MIN)) * 100
+  const DIST_MAX = 200
+  const distPct = Math.min(100, Math.max(0, ((prefs.maxDistanceKm - DIST_MIN) / (DIST_MAX - DIST_MIN)) * 100))
 
   return (
     <aside className="curate">
