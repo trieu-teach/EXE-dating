@@ -4,6 +4,7 @@
  * ========================================================= */
 
 :root {
+  color-scheme: light;
   --color-bg: #fdf2f6;
   --color-bg-elev: #ffffff;
   --color-bg-soft: #fff7fb;
@@ -75,6 +76,7 @@
 }
 
 [data-theme='dark'] {
+  color-scheme: dark;
   --color-bg: #15101a;
   --color-bg-elev: #1e1623;
   --color-bg-soft: #25192c;

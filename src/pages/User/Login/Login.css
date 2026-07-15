@@ -86,15 +86,13 @@
 .auth-hero h1 {
   font-size: 1.7rem;
   font-weight: 900;
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  color: var(--color-text);
   letter-spacing: -0.03em;
   margin-bottom: 8px;
 }
 .auth-hero p {
   font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.8);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  color: var(--color-text-soft);
   line-height: 1.5;
   margin: 0;
 }
@@ -157,8 +155,7 @@
   align-items: center;
   gap: 12px;
   margin: 10px 0 20px;
-  color: rgba(255, 255, 255, 0.7);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  color: var(--color-text-muted);
   font-size: 0.82rem;
 }
 .auth-divider::before,
@@ -166,14 +163,13 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--color-border);
 }
 
 /* Footer */
 .auth-switch {
   text-align: center;
-  color: rgba(255, 255, 255, 0.8);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  color: var(--color-text-soft);
   font-size: 0.88rem;
   margin: 0;
 }
@@ -187,11 +183,6 @@
 [data-theme='dark'] .auth-page {
   background: url('/assets/br-new14.png') center / cover no-repeat fixed;
 }
-[data-theme='dark'] .auth-hero p { color: #8c6b80; }
-[data-theme='dark'] .auth-divider::before,
-[data-theme='dark'] .auth-divider::after { background: #2d1f30; }
-[data-theme='dark'] .auth-divider { color: #6b4a5b; }
-[data-theme='dark'] .auth-switch { color: #c8a8bd; }
 [data-theme='dark'] .auth-pw-toggle { color: #6b4a5b; }
 [data-theme='dark'] .auth-form input {
   background: rgba(255, 255, 255, 0.06);

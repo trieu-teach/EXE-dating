@@ -1011,8 +1011,7 @@
   font-size: 1.5rem;
   font-weight: 900;
   letter-spacing: -0.02em;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  color: var(--color-text);
   margin-bottom: 22px;
 }
 .curate-row {
@@ -1021,8 +1020,8 @@
   align-items: baseline;
 }
 .curate-row-gap { margin-top: 30px; }
-.curate-label { font-size: 1.05rem; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); }
-.curate-value { font-size: 0.92rem; font-weight: 700; color: #ffd0e0; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); }
+.curate-label { font-size: 1.05rem; font-weight: 800; color: var(--color-text); }
+.curate-value { font-size: 0.92rem; font-weight: 800; color: var(--color-primary, #ff4f8b); }
 
 /* Thanh kéo 2 đầu cho độ tuổi */
 .curate-dual { position: relative; height: 28px; margin-top: 8px; }
@@ -1061,7 +1060,7 @@
   height: 5px;
   transform: translateY(-50%);
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.15);
 }
 .curate-fill {
   position: absolute;
@@ -1072,12 +1071,6 @@
   background: var(--color-primary, #ff4f8b);
 }
 
-.curate-single {
-  width: 100%;
-  height: 28px;
-  margin-top: 8px;
-  accent-color: var(--color-primary, #ff4f8b);
-}
 
 .curate-adv {
   display: block;
@@ -1226,22 +1219,22 @@
   flex: 1;
   padding: 11px 0;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(9px);
   -webkit-backdrop-filter: blur(9px);
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  color: var(--color-text);
   font-size: 0.92rem;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.15s;
 }
-.curate-gender-btn:hover { border-color: rgba(255, 255, 255, 0.5); }
+.curate-gender-btn:hover { border-color: var(--color-primary, #ff4f8b); }
 .curate-gender-btn.active {
-  background: rgba(255, 255, 255, 0.28);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: var(--color-primary, #ff4f8b);
+  border-color: var(--color-primary, #ff4f8b);
   color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* ═══ Widget cột phải: Ai đã thích bạn + Match mới ═══ */
@@ -1269,7 +1262,7 @@ a.side-widget:hover {
   justify-content: space-between;
   margin-bottom: 14px;
 }
-.side-widget-title { font-size: 1.08rem; font-weight: 900; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); }
+.side-widget-title { font-size: 1.08rem; font-weight: 900; color: var(--color-text); }
 .side-widget-count {
   background: linear-gradient(135deg, #ff4f8b, #e63472);
   color: #fff;
@@ -1278,9 +1271,9 @@ a.side-widget:hover {
   border-radius: 999px;
   padding: 3px 11px;
 }
-.side-widget-more { font-size: 0.85rem; font-weight: 700; color: #ffd0e0; text-decoration: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+.side-widget-more { font-size: 0.85rem; font-weight: 800; color: var(--color-primary, #ff4f8b); text-decoration: none; }
 .side-widget-more:hover { text-decoration: underline; }
-.side-widget-empty { margin: 0; font-size: 0.88rem; color: rgba(255, 255, 255, 0.78); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+.side-widget-empty { margin: 0; font-size: 0.88rem; color: var(--color-text-soft); }
 
 .side-likedme-grid {
   display: grid;

@@ -91,6 +91,10 @@ function CuratePanel({ onApplied }) {
   const AGE_MAX = 60
   const pct = (v) => ((v - AGE_MIN) / (AGE_MAX - AGE_MIN)) * 100
 
+  const DIST_MIN = 1
+  const DIST_MAX = 100
+  const distPct = ((prefs.maxDistanceKm - DIST_MIN) / (DIST_MAX - DIST_MIN)) * 100
+
   return (
     <aside className="curate">
       <div className="curate-title">Bộ lọc</div>
@@ -112,9 +116,13 @@ function CuratePanel({ onApplied }) {
         <span className="curate-label">Khoảng cách</span>
         <span className="curate-value">Tối đa {prefs.maxDistanceKm} km</span>
       </div>
-      <input className="curate-single" type="range" min={1} max={100} value={prefs.maxDistanceKm}
-        aria-label="Khoảng cách tối đa"
-        onChange={(e) => update({ maxDistanceKm: +e.target.value })} />
+      <div className="curate-dual">
+        <div className="curate-track" />
+        <div className="curate-fill" style={{ left: '0%', right: `${100 - distPct}%` }} />
+        <input className="curate-single" type="range" min={DIST_MIN} max={DIST_MAX} value={prefs.maxDistanceKm}
+          aria-label="Khoảng cách tối đa"
+          onChange={(e) => update({ maxDistanceKm: +e.target.value })} />
+      </div>
 
       <div className="curate-row curate-row-gap">
         <span className="curate-label">Đang tìm</span>
