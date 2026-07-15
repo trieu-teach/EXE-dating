@@ -532,22 +532,22 @@ export default function Discovery() {
         <motion.button className="disc-action disc-action-undo" aria-label="Hoàn tác"
           onClick={undo} disabled={actionLoading}
           whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.9 }}>
-          <RefreshIcon size={24} />
+          <RefreshIcon size={28} />
         </motion.button>
         <motion.button className="disc-action disc-action-pass" aria-label="Bỏ qua"
           onClick={() => decide('Pass')} disabled={actionLoading}
           whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.9 }}>
-          <XIcon size={24} />
+          <XIcon size={28} />
         </motion.button>
         <motion.button className="disc-action disc-action-super" aria-label="Siêu thích"
           onClick={() => decide('SuperLike')} disabled={actionLoading}
           whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.9 }}>
-          <StarIcon size={24} />
+          <StarIcon size={28} />
         </motion.button>
         <motion.button className="disc-action disc-action-like" aria-label="Thích"
           onClick={() => decide('Like')} disabled={actionLoading}
           whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.9 }}>
-          <HeartIcon size={24} />
+          <HeartIcon size={28} />
         </motion.button>
       </div>
       </div>

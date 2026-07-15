@@ -638,9 +638,9 @@
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 28px;
   z-index: 5;
-  padding: 10px 14px;
+  padding: 14px 30px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(9px);
@@ -660,7 +660,7 @@
 }
 .disc-action:disabled { opacity: 0.55; cursor: default; }
 .disc-action {
-  width: 64px; height: 64px; /* 4 nút đồng kích thước */
+  width: 76px; height: 76px; /* 4 nút đồng kích thước */
 }
 .disc-action-undo {
   background: linear-gradient(135deg, #ffd76f, #f5a623);
