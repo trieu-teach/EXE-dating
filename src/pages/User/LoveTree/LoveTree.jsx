@@ -71,7 +71,6 @@ export default function LoveTree() {
   const [milestone, setMilestone] = useState(null)
   const [emojiAnim, setEmojiAnim] = useState('')
   const [tab, setTab] = useState('tree')
-  const [showcase, setShowcase] = useState(false)
 
   const { user } = useAuth()
   const { inventory, refresh: refreshInventory } = useInventory()
@@ -368,12 +367,6 @@ export default function LoveTree() {
                   <button type="button" className="lt2-action-btn is-mission" onClick={() => navigate('/daily-connection')}>
                     <span className="lt2-action-icon lt2-action-icon-sparkle"><Sparkles size={22} /></span> Nhiệm vụ
                   </button>
-                  {isMaxed && (
-                    <button type="button" className="lt2-action-btn is-primary" onClick={() => setShowcase(true)}>
-                      <span className="lt2-action-icon">🎉</span>
-                      Khoe cây
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
@@ -418,68 +411,6 @@ export default function LoveTree() {
         </div>
       )}
 
-      {/* ── Khoe cây: showcase full màn hình + hiệu ứng mạnh ───────── */}
-      {showcase && (
-        <div className="lt-showcase" role="dialog" aria-modal="true">
-          <div className="lt-showcase-bg" aria-hidden />
-          <div className="lt-showcase-glow" aria-hidden />
-          <div className="lt-showcase-rays" aria-hidden />
-
-          {/* Confetti */}
-          <div className="lt-showcase-confetti" aria-hidden>
-            {Array.from({ length: 60 }).map((_, i) => {
-              const colors = ['#ff4f8b', '#e91e63', '#ffd76f', '#ff7eb3', '#7ed7ff', '#7CFC9A', '#ffffff']
-              return (
-                <span key={i} className="lt-cf" style={{
-                  left: `${(i * 17 + 3) % 100}%`,
-                  background: colors[i % colors.length],
-                  width: `${6 + (i % 3) * 3}px`,
-                  height: `${10 + (i % 3) * 5}px`,
-                  animationDelay: `${(i % 12) * 0.28}s`,
-                  animationDuration: `${3 + (i % 5) * 0.7}s`,
-                }} />
-              )
-            })}
-          </div>
-
-          {/* Lấp lánh */}
-          <div className="lt-showcase-sparks" aria-hidden>
-            {Array.from({ length: 28 }).map((_, i) => (
-              <span key={i} className="lt-spark" style={{
-                left: `${(i * 53 + 4) % 98}%`,
-                top: `${(i * 37 + 6) % 92}%`,
-                animationDelay: `${(i % 9) * 0.35}s`,
-                animationDuration: `${1.8 + (i % 5) * 0.5}s`,
-              }} />
-            ))}
-          </div>
-
-          {/* Sao băng */}
-          <div className="lt-showcase-shoot" aria-hidden>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className="lt-shoot" style={{
-                top: `${8 + i * 12}%`,
-                left: `${50 + i * 9}%`,
-                animationDelay: `${i * 1.4 + 0.5}s`,
-              }} />
-            ))}
-          </div>
-
-          <button type="button" className="lt-showcase-close" onClick={() => setShowcase(false)} aria-label="Đóng">✕</button>
-
-          <div className="lt-showcase-content">
-            <div className="lt-showcase-eyebrow">🌳 Cây tình yêu vĩnh cửu</div>
-            <div className="lt-showcase-tree-wrap">
-              <img src={treeImgByNumber(7)} alt="Cây tình yêu vĩnh cửu" className="lt-showcase-tree" />
-            </div>
-            <h2 className="lt-showcase-names">Bạn <span>&</span> {partnerName}</h2>
-            <p className="lt-showcase-tag">Cấp tối đa · Tình yêu bền chặt 💖</p>
-            <div className="lt-showcase-actions">
-              <button type="button" className="lt-showcase-dismiss" onClick={() => setShowcase(false)}>Đóng</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
