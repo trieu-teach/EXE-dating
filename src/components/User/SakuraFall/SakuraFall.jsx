@@ -11,7 +11,9 @@ const COUNT = 24
 export default function SakuraFall() {
   const petals = useMemo(() =>
     Array.from({ length: COUNT }, (_, i) => ({
-      left: Math.random() * 100,             // vị trí ngang (%)
+      // Chia màn hình thành COUNT "làn" đều nhau, mỗi cánh 1 làn + xê dịch nhẹ
+      // trong làn → không bao giờ dồn cục một bên.
+      left: (i + 0.15 + Math.random() * 0.7) * (100 / COUNT),
       size: 9 + Math.random() * 8,           // 9–17px
       fall: 6 + Math.random() * 5,           // thời gian rơi 6–11s (nhanh)
       delay: -(Math.random() * 11),          // âm → phân bố đều từ đầu
