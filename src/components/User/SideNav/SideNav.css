@@ -11,14 +11,29 @@
   flex-direction: column;
   gap: 18px;
   padding: 22px 18px 20px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(9px);
-  -webkit-backdrop-filter: blur(9px);
-  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  /* Glassmorphism blush pink — kính mờ 24px, gradient hồng phấn #FFF6FA, viền pastel mảnh */
+  background: linear-gradient(180deg, rgba(255, 246, 250, 0.82) 0%, rgba(255, 241, 247, 0.74) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid rgba(255, 192, 216, 0.35);
+  box-shadow: 4px 0 28px rgba(255, 150, 190, 0.10);
 }
 [data-theme='dark'] .sidenav {
-  background: rgba(20, 14, 24, 0.15);
-  border-right-color: rgba(255, 255, 255, 0.08);
+  background: rgba(24, 19, 28, 0.72);
+  border-right-color: rgba(255, 255, 255, 0.10);
+  box-shadow: 2px 0 24px rgba(0, 0, 0, 0.45);
+}
+[data-theme='dark'] .sidenav-link { color: #e7e0ec; }
+[data-theme='dark'] .sidenav-link:hover:not(.active) { color: #fff; background: rgba(255, 255, 255, 0.08); }
+
+/* Nút chuyển giao diện — trông như 1 mục sidebar (button reset) */
+.sidenav-theme-btn {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
 }
 
 /* Brand */
@@ -114,6 +129,7 @@
   flex: 0 1 auto;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden; /* hover trượt 2px gây tràn ngang → chặn thanh cuộn ngang */
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -127,23 +143,28 @@
   border-radius: 16px;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #4a2e3d;
+  color: #2E2A3B;
   text-decoration: none;
   background: transparent;
   border: 1px solid transparent;
-  transition: color 0.2s;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
   flex-shrink: 0;
 }
 .sidenav-link svg {
   flex-shrink: 0;
 }
-.sidenav-link:hover {
-  color: #d6336c;
+.sidenav-link:hover:not(.active) {
+  color: #FF4F8B;
+  background: rgba(255, 236, 244, 0.85);
+  transform: translateX(2px);
   text-decoration: none;
 }
+/* Mục đang chọn: viên gradient hồng rực (vibrant), chữ + icon trắng, bóng hồng mềm */
 .sidenav-link.active {
-  color: #d6336c;
-  font-weight: 600;
+  color: #fff;
+  font-weight: 700;
+  background: linear-gradient(90deg, #FF7AA8, #FF4F8B);
+  box-shadow: 0 6px 16px rgba(255, 79, 139, 0.28);
 }
 
 /* CTA nâng cấp */
@@ -170,17 +191,17 @@
   color: #fff;
 }
 
-/* Chân sidebar */
+/* Chân sidebar — tách rõ khỏi phần nav bằng đường kẻ đậm hơn */
 .sidenav-foot {
   margin-top: auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  padding-top: 12px;
+  border-top: 1px solid rgba(255, 170, 205, 0.45);
+  padding-top: 14px;
   display: flex;
   flex-direction: column;
   gap: 2px;
   flex-shrink: 0;
 }
-[data-theme='dark'] .sidenav-foot { border-top-color: rgba(255, 255, 255, 0.08); }
+[data-theme='dark'] .sidenav-foot { border-top-color: rgba(255, 255, 255, 0.10); }
 
 /* ── Màn hẹp: thu thành thanh icon ── */
 @media (max-width: 1023px) {

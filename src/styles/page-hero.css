@@ -13,12 +13,8 @@
 }
 .ph-header > * { position: relative; z-index: 1; }
 .ph-glow {
-  position: absolute;
-  z-index: 0;
-  pointer-events: none;
-  border-radius: 50%;
-  filter: blur(6px);
-  background: var(--ph-glow, radial-gradient(circle, rgba(255, 111, 97, 0.35), transparent 70%));
+  /* Đã gỡ vầng sáng sau tiêu đề — nền Pink Aurora mới đủ sạch, chữ gradient tự nổi. */
+  display: none;
 }
 /* Modifier: vầng sáng lớn phủ mờ phía sau toàn bộ tiêu đề (không phải khối nền đặc) */
 .ph-glow.ph-glow-fill { inset: -20px; border-radius: 32px; }

@@ -7,9 +7,9 @@
  */
 
 export const MATERIAL_META = {
-  Water:      { emoji: '💧', label: 'Nước',       color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)' },
-  Sun:        { emoji: '☀️', label: 'Nắng',       color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
-  Fertilizer: { emoji: '🌿', label: 'Phân bón',   color: '#16a34a', bg: 'rgba(22, 163, 74, 0.12)' },
+  Water:      { emoji: '💧', label: 'Nước',       color: '#2563eb', bg: '#dbeafe' },
+  Sun:        { emoji: '☀️', label: 'Nắng',       color: '#d97706', bg: '#fdecc4' },
+  Fertilizer: { emoji: '🌿', label: 'Phân bón',   color: '#15803d', bg: '#d6f2df' },
 }
 
 export const MATERIALS = ['Water', 'Sun', 'Fertilizer']

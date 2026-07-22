@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect } from 'react'
 
-// App chỉ dùng chế độ SÁNG (light). Dark mode đã bị gỡ.
+// App chỉ dùng chế độ SÁNG (light). Dark mode đã gỡ.
 const ThemeContext = createContext({ theme: 'light', isDark: false, setTheme: () => {}, toggle: () => {} })
 
 export function ThemeProvider({ children }) {

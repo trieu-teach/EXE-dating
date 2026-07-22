@@ -1,0 +1,44 @@
+/* ── Hoa anh đào rơi (overlay toàn trang, không chặn chuột) ── */
+.sakura-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40; /* trên nội dung, dưới sidebar (60) và modal (300+) */
+  overflow: hidden;
+}
+
+/* Trục RƠI: đi thẳng từ trên xuống, tuyến tính, lặp vô hạn */
+.sakura-fall {
+  position: absolute;
+  top: -5%;
+  animation-name: sakura-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+@keyframes sakura-fall {
+  to { transform: translateY(110vh); }
+}
+
+/* Cánh hoa: LẮC ngang + xoay nhẹ qua lại (animation riêng, lồng trong trục rơi) */
+.sakura-petal {
+  display: block;
+  border-radius: 150% 0 150% 0; /* dáng cánh hoa */
+  background: radial-gradient(circle at 30% 30%, #ffb3d2, #ff6fa9);
+  box-shadow: 0 0 6px rgba(255, 110, 170, 0.35);
+  animation-name: sakura-sway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+.sakura-hue-1 { background: radial-gradient(circle at 30% 30%, #ffc4dc, #ff85b8); }
+.sakura-hue-2 { background: radial-gradient(circle at 30% 30%, #ffa9cc, #f75d9d); }
+@keyframes sakura-sway {
+  from { transform: translateX(-16px) rotate(-14deg); }
+  to   { transform: translateX(16px) rotate(52deg); }
+}
+
+/* Tôn trọng người dùng tắt chuyển động */
+@media (prefers-reduced-motion: reduce) {
+  .sakura-layer { display: none; }
+}

@@ -11,7 +11,10 @@
   content: '';
   position: fixed;
   inset: 0;
-  background: url('/assets/br-15.png') center top / cover no-repeat;
+  background:
+    radial-gradient(60% 44% at 50% -6%, rgba(255, 79, 139, 0.16), transparent 70%),
+    radial-gradient(46% 34% at 88% 6%, rgba(181, 75, 255, 0.10), transparent 72%),
+    linear-gradient(180deg, #ffe6f1 0%, #fff1f7 46%, #fff7fc 100%);
   pointer-events: none;
   z-index: 0;
 }
@@ -271,4 +274,37 @@
 }
 [data-theme='dark'] .settings-avatar-header::after {
   background: radial-gradient(circle, rgba(255, 79, 139, 0.12) 0%, transparent 70%);
+}
+
+/* ══ HƯỚNG A — thẻ mục cài đặt kính mờ 16% → trắng đặc cho rõ ══ */
+.settings-root .settings-section-card {
+  background: var(--color-surface, #fff) !important;
+  border: 1px solid rgba(20, 10, 30, 0.06) !important;
+  box-shadow: 0 8px 26px rgba(180, 60, 130, 0.08) !important;
+  backdrop-filter: none !important;
+}
+
+/* ══ Nền Pink Aurora — đồng bộ với trang Discovery ══ */
+.settings-root::before {
+  inset: -12%;
+  background:
+    radial-gradient(44% 38% at 14% 14%, rgba(255, 220, 235, 0.55), transparent 70%),
+    radial-gradient(38% 34% at 88% 78%, rgba(255, 220, 235, 0.38), transparent 70%),
+    radial-gradient(34% 30% at 88% 10%, rgba(243, 216, 255, 0.35), transparent 72%),
+    radial-gradient(20% 18% at 8% 88%, rgba(255, 233, 214, 0.30), transparent 70%),
+    #FFF8FB;
+  filter: blur(52px);
+}
+.settings-root::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(80px 80px at 16% 24%, rgba(255, 255, 255, 0.22), transparent 70%),
+    radial-gradient(56px 56px at 80% 16%, rgba(255, 255, 255, 0.16), transparent 70%),
+    radial-gradient(100px 100px at 90% 70%, rgba(255, 240, 248, 0.16), transparent 70%),
+    radial-gradient(44px 44px at 28% 80%, rgba(255, 255, 255, 0.12), transparent 70%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/></svg>");
+  pointer-events: none;
+  z-index: 0;
 }
