@@ -5,7 +5,7 @@ import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
 import { HeartIcon, StarIcon, CrownIcon, MatchHeartIcon } from '../../../components/ui/CustomIcons.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
-import ProfileDetailModal from '../../../components/User/ProfileDetailModal/ProfileDetailModal.jsx'
+import ProfilePreviewModal from '../../../components/User/ProfilePreviewModal/ProfilePreviewModal.jsx'
 import MatchCelebration from '../../../components/User/MatchCelebration/MatchCelebration.jsx'
 import AdminBadge from '../../../components/User/AdminBadge/AdminBadge.jsx'
 import AvatarFrame from '../../../components/User/AvatarFrame/AvatarFrame.jsx'
@@ -232,7 +232,12 @@ export default function Matches() {
 
           {!locked && (
             <div className="liked-card-v2-actions">
-              <button className="btn-view-profile" onClick={() => setDetail(u)}>
+              <button className="btn-view-profile" onClick={async () => {
+                // Lấy hồ sơ đầy đủ (kèm điểm sao + review) rồi mở modal GIỐNG bên Tin nhắn
+                try {
+                  setDetail(await profileService.byId(u.userId))
+                } catch { setDetail(u) }
+              }}>
                 Xem hồ sơ
               </button>
               <button className="btn-like-back" disabled={acting === u.userId} onClick={(e) => { e.stopPropagation(); act(u, 'Like') }}>
@@ -494,8 +499,8 @@ export default function Matches() {
         )}
       </AnimatePresence>
 
-      {/* Hồ sơ đầy đủ — giống nút i bên Discovery */}
-      <ProfileDetailModal profile={detail} open={!!detail} onClose={() => setDetail(null)} onSwipe={onDetailSwipe} />
+      {/* Hồ sơ — dùng chung modal với trang Tin nhắn (chỉ xem, kèm điểm sao + review) */}
+      <ProfilePreviewModal profile={detail} open={!!detail} onClose={() => setDetail(null)} ownerView={false} />
       <MatchCelebration match={celebrate} onClose={() => setCelebrate(null)} />
     </div>
   )

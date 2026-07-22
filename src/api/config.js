@@ -104,6 +104,10 @@ export const API_ENDPOINTS = {
   reputation: {
     me: '/api/reputation/me',
   },
+  reviews: {
+    pending: '/api/reviews/pending',
+    create: '/api/reviews',
+  },
   subscription: {
     plans: '/api/plans',
     me: '/api/subscription/me',

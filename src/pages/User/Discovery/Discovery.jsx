@@ -12,6 +12,7 @@ import AdminBadge from '../../../components/User/AdminBadge/AdminBadge.jsx'
 import AdminFireName from '../../../components/User/AdminBadge/AdminFireName.jsx'
 import AvatarFrame from '../../../components/User/AvatarFrame/AvatarFrame.jsx'
 import MatchCelebration from '../../../components/User/MatchCelebration/MatchCelebration.jsx'
+import ReviewsModal from '../../../components/User/ReviewsModal/ReviewsModal.jsx'
 import './Discovery.css'
 
 const GOAL_LABEL = {
@@ -240,6 +241,7 @@ function NewMatchesWidget() {
  */
 function CardContent({ profile }) {
   const [idx, setIdx] = useState(0)
+  const [reviewsOpen, setReviewsOpen] = useState(false)
   const photos = orderedPhotos(profile)
   const show = (i) => setIdx(Math.max(0, Math.min(photos.length - 1, i)))
   const chips = [
@@ -248,6 +250,7 @@ function CardContent({ profile }) {
     profile.datingGoal && (GOAL_LABEL[profile.datingGoal] || profile.datingGoal),
   ].filter(Boolean)
   return (
+    <>
     <AvatarFrame frame={profile.avatarFrame} size="xl">
       <div className="dtc-body">
         {photos.length > 0
@@ -291,9 +294,25 @@ function CardContent({ profile }) {
               {chips.map((c, i) => <span key={i} className="dtc-chip">{c}</span>)}
             </div>
           )}
+          <button
+            type="button"
+            className="dtc-reviews-btn"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); setReviewsOpen(true) }}
+          >
+            ⭐ Xem đánh giá
+          </button>
         </div>
       </div>
     </AvatarFrame>
+
+    <ReviewsModal
+      userId={profile.userId}
+      name={profile.displayName}
+      open={reviewsOpen}
+      onClose={() => setReviewsOpen(false)}
+    />
+    </>
   )
 }
 

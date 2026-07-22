@@ -328,6 +328,35 @@
 .dp-redeem-btn:disabled { opacity: 0.6; }
 .dp-voucher-done { color: #16a34a; flex-shrink: 0; }
 
+/* Nút "Đánh giá" trên voucher đã dùng */
+.dp-review-btn {
+  flex-shrink: 0; padding: 9px 14px; border: none; border-radius: 10px; cursor: pointer;
+  font-family: inherit; font-weight: 800; font-size: 0.8rem; color: #fff;
+  background: linear-gradient(135deg, #ff8f3f, #ff5f6d); transition: filter 0.15s;
+}
+.dp-review-btn:hover { filter: brightness(1.08); }
+
+/* Modal đánh giá */
+.dp-review-modal { text-align: center; }
+.dp-review-head { margin-bottom: 6px; }
+.dp-review-title { font-size: 1.15rem; font-weight: 800; color: var(--color-text, #1f2937); }
+.dp-review-sub { font-size: 0.9rem; color: var(--color-text-secondary, #6b7280); margin-top: 4px; }
+.dp-stars { display: flex; justify-content: center; gap: 6px; margin: 16px 0 4px; }
+.dp-star {
+  background: none; border: none; cursor: pointer; font-size: 2.4rem; line-height: 1;
+  color: #d9d4de; transition: transform 0.12s, color 0.12s; padding: 0;
+}
+.dp-star.is-on { color: #ffb400; }
+.dp-star:hover { transform: scale(1.15); }
+.dp-stars-label { min-height: 18px; font-size: 0.85rem; font-weight: 700; color: #ff8f3f; margin-bottom: 12px; }
+.dp-review-text {
+  width: 100%; box-sizing: border-box; resize: none; border-radius: 12px;
+  border: 1.5px solid var(--color-border, #e5e7eb); padding: 10px 12px; font-family: inherit;
+  font-size: 0.9rem; background: var(--color-surface, #fff); color: var(--color-text, #1f2937);
+  margin-bottom: 14px;
+}
+.dp-review-text:focus { outline: none; border-color: #ff8f3f; }
+
 /* Revenue dashboard */
 .dp-revenue { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; max-width: 760px; margin: 0 auto; }
 .dp-stat {

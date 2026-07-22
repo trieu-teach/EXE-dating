@@ -17,6 +17,74 @@ import { cn } from '../../../lib/utils'
 
 import './Profile.css'
 
+/** Dải sao (đầy theo điểm làm tròn). */
+function StarRow({ value = 0, size = 15 }) {
+  const filled = Math.round(value)
+  return (
+    <span className="rv-stars" style={{ fontSize: size }} aria-label={`${value} sao`}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <span key={n} className={n <= filled ? 'rv-star on' : 'rv-star'}>★</span>
+      ))}
+    </span>
+  )
+}
+
+/** Khối đánh giá sau buổi hẹn gắn vào hồ sơ. */
+function ReviewsBlock({ profile, isMe, navigate }) {
+  const count = profile.ratingCount || 0
+  if (count === 0) {
+    return isMe ? (
+      <div className="profile-card rv-empty">
+        <div className="profile-card-label">Đánh giá sau buổi hẹn</div>
+        <p className="rv-empty-text">Bạn chưa có đánh giá nào. Hãy hẹn hò và nhận đánh giá từ người ấy 💕</p>
+      </div>
+    ) : null
+  }
+  const avg = profile.ratingAvg || 0
+  return (
+    <div className="profile-card">
+      <div className="profile-card-label">Đánh giá sau buổi hẹn</div>
+      <div className="rv-summary">
+        <div className="rv-avg">{avg.toFixed(1)}</div>
+        <div className="rv-summary-right">
+          <StarRow value={avg} size={18} />
+          <div className="rv-count">{count} đánh giá</div>
+        </div>
+      </div>
+
+      {profile.reviewsLocked ? (
+        <button type="button" className="rv-locked" onClick={() => navigate('/premium')}>
+          <span className="rv-locked-ico">🔒</span>
+          <span className="rv-locked-text">
+            <strong>Nâng cấp Gold để đọc {count} đánh giá</strong>
+            <span>{isMe ? 'Xem người ấy nói gì về bạn sau buổi hẹn' : 'Xem người khác nói gì về người này'}</span>
+          </span>
+          <span className="rv-locked-cta">Gold →</span>
+        </button>
+      ) : (
+        <div className="rv-list">
+          {(profile.reviews || []).map((r) => (
+            <div key={r.id} className="rv-item">
+              <div className={`rv-item-avatar${r.reviewerAvatarUrl ? '' : ' rv-anon'}`}
+                style={r.reviewerAvatarUrl ? { backgroundImage: `url(${resolveImageUrl(r.reviewerAvatarUrl)})` } : undefined}>
+                {!r.reviewerAvatarUrl && '💬'}
+              </div>
+              <div className="rv-item-body">
+                <div className="rv-item-top">
+                  <span className="rv-item-name">{r.reviewerName}</span>
+                  <StarRow value={r.rating} size={14} />
+                </div>
+                {r.comment && <p className="rv-item-comment">{r.comment}</p>}
+                <div className="rv-item-date">{formatDate(r.createdAt)}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Profile() {
   const { userId } = useParams()
   const navigate = useNavigate()
@@ -106,6 +174,9 @@ export default function Profile() {
             </button>
           )}
         </div>
+
+        {/* ── Đánh giá sau buổi hẹn (điểm TB cho mọi người; nội dung chỉ Gold) ── */}
+        <ReviewsBlock profile={profile} isMe={isMe} navigate={navigate} />
 
         {/* ── Người khác: chỉ xem ── */}
         {!isMe && (

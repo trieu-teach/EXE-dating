@@ -12,6 +12,17 @@ const GOAL_LABEL = {
 }
 const GENDER_LABEL = { Male: 'Nam', Female: 'Nữ', Other: 'Khác' }
 
+function Stars({ value = 0 }) {
+  const filled = Math.round(value)
+  return (
+    <span className="pv-rv-stars">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <span key={n} className={n <= filled ? 'pv-rv-star on' : 'pv-rv-star'}>★</span>
+      ))}
+    </span>
+  )
+}
+
 const orderedPhotos = (p) => {
   const list = Array.isArray(p?.photos) ? [...p.photos] : []
   list.sort((a, b) => (b.isPrimary === true) - (a.isPrimary === true))
@@ -71,6 +82,37 @@ export default function ProfilePreviewModal({ profile, open, onClose, ownerView 
                 <div className="pv-panel">
                   <div className="pv-panel-label"><HeartIcon size={13} /> Giới thiệu về {name}</div>
                   <p className="pv-panel-bio">{profile.bio}</p>
+                </div>
+              )}
+
+              {/* Đánh giá sau buổi hẹn (điểm TB cho mọi người; nội dung chỉ Gold) */}
+              {profile.ratingCount > 0 && (
+                <div className="pv-panel">
+                  <div className="pv-panel-label"><StarIcon size={12} /> Đánh giá sau buổi hẹn</div>
+                  <div className="pv-rv-summary">
+                    <span className="pv-rv-avg">{(profile.ratingAvg || 0).toFixed(1)}</span>
+                    <span className="pv-rv-right">
+                      <Stars value={profile.ratingAvg} />
+                      <span className="pv-rv-count">{profile.ratingCount} đánh giá</span>
+                    </span>
+                  </div>
+                  {profile.reviewsLocked ? (
+                    <div className="pv-rv-locked">
+                      🔒 Chỉ tài khoản <strong>Gold</strong> mới đọc được {profile.ratingCount} đánh giá về {name}.
+                    </div>
+                  ) : (
+                    <div className="pv-rv-list">
+                      {(profile.reviews || []).map((r) => (
+                        <div key={r.id} className="pv-rv-item">
+                          <div className="pv-rv-item-top">
+                            <span className="pv-rv-item-name">{r.reviewerName}</span>
+                            <Stars value={r.rating} />
+                          </div>
+                          {r.comment && <p className="pv-rv-item-comment">{r.comment}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 

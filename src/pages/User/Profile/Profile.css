@@ -286,6 +286,49 @@
   color: var(--color-text-soft);
 }
 
+/* ── Đánh giá sau buổi hẹn ── */
+.rv-stars { display: inline-flex; gap: 1px; line-height: 1; }
+.rv-star { color: #d9d4de; }
+.rv-star.on { color: #ffb400; }
+
+.rv-summary { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+.rv-avg {
+  font-size: 2.2rem; font-weight: 900; line-height: 1;
+  background: linear-gradient(135deg, #ff8f3f, #ff4f8b);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.rv-summary-right { display: flex; flex-direction: column; gap: 3px; }
+.rv-count { font-size: 0.8rem; color: var(--color-text-muted); }
+
+.rv-empty-text { font-size: 0.88rem; color: var(--color-text-muted); margin-top: 4px; }
+
+/* Khoá — chỉ Gold đọc được */
+.rv-locked {
+  width: 100%; margin-top: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+  padding: 12px 14px; border: 1.5px dashed #ffcf8a; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255,215,111,0.12), rgba(255,143,63,0.10));
+  text-align: left; font-family: inherit;
+}
+.rv-locked-ico { font-size: 1.3rem; }
+.rv-locked-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.rv-locked-text strong { font-size: 0.9rem; color: var(--color-text); }
+.rv-locked-text span { font-size: 0.78rem; color: var(--color-text-muted); }
+.rv-locked-cta { font-weight: 800; color: #f5a623; font-size: 0.85rem; white-space: nowrap; }
+
+/* Danh sách review (Gold) */
+.rv-list { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.rv-item { display: flex; gap: 10px; }
+.rv-item-avatar {
+  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+  background-size: cover; background-position: center; background-color: var(--color-primary-soft, #ffe0ec);
+  display: flex; align-items: center; justify-content: center; font-weight: 800; color: #ff4f8b;
+}
+.rv-item-body { flex: 1; min-width: 0; }
+.rv-item-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.rv-item-name { font-weight: 700; font-size: 0.9rem; color: var(--color-text); }
+.rv-item-comment { font-size: 0.88rem; line-height: 1.5; color: var(--color-text-soft); margin: 4px 0 2px; }
+.rv-item-date { font-size: 0.72rem; color: var(--color-text-muted); }
+
 /* Interest tags */
 .profile-tags {
   display: flex;

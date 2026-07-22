@@ -35,6 +35,17 @@ const GOAL_LABELS = {
 }
 const GENDER_LABELS = { Male: 'Nam', Female: 'Nữ', Other: 'Khác' }
 
+function Stars({ value = 0 }) {
+  const filled = Math.round(value)
+  return (
+    <span className="pdm-rv-stars">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <span key={n} className={n <= filled ? 'pdm-rv-star on' : 'pdm-rv-star'}>★</span>
+      ))}
+    </span>
+  )
+}
+
 export default function ProfileDetailModal({ profile, open, onClose, onSwipe }) {
   const toast = useToast()
   const [swiping, setSwiping] = useState(false)
@@ -219,6 +230,37 @@ export default function ProfileDetailModal({ profile, open, onClose, onSwipe }) 
                 ? <p>{profile.bio}</p>
                 : <p className="pdm-bio-empty">{profile.displayName || 'Người ấy'} chưa viết giới thiệu — hãy bắt chuyện để hiểu họ hơn nhé 💬</p>}
             </div>
+
+            {/* Đánh giá sau buổi hẹn (điểm TB cho mọi người; nội dung chỉ Gold) */}
+            {profile.ratingCount > 0 && (
+              <div className="pdm-reviews">
+                <div className="pdm-bio-label">Đánh giá sau buổi hẹn</div>
+                <div className="pdm-rv-summary">
+                  <span className="pdm-rv-avg">{(profile.ratingAvg || 0).toFixed(1)}</span>
+                  <span className="pdm-rv-right">
+                    <Stars value={profile.ratingAvg} />
+                    <span className="pdm-rv-count">{profile.ratingCount} đánh giá</span>
+                  </span>
+                </div>
+                {profile.reviewsLocked ? (
+                  <div className="pdm-rv-locked">
+                    🔒 Chỉ tài khoản <strong>Gold</strong> mới đọc được {profile.ratingCount} đánh giá về {profile.displayName || 'người ấy'}.
+                  </div>
+                ) : (
+                  <div className="pdm-rv-list">
+                    {(profile.reviews || []).map((r) => (
+                      <div key={r.id} className="pdm-rv-item">
+                        <div className="pdm-rv-item-top">
+                          <span className="pdm-rv-item-name">{r.reviewerName}</span>
+                          <Stars value={r.rating} />
+                        </div>
+                        {r.comment && <p className="pdm-rv-item-comment">{r.comment}</p>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Interests */}
             {profile.interests?.length > 0 && (

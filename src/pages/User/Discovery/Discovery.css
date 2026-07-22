@@ -1188,6 +1188,19 @@
   font-weight: 700;
 }
 
+/* Nút xem đánh giá trên card Discovery */
+.dtc-reviews-btn {
+  margin-top: 11px;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 7px 14px; border: none; border-radius: 999px; cursor: pointer;
+  font-family: inherit; font-weight: 800; font-size: 0.78rem; color: #fff;
+  background: linear-gradient(135deg, rgba(255,143,63,0.95), rgba(255,79,139,0.95));
+  backdrop-filter: blur(4px); box-shadow: 0 4px 14px rgba(255,79,139,0.35);
+  transition: filter 0.15s, transform 0.12s;
+}
+.dtc-reviews-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.dtc-reviews-btn:active { transform: translateY(0); }
+
 /* Nút Áp dụng bộ lọc */
 .curate-apply {
   display: flex;

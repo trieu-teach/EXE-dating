@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { datePassService, subscriptionService } from '../../../api'
+import { datePassService, subscriptionService, reviewService } from '../../../api'
 import { useToast } from '../../../context/ToastContext.jsx'
 import { resolveImageUrl } from '../../../utils/format.js'
 import { brandBg } from '../../../utils/brandBg.js'
@@ -53,19 +53,56 @@ export default function DatePass() {
   const [voucher, setVoucher] = useState(null) // order vừa mua → hiện QR
   const [redeeming, setRedeeming] = useState(null)
 
+  // Đánh giá sau buổi hẹn
+  const [pending, setPending] = useState([])          // buổi hẹn chưa đánh giá
+  const [reviewFor, setReviewFor] = useState(null)    // pending item đang mở form
+  const [rating, setRating] = useState(0)
+  const [reviewComment, setReviewComment] = useState('')
+  const [submittingReview, setSubmittingReview] = useState(false)
+
   const reloadOrders = () =>
     datePassService.my().then((d) => setOrders(Array.isArray(d) ? d : (d?.items ?? []))).catch(() => {})
+  const reloadPending = () =>
+    reviewService.pending().then((d) => setPending(Array.isArray(d) ? d : (d?.items ?? []))).catch(() => {})
 
   useEffect(() => {
     Promise.all([
       datePassService.combos().catch(() => []),
       datePassService.my().catch(() => []),
       datePassService.eligibleMatches().catch(() => []),
-    ]).then(([c, o, m]) => {
+      reviewService.pending().catch(() => []),
+    ]).then(([c, o, m, p]) => {
       const norm = (x) => (Array.isArray(x) ? x : (x?.items ?? []))
-      setCombos(norm(c)); setOrders(norm(o)); setMatches(norm(m))
+      setCombos(norm(c)); setOrders(norm(o)); setMatches(norm(m)); setPending(norm(p))
     }).finally(() => setLoading(false))
   }, [])
+
+  // Tập orderId đang chờ đánh giá (để hiện nút "Đánh giá" trên voucher đã dùng)
+  const pendingSet = useMemo(() => new Set(pending.map((p) => p.datePassOrderId)), [pending])
+
+  const openReview = (order) => {
+    // tìm thông tin pending khớp order (để lấy tên đối phương)
+    const p = pending.find((x) => x.datePassOrderId === order.id)
+      || { datePassOrderId: order.id, partnerName: order.partnerName, venueName: order.venueName }
+    setReviewFor(p); setRating(0); setReviewComment('')
+  }
+
+  const submitReview = async () => {
+    if (!reviewFor) return
+    if (rating < 1) { toast.warn('Hãy chọn số sao (1–5).'); return }
+    setSubmittingReview(true)
+    try {
+      await reviewService.create({ datePassOrderId: reviewFor.datePassOrderId, rating, comment: reviewComment.trim() || null })
+      toast.success(`Đã gửi đánh giá ${rating}★ cho ${reviewFor.partnerName || 'người ấy'} 💖`)
+      setReviewFor(null)
+      reloadPending()
+    } catch (err) {
+      if (err?.status === 409) toast.error('Bạn đã đánh giá buổi hẹn này rồi.')
+      else toast.error(err?.message || 'Không gửi được đánh giá.')
+    } finally {
+      setSubmittingReview(false)
+    }
+  }
 
   // Quay về từ PayOS: chốt thanh toán (hỏi PayOS trạng thái thật) rồi làm mới voucher
   useEffect(() => {
@@ -120,6 +157,7 @@ export default function DatePass() {
       await datePassService.redeem(o.id)
       toast.success('Đã xác nhận sử dụng tại quán ✅')
       reloadOrders()
+      reloadPending()
     } catch (err) {
       toast.error(err?.message || 'Không xác nhận được.')
     } finally {
@@ -249,7 +287,11 @@ export default function DatePass() {
                         {redeeming === o.id ? <span className="spinner" /> : 'Quán xác nhận'}
                       </button>
                     )}
-                    {o.status === 'Redeemed' && <span className="dp-voucher-done"><CheckIcon size={20} /></span>}
+                    {o.status === 'Redeemed' && (
+                      pendingSet.has(o.id)
+                        ? <button className="dp-review-btn" onClick={() => openReview(o)}>⭐ Đánh giá</button>
+                        : <span className="dp-voucher-done" title="Đã đánh giá"><CheckIcon size={20} /></span>
+                    )}
                   </div>
                 )
               })}
@@ -360,6 +402,44 @@ export default function DatePass() {
                   )}
                 </>
               )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Modal đánh giá sau buổi hẹn ── */}
+      <AnimatePresence>
+        {reviewFor && (
+          <motion.div className="dp-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => !submittingReview && setReviewFor(null)}>
+            <motion.div className="dp-modal dp-review-modal" initial={{ opacity: 0, scale: 0.92, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }} onClick={(e) => e.stopPropagation()}>
+              <div className="dp-review-head">
+                <div className="dp-review-title">Đánh giá buổi hẹn</div>
+                <div className="dp-review-sub">Bạn thấy <strong>{reviewFor.partnerName || 'người ấy'}</strong> thế nào?</div>
+              </div>
+
+              <div className="dp-stars">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button key={n} type="button"
+                    className={`dp-star${n <= rating ? ' is-on' : ''}`}
+                    onClick={() => setRating(n)} aria-label={`${n} sao`}>★</button>
+                ))}
+              </div>
+              <div className="dp-stars-label">
+                {['', 'Tệ', 'Không hợp', 'Ổn', 'Tốt', 'Tuyệt vời'][rating]}
+              </div>
+
+              <textarea className="dp-review-text" rows={3} maxLength={500}
+                placeholder="Nhận xét ngắn (không bắt buộc)…"
+                value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} />
+
+              <div className="dp-modal-actions">
+                <button className="dp-pay-btn" disabled={submittingReview || rating < 1} onClick={submitReview}>
+                  {submittingReview ? <span className="spinner" /> : 'Gửi đánh giá'}
+                </button>
+                <button className="btn btn-ghost btn-sm" disabled={submittingReview} onClick={() => setReviewFor(null)}>Để sau</button>
+              </div>
             </motion.div>
           </motion.div>
         )}
